@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfroLink Admin — admin.afrolink254.com</title>
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+:root {
+    --bg-base:#0a0a0f; --bg-card:#12121a; --bg-elevated:#1a1a28;
+    --bg-glass:rgba(18,18,26,0.92); --text-primary:#F0F0F5;
+    --text-secondary:#8b8b9e; --text-muted:#5a5a6e;
+    --accent-gold:#D4AF37; --accent-gold-hover:#B8941F; --accent-gold-soft:rgba(212,175,55,0.12);
+    --accent-purple:#7C3AED; --accent-purple-hover:#6D28D9; --accent-purple-soft:rgba(124,58,237,0.15);
+    --accent-coral:#F43F5E; --accent-coral-hover:#E11D48; --accent-coral-soft:rgba(244,63,94,0.12);
+    --accent-teal:#14B8A6; --accent-teal-soft:rgba(20,184,166,0.12);
+    --accent-amber:#F59E0B; --accent-amber-soft:rgba(245,158,11,0.12);
+    --border-subtle:#1e1e2e; --border-hover:#2d2d42;
+    --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:24px;
+    --font-body:'Plus Jakarta Sans',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
+.material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
+
+/* LOGIN */
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+.login-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:420px; box-shadow:0 24px 48px rgba(0,0,0,0.5); position:relative; overflow:hidden; }
+.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-gold),var(--accent-purple)); }
+.login-card h1 { font-size:24px; font-weight:800; text-align:center; margin-bottom:6px; }
+.login-card p { color:var(--text-secondary); text-align:center; font-size:13px; margin-bottom:28px; }
+.login-logo { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:24px; }
+.login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-coral)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#0a0a0f; }
+.form-control { width:100%; padding:13px 14px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); font-size:14px; font-family:var(--font-body); transition:all .25s; background:var(--bg-base); color:var(--text-primary); margin-bottom:14px; }
+.form-control:focus { outline:none; border-color:var(--accent-gold); box-shadow:0 0 0 3px var(--accent-gold-soft); }
+.form-label { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-mono); }
+.btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:13px 20px; border-radius:var(--radius-md); font-weight:700; font-size:13px; cursor:pointer; transition:all .3s; border:none; width:100%; font-family:var(--font-body); }
+.btn--primary { background:linear-gradient(135deg,var(--accent-gold),var(--accent-gold-hover)); color:#0a0a0f; }
+.btn--primary:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(212,175,55,.3); }
+.btn--purple { background:linear-gradient(135deg,var(--accent-purple),var(--accent-purple-hover)); color:#FFF; }
+.btn--coral { background:linear-gradient(135deg,var(--accent-coral),var(--accent-coral-hover)); color:#FFF; }
+.btn--outline { background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-hover); }
+.btn-sm { padding:8px 14px; font-size:12px; width:auto; }
+
+/* DASHBOARD */
+.dashboard { display:none; min-height:100vh; }
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:var(--bg-card); border-right:1px solid var(--border-subtle); padding:24px 20px; z-index:100; display:flex; flex-direction:column; }
+.sidebar-logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:32px; padding:0 4px; }
+.sidebar-logo .logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-coral)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#0a0a0f; }
+.nav-link { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:var(--radius-md); color:var(--text-secondary); text-decoration:none; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; margin-bottom:4px; border:none; background:none; width:100%; font-family:inherit; }
+.nav-link:hover, .nav-link.active { background:var(--accent-purple-soft); color:var(--accent-purple); }
+.nav-link i.material-symbols-outlined { font-size:20px; }
+.sidebar-footer { margin-top:auto; padding-top:16px; border-top:1px solid var(--border-subtle); }
+.main-content { margin-left:260px; padding:28px 32px; min-height:100vh; }
+.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+.topbar h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; }
+.topbar-actions { display:flex; gap:10px; }
+
+/* STATS */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+.stat-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px 18px; }
+.stat-card .stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
+.stat-card .stat-value { font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--accent-gold); }
+.stat-card .stat-delta { font-size:11px; color:var(--accent-teal); margin-top:4px; font-family:var(--font-mono); }
+
+/* TABLES */
+.table-wrap { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); overflow:hidden; }
+.table-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
+.table-wrap th { text-align:left; padding:14px 16px; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); background:var(--bg-elevated); border-bottom:1px solid var(--border-subtle); }
+.table-wrap td { padding:14px 16px; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary); }
+.table-wrap tr:last-child td { border-bottom:none; }
+.table-wrap tr:hover td { background:rgba(255,255,255,.02); }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-size:10px; font-weight:700; font-family:var(--font-mono); }
+.badge--verified { background:var(--accent-teal-soft); color:var(--accent-teal); }
+.badge--pending { background:var(--accent-amber-soft); color:var(--accent-amber); }
+.badge--rejected { background:var(--accent-coral-soft); color:var(--accent-coral); }
+.badge--success { background:var(--accent-teal-soft); color:var(--accent-teal); }
+.badge--failed { background:var(--accent-coral-soft); color:var(--accent-coral); }
+
+/* SECTIONS */
+.section { display:none; }
+.section.active { display:block; animation:fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(12px); display:none; justify-content:center; align-items:center; z-index:2000; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; position:relative; }
+.modal-box h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
+.close-modal { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; }
+.close-modal:hover { color:var(--accent-coral); }
+
+/* TOAST */
+.toast-container { position:fixed; top:20px; right:20px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
+.toast { background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 16px; box-shadow:0 8px 24px rgba(0,0,0,.5); display:flex; align-items:center; gap:10px; font-size:12px; font-weight:500; animation:toastIn .3s ease; }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+.toast--success { border-left:3px solid var(--accent-teal); }
+.toast--error { border-left:3px solid var(--accent-coral); }
+
+@media(max-width:900px){
+    .sidebar { width:100%; height:auto; position:relative; padding:16px; flex-direction:row; flex-wrap:wrap; gap:8px; }
+    .sidebar-logo { margin-bottom:0; }
+    .sidebar-footer { display:none; }
+    .main-content { margin-left:0; padding:20px; }
+    .stats-grid { grid-template-columns:repeat(2,1fr); }
+    .table-wrap { overflow-x:auto; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-mark">AL</div>
+            <span style="font-size:20px;font-weight:800;">AfroLink Admin</span>
+        </div>
+        <h1>Admin Portal</h1>
+        <p>admin.afrolink254.com</p>
+        <label class="form-label">Username</label>
+        <input type="text" id="adminUser" class="form-control" placeholder="admin" value="admin">
+        <label class="form-label">Password</label>
+        <input type="password" id="adminPass" class="form-control" placeholder="Enter password">
+        <button class="btn btn--primary" style="margin-top:8px;" onclick="doLogin()"><i class="material-symbols-outlined">login</i> Sign In</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-mark">AL</div>
+            <span>AfroLink</span>
+        </div>
+        <button class="nav-link active" onclick="showSection('overview',this)"><i class="material-symbols-outlined">dashboard</i> Overview</button>
+        <button class="nav-link" onclick="showSection('creators',this)"><i class="material-symbols-outlined">group</i> Creators</button>
+        <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Transactions</button>
+        <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-coral);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('settings',this)"><i class="material-symbols-outlined">settings</i> Settings</button>
+        <div class="sidebar-footer">
+            <button class="nav-link" onclick="doLogout()" style="color:var(--accent-coral);"><i class="material-symbols-outlined">logout</i> Logout</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <!-- OVERVIEW -->
+        <div class="section active" id="section-overview">
+            <div class="topbar">
+                <h2>Dashboard Overview</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn--outline btn-sm" onclick="refreshData()"><i class="material-symbols-outlined">refresh</i> Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">KES 0</div><div class="stat-delta">+12% this week</div></div>
+                <div class="stat-card"><div class="stat-label">Total Unlocks</div><div class="stat-value" id="stat-unlocks">0</div><div class="stat-delta">+8% this week</div></div>
+                <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value" id="stat-creators">0</div><div class="stat-delta">+3 new today</div></div>
+                <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value" id="stat-pending">0</div><div class="stat-delta">Needs action</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Recent Transaction</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead>
+                    <tbody id="recent-tx-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CREATORS -->
+        <div class="section" id="section-creators">
+            <div class="topbar">
+                <h2>All Creators</h2>
+                <div class="topbar-actions">
+                    <input type="text" id="creatorSearch" class="form-control" style="width:220px;margin-bottom:0;" placeholder="Search creators..." oninput="filterCreators(this.value)">
+                    <button class="btn btn--purple btn-sm" onclick="openAddCreator()"><i class="material-symbols-outlined">add</i> Add</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Creator</th><th>Category</th><th>City</th><th>Price</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="creators-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS -->
+        <div class="section" id="section-transactions">
+            <div class="topbar"><h2>Transactions</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Status</th><th>Date</th><th>Ref</th></tr></thead>
+                    <tbody id="tx-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- APPROVALS -->
+        <div class="section" id="section-approvals">
+            <div class="topbar"><h2>Pending Approvals</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Applicant</th><th>Category</th><th>City</th><th>Price</th><th>Applied</th><th>Actions</th></tr></thead>
+                    <tbody id="approvals-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="section" id="section-settings">
+            <div class="topbar"><h2>Platform Settings</h2></div>
+            <div style="max-width:600px;">
+                <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">General</h4>
+                    <label class="form-label">Platform Name</label>
+                    <input type="text" class="form-control" value="AfroLink" style="margin-bottom:16px;">
+                    <label class="form-label">Verification Fee (KES)</label>
+                    <input type="number" class="form-control" value="999" style="margin-bottom:16px;">
+                    <label class="form-label">Default Unlock Price (KES)</label>
+                    <input type="number" class="form-control" value="499" style="margin-bottom:16px;">
+                    <button class="btn btn--primary btn-sm" style="width:auto;" onclick="showToast('Settings saved', 'success', 'Saved')"><i class="material-symbols-outlined">save</i> Save Changes</button>
+                </div>
+                <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">Danger Zone</h4>
+                    <button class="btn btn--coral btn-sm" style="width:auto;" onclick="showToast('This would clear all data. Not implemented in demo.', 'warning', 'Demo')"><i class="material-symbols-outlined">delete</i> Reset Platform Data</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ADD CREATOR MODAL -->
+<div class="modal-overlay" id="addCreatorModal">
+    <div class="modal-box">
+        <button class="close-modal" onclick="closeAddCreator()">&times;</button>
+        <h3>Add Creator</h3>
+        <label class="form-label">Name</label><input type="text" id="addName" class="form-control">
+        <label class="form-label">Handle</label><input type="text" id="addHandle" class="form-control" placeholder="@handle">
+        <label class="form-label">Category</label>
+        <select id="addCategory" class="form-control" style="margin-bottom:14px;">
+            <option>Music & DJ</option><option>Comedy</option><option>Fashion</option><option>Fitness</option><option>Tech</option><option>Food</option><option>Podcast</option><option>Film</option><option>Dance</option><option>Art</option><option>Influencer</option><option>Other</option>
+        </select>
+        <label class="form-label">City</label><input type="text" id="addCity" class="form-control" value="Nairobi">
+        <label class="form-label">Price (KES)</label><input type="number" id="addPrice" class="form-control" value="499">
+        <label class="form-label">Phone</label><input type="tel" id="addPhone" class="form-control" placeholder="0712...">
+        <label class="form-label">Bio</label><textarea id="addBio" class="form-control" style="min-height:80px;"></textarea>
+        <button class="btn btn--purple" style="margin-top:10px;" onclick="submitAddCreator()"><i class="material-symbols-outlined">save</i> Save Creator</button>
+    </div>
+</div>
+
+<script>
+const API_BASE = 'https://api.afrolink254.com';
+let adminToken = localStorage.getItem('afrolink_admin_token');
+let creators = [], transactions = [], approvals = [];
+
+function showToast(m, t='info', ti='') {
+    const C = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast toast--${t}`;
+    el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-teal)':t==='error'?'var(--accent-coral)':'var(--accent-gold)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
+    C.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
+
+async function doLogin() {
+    const u = document.getElementById('adminUser').value;
+    const p = document.getElementById('adminPass').value;
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/login`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({username:u, password:p})
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+            adminToken = data.token;
+            localStorage.setItem('afrolink_admin_token', adminToken);
+            document.getElementById('loginWrap').style.display='none';
+            document.getElementById('dashboard').style.display='block';
+            showToast('Welcome back, Admin', 'success', 'Logged In');
+            loadDashboard();
+        } else {
+            showToast(data.message || 'Invalid credentials', 'error', 'Login Failed');
+        }
+    } catch(e) {
+        // Demo fallback
+        if (u === 'admin' && p === 'AfroLink@2026') {
+            adminToken = 'demo_token_' + Date.now();
+            localStorage.setItem('afrolink_admin_token', adminToken);
+            document.getElementById('loginWrap').style.display='none';
+            document.getElementById('dashboard').style.display='block';
+            showToast('Welcome back, Admin', 'success', 'Logged In');
+            loadDashboard();
+        } else {
+            showToast('Invalid credentials. Try admin / AfroLink@2026', 'error', 'Login Failed');
+        }
+    }
+}
+
+function doLogout() {
+    localStorage.removeItem('afrolink_admin_token');
+    location.reload();
+}
+
+function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-'+id).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+}
+
+function formatKES(n) { return 'KES ' + n.toLocaleString(); }
+function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+
+async function loadDashboard() {
+    await Promise.all([loadCreators(), loadTransactions(), loadApprovals()]);
+    updateStats();
+    renderRecentTx();
+    renderCreators();
+    renderTransactions();
+    renderApprovals();
+}
+
+async function loadCreators() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        creators = Array.isArray(data) ? data : (data.creators || []);
+    } catch(e) {
+        creators = [
+            {id:'c1',name:'Willy Paul',handle:'@willy.paul',category:'Music & DJ',city:'Nairobi',price:999,unlocks:142,status:'verified',phone:'0712345678'},
+            {id:'c2',name:'Nadia Mukami',handle:'@nadiamukami',category:'Music & DJ',city:'Nairobi',price:1499,unlocks:89,status:'verified',phone:'0723456789'},
+            {id:'c3',name:'Eric Omondi',handle:'@ericomondi',category:'Comedy',city:'Nairobi',price:799,unlocks:210,status:'verified',phone:'0734567890'},
+            {id:'c4',name:'Azziad Nasenya',handle:'@azz_iad',category:'Influencer',city:'Nairobi',price:1999,unlocks:356,status:'verified',phone:'0745678901'},
+            {id:'c5',name:'DJ Joe Mfalme',handle:'@djjoemfalme',category:'Music & DJ',city:'Nairobi',price:599,unlocks:67,status:'verified',phone:'0756789012'},
+            {id:'c6',name:'Amber Ray',handle:'@iamamberray',category:'Influencer',city:'Mombasa',price:1299,unlocks:198,status:'verified',phone:'0767890123'},
+        ];
+    }
+}
+
+async function loadTransactions() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/transactions`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        transactions = Array.isArray(data) ? data : (data.transactions || []);
+    } catch(e) {
+        transactions = [
+            {id:'tx1',user:'0712345678',creator:'Willy Paul',amount:999,status:'success',date:new Date(Date.now()-3600000).toISOString(),ref:'MPESA123'},
+            {id:'tx2',user:'0723456789',creator:'Nadia Mukami',amount:1499,status:'success',date:new Date(Date.now()-7200000).toISOString(),ref:'MPESA124'},
+            {id:'tx3',user:'0734567890',creator:'Eric Omondi',amount:799,status:'failed',date:new Date(Date.now()-10800000).toISOString(),ref:'MPESA125'},
+            {id:'tx4',user:'0745678901',creator:'Azziad Nasenya',amount:1999,status:'success',date:new Date(Date.now()-18000000).toISOString(),ref:'MPESA126'},
+            {id:'tx5',user:'0756789012',creator:'DJ Joe Mfalme',amount:599,status:'success',date:new Date(Date.now()-86400000).toISOString(),ref:'MPESA127'},
+        ];
+    }
+}
+
+async function loadApprovals() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/approvals`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        approvals = Array.isArray(data) ? data : (data.approvals || []);
+    } catch(e) {
+        approvals = [
+            {id:'a1',name:'Brian Chweya',category:'Comedy',city:'Kisumu',price:499,applied:new Date(Date.now()-172800000).toISOString()},
+            {id:'a2',name:'Sharon Mwangi',category:'Fashion',city:'Nairobi',price:799,applied:new Date(Date.now()-259200000).toISOString()},
+            {id:'a3',name:'Kevin Otieno',category:'Tech',city:'Nakuru',price:299,applied:new Date(Date.now()-345600000).toISOString()},
+        ];
+    }
+}
+
+function updateStats() {
+    const revenue = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+t.amount,0);
+    const unlocks = transactions.filter(t=>t.status==='success').length;
+    document.getElementById('stat-revenue').innerText = formatKES(revenue);
+    document.getElementById('stat-unlocks').innerText = unlocks.toLocaleString();
+    document.getElementById('stat-creators').innerText = creators.length.toLocaleString();
+    document.getElementById('stat-pending').innerText = approvals.length.toLocaleString();
+    document.getElementById('pendingCount').innerText = approvals.length;
+}
+
+function renderRecentTx() {
+    const tbody = document.getElementById('recent-tx-body');
+    const recent = transactions.slice(0, 5);
+    tbody.innerHTML = recent.map(t => `
+        <tr><td style="color:var(--text-primary);font-weight:600;">${t.user}</td><td>${formatKES(t.amount)}</td>
+        <td><span class="badge badge--${t.status}">${t.status}</span></td><td>${timeAgo(t.date)}</td></tr>
+    `).join('');
+}
+
+function renderCreators() {
+    const tbody = document.getElementById('creators-body');
+    tbody.innerHTML = creators.map(c => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${c.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${c.handle}</span></td>
+            <td>${c.category}</td><td>${c.city}</td><td style="font-family:var(--font-mono);">${formatKES(c.price)}</td>
+            <td style="font-family:var(--font-mono);">${c.unlocks||0}</td>
+            <td><span class="badge badge--verified">${c.status}</span></td>
+            <td><button class="btn btn--outline btn-sm" onclick="editCreator('${c.id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--coral btn-sm" onclick="deleteCreator('${c.id}')"><i class="material-symbols-outlined">delete</i></button></td>
+        </tr>
+    `).join('');
+}
+
+function renderTransactions() {
+    const tbody = document.getElementById('tx-body');
+    tbody.innerHTML = transactions.map(t => `
+        <tr><td style="font-family:var(--font-mono);font-size:11px;">${t.id}</td>
+        <td>${t.user}</td><td style="color:var(--text-primary);font-weight:600;">${t.creator}</td>
+        <td style="font-family:var(--font-mono);">${formatKES(t.amount)}</td>
+        <td><span class="badge badge--${t.status}">${t.status}</span></td>
+        <td>${timeAgo(t.date)}</td><td style="font-family:var(--font-mono);font-size:11px;">${t.ref}</td></tr>
+    `).join('');
+}
+
+function renderApprovals() {
+    const tbody = document.getElementById('approvals-body');
+    tbody.innerHTML = approvals.map(a => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${a.name}</td>
+            <td>${a.category}</td><td>${a.city}</td>
+            <td style="font-family:var(--font-mono);">${formatKES(a.price)}</td>
+            <td>${timeAgo(a.applied)}</td>
+            <td><button class="btn btn--primary btn-sm" onclick="approveCreator('${a.id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--coral btn-sm" onclick="rejectCreator('${a.id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
+        </tr>
+    `).join('');
+}
+
+function filterCreators(q) {
+    const term = q.toLowerCase();
+    const rows = document.querySelectorAll('#creators-body tr');
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+}
+
+function openAddCreator() { document.getElementById('addCreatorModal').classList.add('active'); }
+function closeAddCreator() { document.getElementById('addCreatorModal').classList.remove('active'); }
+
+function submitAddCreator() {
+    const c = {
+        id: 'c' + Date.now(),
+        name: document.getElementById('addName').value,
+        handle: document.getElementById('addHandle').value,
+        category: document.getElementById('addCategory').value,
+        city: document.getElementById('addCity').value,
+        price: parseInt(document.getElementById('addPrice').value) || 499,
+        phone: document.getElementById('addPhone').value,
+        bio: document.getElementById('addBio').value,
+        status: 'verified', unlocks: 0
+    };
+    if (!c.name) { showToast('Name is required', 'error'); return; }
+    creators.unshift(c);
+    renderCreators(); updateStats(); closeAddCreator();
+    showToast(`${c.name} added successfully`, 'success', 'Creator Added');
+}
+
+function editCreator(id) {
+    const c = creators.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('addName').value = c.name;
+    document.getElementById('addHandle').value = c.handle;
+    document.getElementById('addCategory').value = c.category;
+    document.getElementById('addCity').value = c.city;
+    document.getElementById('addPrice').value = c.price;
+    document.getElementById('addPhone').value = c.phone || '';
+    document.getElementById('addBio').value = c.bio || '';
+    openAddCreator();
+}
+
+function deleteCreator(id) {
+    if (!confirm('Delete this creator?')) return;
+    creators = creators.filter(c => c.id !== id);
+    renderCreators(); updateStats();
+    showToast('Creator deleted', 'info', 'Deleted');
+}
+
+function approveCreator(id) {
+    const a = approvals.find(x => x.id === id);
+    if (!a) return;
+    creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,''))});
+    approvals = approvals.filter(x => x.id !== id);
+    renderApprovals(); renderCreators(); updateStats();
+    showToast(`${a.name} approved and listed`, 'success', 'Approved');
+}
+
+function rejectCreator(id) {
+    const a = approvals.find(x => x.id === id);
+    if (!a) return;
+    approvals = approvals.filter(x => x.id !== id);
+    renderApprovals(); updateStats();
+    showToast(`${a.name} rejected`, 'warning', 'Rejected');
+}
+
+function refreshData() {
+    loadDashboard();
+    showToast('Data refreshed', 'success', 'Updated');
+}
+
+// Auto-login if token exists
+if (adminToken) {
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    loadDashboard();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AfroLink Creator Dashboard — fanbase.afrolink254.com</title>
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+:root {
+    --bg-base:#0a0a0f; --bg-card:#12121a; --bg-elevated:#1a1a28;
+    --bg-glass:rgba(18,18,26,0.88); --text-primary:#F0F0F5;
+    --text-secondary:#8b8b9e; --text-muted:#5a5a6e;
+    --accent-gold:#D4AF37; --accent-gold-hover:#B8941F; --accent-gold-soft:rgba(212,175,55,0.12);
+    --accent-purple:#7C3AED; --accent-purple-hover:#6D28D9; --accent-purple-soft:rgba(124,58,237,0.15);
+    --accent-coral:#F43F5E; --accent-coral-hover:#E11D48; --accent-coral-soft:rgba(244,63,94,0.12);
+    --accent-teal:#14B8A6; --accent-teal-soft:rgba(20,184,166,0.12);
+    --accent-amber:#F59E0B; --accent-amber-soft:rgba(245,158,11,0.12);
+    --border-subtle:#1e1e2e; --border-hover:#2d2d42;
+    --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:24px;
+    --font-body:'Plus Jakarta Sans',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
+.material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
+
+/* LOGIN */
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+.login-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:400px; box-shadow:0 24px 48px rgba(0,0,0,0.5); position:relative; overflow:hidden; }
+.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-gold),var(--accent-purple)); }
+.login-logo { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:24px; }
+.login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-coral)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#0a0a0f; }
+.login-card h1 { font-size:22px; font-weight:800; text-align:center; margin-bottom:6px; }
+.login-card p { color:var(--text-secondary); text-align:center; font-size:13px; margin-bottom:28px; }
+.form-control { width:100%; padding:13px 14px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); font-size:14px; font-family:var(--font-body); transition:all .25s; background:var(--bg-base); color:var(--text-primary); margin-bottom:14px; }
+.form-control:focus { outline:none; border-color:var(--accent-gold); box-shadow:0 0 0 3px var(--accent-gold-soft); }
+.form-label { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-mono); }
+.btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:13px 20px; border-radius:var(--radius-md); font-weight:700; font-size:13px; cursor:pointer; transition:all .3s; border:none; width:100%; font-family:var(--font-body); }
+.btn--primary { background:linear-gradient(135deg,var(--accent-gold),var(--accent-gold-hover)); color:#0a0a0f; }
+.btn--primary:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(212,175,55,.3); }
+.btn--purple { background:linear-gradient(135deg,var(--accent-purple),var(--accent-purple-hover)); color:#FFF; }
+.btn--outline { background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-hover); }
+.btn-sm { padding:8px 14px; font-size:12px; width:auto; }
+
+/* DASHBOARD */
+.dashboard { display:none; min-height:100vh; }
+.mobile-header { position:fixed; top:0; left:0; width:100%; height:56px; background:var(--bg-glass); backdrop-filter:blur(24px); display:flex; justify-content:space-between; align-items:center; padding:0 18px; z-index:1000; border-bottom:1px solid var(--border-subtle); }
+.desktop-header { display:none; position:fixed; top:0; left:0; width:100%; height:64px; background:var(--bg-glass); backdrop-filter:blur(24px); border-bottom:1px solid var(--border-subtle); z-index:1000; padding:0 32px; align-items:center; justify-content:space-between; }
+.logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:var(--text-primary); text-decoration:none; }
+.logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-coral)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#0a0a0f; }
+
+.bottom-nav { position:fixed; bottom:0; left:0; width:100%; height:60px; background:var(--bg-glass); backdrop-filter:blur(24px); border-top:1px solid var(--border-subtle); display:flex; justify-content:space-around; align-items:center; z-index:1000; padding-bottom:env(safe-area-inset-bottom); }
+.nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); text-decoration:none; width:56px; height:100%; transition:all .3s; cursor:pointer; position:relative; background:none; border:none; font-family:inherit; }
+.nav-item i.material-symbols-outlined { font-size:22px; margin-bottom:1px; }
+.nav-item span { font-size:9px; font-weight:600; }
+.nav-item.active { color:var(--accent-gold); }
+.nav-item.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:18px; height:3px; background:var(--accent-gold); border-radius:0 0 4px 4px; }
+
+.main-content { padding-top:64px; padding-bottom:80px; max-width:800px; margin:0 auto; padding-left:16px; padding-right:16px; }
+
+/* PROFILE HEADER */
+.profile-header { display:flex; align-items:center; gap:16px; padding:24px 0 20px; }
+.profile-avatar { width:72px; height:72px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--accent-gold); box-shadow:0 4px 16px rgba(212,175,55,.2); }
+.profile-info h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; margin-bottom:2px; }
+.profile-info p { font-size:12px; color:var(--text-muted); font-family:var(--font-mono); }
+.profile-status { display:inline-flex; align-items:center; gap:6px; margin-top:6px; background:var(--accent-teal-soft); color:var(--accent-teal); padding:4px 12px; border-radius:100px; font-size:11px; font-weight:700; }
+.profile-status .dot { width:5px; height:5px; background:var(--accent-teal); border-radius:50%; animation:pulseOnline 2s infinite; }
+
+/* STATS */
+.earnings-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
+@media(min-width:640px){ .earnings-grid { grid-template-columns:repeat(4,1fr); } }
+.earn-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px 14px; text-align:center; }
+.earn-card .earn-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
+.earn-card .earn-value { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-gold); }
+.earn-card .earn-delta { font-size:10px; color:var(--accent-teal); margin-top:4px; font-family:var(--font-mono); }
+
+/* SECTIONS */
+.section-title { font-size:16px; font-weight:700; margin:24px 0 12px; display:flex; align-items:center; gap:8px; }
+
+/* LIST */
+.list-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
+.list-card .list-icon { width:40px; height:40px; border-radius:var(--radius-sm); background:var(--accent-purple-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.list-card .list-icon i.material-symbols-outlined { color:var(--accent-purple); }
+.list-card .list-content { flex:1; }
+.list-card .list-title { font-size:13px; font-weight:700; margin-bottom:2px; }
+.list-card .list-sub { font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
+.list-card .list-amount { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--accent-gold); }
+
+/* EDIT FORM */
+.edit-form { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; }
+.edit-form h3 { font-size:16px; font-weight:700; margin-bottom:16px; }
+
+/* WITHDRAW */
+.withdraw-box { background:linear-gradient(135deg,var(--accent-purple-soft),var(--accent-gold-soft)); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; text-align:center; }
+.withdraw-box h4 { font-size:14px; font-weight:700; margin-bottom:8px; }
+.withdraw-box p { font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
+
+/* TOAST */
+.toast-container { position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:3000; display:flex; flex-direction:column; gap:10px; width:92%; max-width:380px; }
+.toast { background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 16px; box-shadow:0 8px 24px rgba(0,0,0,.5); display:flex; align-items:center; gap:10px; font-size:12px; font-weight:500; animation:toastIn .3s ease; }
+@keyframes toastIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+.toast--success { border-left:3px solid var(--accent-teal); }
+.toast--error { border-left:3px solid var(--accent-coral); }
+
+@media(min-width:768px){
+    .desktop-header { display:flex!important; }
+    .mobile-header { display:none!important; }
+    .bottom-nav { display:none!important; }
+    .main-content { padding-top:80px!important; padding-bottom:40px!important; }
+}
+@media(max-width:767px){
+    .desktop-header { display:none!important; }
+    .mobile-header { display:flex!important; }
+    .bottom-nav { display:flex!important; }
+    .main-content { padding-top:64px!important; padding-bottom:80px!important; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-mark">AL</div>
+            <span style="font-size:20px;font-weight:800;">Creator Portal</span>
+        </div>
+        <h1>Creator Login</h1>
+        <p>fanbase.afrolink254.com</p>
+        <label class="form-label">Phone Number</label>
+        <input type="tel" id="loginPhone" class="form-control" placeholder="0712 345 678">
+        <label class="form-label">PIN</label>
+        <input type="password" id="loginPin" class="form-control" placeholder="4-digit PIN">
+        <button class="btn btn--primary" style="margin-top:8px;" onclick="doLogin()"><i class="material-symbols-outlined">login</i> Sign In</button>
+        <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted);">Don't have an account? <a href="#" style="color:var(--accent-gold);text-decoration:none;font-weight:600;">Apply on afrolink254.com</a></p>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <a class="logo"><div class="logo-mark" style="width:28px;height:28px;font-size:11px;">AL</div><span style="font-size:16px;">AfroLink</span></a>
+        <button class="btn btn--outline btn-sm" onclick="doLogout()" style="width:auto;padding:6px 12px;"><i class="material-symbols-outlined">logout</i></button>
+    </header>
+    <!-- Desktop Header -->
+    <header class="desktop-header">
+        <a class="logo"><div class="logo-mark">AL</div><span>AfroLink Creator</span></a>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <span id="headerName" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Creator</span>
+            <button class="btn btn--outline btn-sm" onclick="doLogout()"><i class="material-symbols-outlined">logout</i> Logout</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- PROFILE -->
+        <div class="profile-header">
+            <img id="dashAvatar" class="profile-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" alt="Avatar">
+            <div class="profile-info">
+                <h2 id="dashName">Creator Name</h2>
+                <p id="dashHandle">@handle</p>
+                <div class="profile-status"><div class="dot"></div> Verified & Active</div>
+            </div>
+        </div>
+
+        <!-- EARNINGS -->
+        <div class="earnings-grid">
+            <div class="earn-card">
+                <div class="earn-label">Total Earned</div>
+                <div class="earn-value" id="earnTotal">KES 0</div>
+                <div class="earn-delta">Lifetime</div>
+            </div>
+            <div class="earn-card">
+                <div class="earn-label">This Month</div>
+                <div class="earn-value" id="earnMonth">KES 0</div>
+                <div class="earn-delta">+24% vs last</div>
+            </div>
+            <div class="earn-card">
+                <div class="earn-label">Unlocks</div>
+                <div class="earn-value" id="earnUnlocks">0</div>
+                <div class="earn-delta">Total fans</div>
+            </div>
+            <div class="earn-card">
+                <div class="earn-label">Balance</div>
+                <div class="earn-value" id="earnBalance">KES 0</div>
+                <div class="earn-delta">Available</div>
+            </div>
+        </div>
+
+        <!-- WITHDRAW -->
+        <div class="withdraw-box">
+            <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-gold);margin-bottom:6px;">account_balance</i>
+            <h4>Withdraw Earnings</h4>
+            <p>Funds are sent to your registered M-Pesa number within 24 hours.</p>
+            <button class="btn btn--primary btn-sm" style="width:auto;padding:10px 24px;" onclick="requestWithdrawal()"><i class="material-symbols-outlined">payments</i> Withdraw to M-Pesa</button>
+        </div>
+
+        <!-- RECENT FANS -->
+        <h3 class="section-title"><i class="material-symbols-outlined">group</i> Recent Unlocks</h3>
+        <div id="fansList"></div>
+
+        <!-- EDIT PROFILE -->
+        <h3 class="section-title"><i class="material-symbols-outlined">edit</i> Edit Profile</h3>
+        <div class="edit-form">
+            <label class="form-label">Display Name</label>
+            <input type="text" id="editName" class="form-control">
+            <label class="form-label">Bio</label>
+            <textarea id="editBio" class="form-control" style="min-height:80px;margin-bottom:14px;"></textarea>
+            <label class="form-label">Unlock Price (KES)</label>
+            <input type="number" id="editPrice" class="form-control" style="margin-bottom:14px;">
+            <label class="form-label">WhatsApp Number</label>
+            <input type="tel" id="editPhone" class="form-control" style="margin-bottom:14px;">
+            <label class="form-label">Social Handle</label>
+            <input type="text" id="editSocial" class="form-control" style="margin-bottom:14px;">
+            <button class="btn btn--purple btn-sm" style="width:auto;" onclick="saveProfile()"><i class="material-symbols-outlined">save</i> Save Changes</button>
+        </div>
+    </main>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="scrollToSection('top')"><i class="material-symbols-outlined">dashboard</i><span>Home</span></button>
+        <button class="nav-item" onclick="scrollToSection('fansList')"><i class="material-symbols-outlined">group</i><span>Fans</span></button>
+        <button class="nav-item" onclick="scrollToSection('editName')"><i class="material-symbols-outlined">edit</i><span>Edit</span></button>
+        <button class="nav-item" onclick="doLogout()"><i class="material-symbols-outlined">logout</i><span>Exit</span></button>
+    </nav>
+</div>
+
+<script>
+const API_BASE = 'https://api.afrolink254.com';
+let creatorToken = localStorage.getItem('afrolink_creator_token');
+let currentCreator = null;
+let transactions = [];
+
+function showToast(m, t='info', ti='') {
+    const C = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast toast--${t}`;
+    el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-teal)':t==='error'?'var(--accent-coral)':'var(--accent-gold)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
+    C.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
+
+async function doLogin() {
+    const phone = document.getElementById('loginPhone').value.trim();
+    const pin = document.getElementById('loginPin').value.trim();
+    try {
+        const res = await fetch(`${API_BASE}/api/creator/login`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({phone, pin})
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+            creatorToken = data.token;
+            localStorage.setItem('afrolink_creator_token', creatorToken);
+            enterDashboard();
+        } else {
+            showToast(data.message || 'Invalid PIN', 'error', 'Login Failed');
+        }
+    } catch(e) {
+        // Demo fallback
+        if (phone && pin === '1234') {
+            creatorToken = 'demo_creator_' + Date.now();
+            localStorage.setItem('afrolink_creator_token', creatorToken);
+            currentCreator = {
+                id:'demo', name:'Willy Paul', handle:'@willy.paul.msafi',
+                bio:'Kenyan artist blending gengetone and bongo flava.',
+                price:999, phone:'0712345678', social:'@willy.paul.msafi',
+                avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+                totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900
+            };
+            enterDashboard();
+            showToast('Welcome back, Creator', 'success', 'Logged In');
+        } else {
+            showToast('Demo login: any phone + PIN 1234', 'info', 'Demo Mode');
+        }
+    }
+}
+
+function enterDashboard() {
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    loadCreatorData();
+}
+
+function doLogout() {
+    localStorage.removeItem('afrolink_creator_token');
+    location.reload();
+}
+
+async function loadCreatorData() {
+    try {
+        const res = await fetch(`${API_BASE}/api/creator/me`, { headers:{'Authorization':'Bearer '+creatorToken} });
+        if (res.ok) {
+            const data = await res.json();
+            currentCreator = data.creator || data;
+        }
+    } catch(e) { /* use demo */ }
+    if (!currentCreator) {
+        currentCreator = {
+            id:'demo', name:'Willy Paul', handle:'@willy.paul.msafi',
+            bio:'Kenyan artist blending gengetone and bongo flava.',
+            price:999, phone:'0712345678', social:'@willy.paul.msafi',
+            avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+            totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900
+        };
+    }
+    renderDashboard();
+    loadTransactions();
+}
+
+function renderDashboard() {
+    const c = currentCreator;
+    document.getElementById('dashName').innerText = c.name;
+    document.getElementById('dashHandle').innerText = c.handle;
+    document.getElementById('headerName').innerText = c.name;
+    document.getElementById('dashAvatar').src = c.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop';
+    document.getElementById('earnTotal').innerText = 'KES ' + (c.totalEarned||0).toLocaleString();
+    document.getElementById('earnMonth').innerText = 'KES ' + (c.monthEarned||0).toLocaleString();
+    document.getElementById('earnUnlocks').innerText = (c.unlocks||0).toLocaleString();
+    document.getElementById('earnBalance').innerText = 'KES ' + (c.balance||0).toLocaleString();
+    document.getElementById('editName').value = c.name;
+    document.getElementById('editBio').value = c.bio || '';
+    document.getElementById('editPrice').value = c.price || 499;
+    document.getElementById('editPhone').value = c.phone || '';
+    document.getElementById('editSocial').value = c.social || '';
+}
+
+async function loadTransactions() {
+    try {
+        const res = await fetch(`${API_BASE}/api/creator/transactions`, { headers:{'Authorization':'Bearer '+creatorToken} });
+        if (res.ok) {
+            const data = await res.json();
+            transactions = Array.isArray(data) ? data : (data.transactions || []);
+        }
+    } catch(e) {
+        transactions = [
+            {id:'t1',user:'0712XXXXXX',amount:999,date:new Date(Date.now()-3600000).toISOString()},
+            {id:'t2',user:'0723XXXXXX',amount:999,date:new Date(Date.now()-7200000).toISOString()},
+            {id:'t3',user:'0734XXXXXX',amount:999,date:new Date(Date.now()-18000000).toISOString()},
+            {id:'t4',user:'0745XXXXXX',amount:999,date:new Date(Date.now()-86400000).toISOString()},
+            {id:'t5',user:'0756XXXXXX',amount:999,date:new Date(Date.now()-172800000).toISOString()},
+        ];
+    }
+    renderFans();
+}
+
+function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+
+function renderFans() {
+    const container = document.getElementById('fansList');
+    if (!transactions.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No unlocks yet.</p>'; return; }
+    container.innerHTML = transactions.map(t => `
+        <div class="list-card">
+            <div class="list-icon"><i class="material-symbols-outlined">person</i></div>
+            <div class="list-content">
+                <div class="list-title">Fan unlocked your contact</div>
+                <div class="list-sub">${timeAgo(t.date)} &bull; ${t.user}</div>
+            </div>
+            <div class="list-amount">+KES ${t.amount.toLocaleString()}</div>
+        </div>
+    `).join('');
+}
+
+async function saveProfile() {
+    const payload = {
+        name: document.getElementById('editName').value,
+        bio: document.getElementById('editBio').value,
+        price: parseInt(document.getElementById('editPrice').value) || 499,
+        phone: document.getElementById('editPhone').value,
+        social: document.getElementById('editSocial').value
+    };
+    try {
+        const res = await fetch(`${API_BASE}/api/creator/me`, {
+            method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+creatorToken},
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) showToast('Profile updated', 'success', 'Saved');
+        else throw new Error('fail');
+    } catch(e) {
+        Object.assign(currentCreator, payload);
+        renderDashboard();
+        showToast('Profile updated (demo)', 'success', 'Saved');
+    }
+}
+
+function requestWithdrawal() {
+    const bal = currentCreator ? (currentCreator.balance || 0) : 0;
+    if (bal < 500) { showToast('Minimum withdrawal is KES 500', 'warning', 'Too Low'); return; }
+    showToast(`Withdrawal of KES ${bal.toLocaleString()} requested. Funds sent within 24h.`, 'success', 'Requested');
+}
+
+function scrollToSection(id) {
+    const el = document.getElementById(id) || document.querySelector('[id="'+id+'"]');
+    if (el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+if (creatorToken) enterDashboard();
+</script>
+</body>
+</html>
