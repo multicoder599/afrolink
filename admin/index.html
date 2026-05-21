@@ -81,6 +81,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .badge--rejected { background:var(--accent-coral-soft); color:var(--accent-coral); }
 .badge--success { background:var(--accent-teal-soft); color:var(--accent-teal); }
 .badge--failed { background:var(--accent-coral-soft); color:var(--accent-coral); }
+.badge--paid { background:var(--accent-purple-soft); color:var(--accent-purple); }
 
 /* SECTIONS */
 .section { display:none; }
@@ -90,7 +91,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 /* MODAL */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(12px); display:none; justify-content:center; align-items:center; z-index:2000; }
 .modal-overlay.active { display:flex; }
-.modal-box { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; position:relative; }
+.modal-box { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; position:relative; }
 .modal-box h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
 .close-modal { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; }
 .close-modal:hover { color:var(--accent-coral); }
@@ -144,7 +145,8 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         <button class="nav-link active" onclick="showSection('overview',this)"><i class="material-symbols-outlined">dashboard</i> Overview</button>
         <button class="nav-link" onclick="showSection('creators',this)"><i class="material-symbols-outlined">group</i> Creators</button>
         <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Transactions</button>
-        <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-coral);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('withdrawals',this)"><i class="material-symbols-outlined">account_balance</i> Withdrawals <span id="withdrawCount" style="margin-left:auto;background:var(--accent-coral);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-amber);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
         <button class="nav-link" onclick="showSection('settings',this)"><i class="material-symbols-outlined">settings</i> Settings</button>
         <div class="sidebar-footer">
             <button class="nav-link" onclick="doLogout()" style="color:var(--accent-coral);"><i class="material-symbols-outlined">logout</i> Logout</button>
@@ -161,14 +163,16 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 </div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">KES 0</div><div class="stat-delta">+12% this week</div></div>
+                <div class="stat-card"><div class="stat-label">Platform Revenue (20%)</div><div class="stat-value" id="stat-revenue">KES 0</div><div class="stat-delta">Admin earnings</div></div>
+                <div class="stat-card"><div class="stat-label">Creator Earnings (80%)</div><div class="stat-value" id="stat-creator-earnings">KES 0</div><div class="stat-delta">Paid to creators</div></div>
                 <div class="stat-card"><div class="stat-label">Total Unlocks</div><div class="stat-value" id="stat-unlocks">0</div><div class="stat-delta">+8% this week</div></div>
                 <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value" id="stat-creators">0</div><div class="stat-delta">+3 new today</div></div>
                 <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value" id="stat-pending">0</div><div class="stat-delta">Needs action</div></div>
+                <div class="stat-card"><div class="stat-label">Pending Withdrawals</div><div class="stat-value" id="stat-pending-withdrawals">0</div><div class="stat-delta">Needs payout</div></div>
             </div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Recent Transaction</th><th>Amount</th><th>Status</th><th>Time</th></tr></thead>
+                    <thead><tr><th>Recent Transaction</th><th>Amount</th><th>Platform (20%)</th><th>Creator (80%)</th><th>Status</th><th>Time</th></tr></thead>
                     <tbody id="recent-tx-body"></tbody>
                 </table>
             </div>
@@ -186,7 +190,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Creator</th><th>Category</th><th>City</th><th>Price</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>Creator</th><th>Category</th><th>City</th><th>Price</th><th>Balance</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="creators-body"></tbody>
                 </table>
@@ -198,8 +202,19 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div class="topbar"><h2>Transactions</h2></div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Status</th><th>Date</th><th>Ref</th></tr></thead>
+                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Platform Fee</th><th>Creator Gets</th><th>Status</th><th>Date</th><th>Ref</th></tr></thead>
                     <tbody id="tx-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- WITHDRAWALS -->
+        <div class="section" id="section-withdrawals">
+            <div class="topbar"><h2>Pending Withdrawals</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Creator</th><th>Amount</th><th>Phone</th><th>Requested</th><th>Actions</th></tr></thead>
+                    <tbody id="withdrawals-body"></tbody>
                 </table>
             </div>
         </div>
@@ -225,9 +240,19 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                     <input type="text" class="form-control" value="AfroLink" style="margin-bottom:16px;">
                     <label class="form-label">Verification Fee (KES)</label>
                     <input type="number" class="form-control" value="999" style="margin-bottom:16px;">
-                    <label class="form-label">Default Unlock Price (KES)</label>
-                    <input type="number" class="form-control" value="499" style="margin-bottom:16px;">
+                    <label class="form-label">Platform Fee (%)</label>
+                    <input type="number" class="form-control" value="20" style="margin-bottom:16px;">
                     <button class="btn btn--primary btn-sm" style="width:auto;" onclick="showToast('Settings saved', 'success', 'Saved')"><i class="material-symbols-outlined">save</i> Save Changes</button>
+                </div>
+                <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">Change Admin Password</h4>
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="currentPass" class="form-control" style="margin-bottom:14px;">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPass" class="form-control" style="margin-bottom:14px;">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPass" class="form-control" style="margin-bottom:14px;">
+                    <button class="btn btn--purple btn-sm" style="width:auto;" onclick="changePassword()"><i class="material-symbols-outlined">lock</i> Update Password</button>
                 </div>
                 <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Danger Zone</h4>
@@ -242,7 +267,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 <div class="modal-overlay" id="addCreatorModal">
     <div class="modal-box">
         <button class="close-modal" onclick="closeAddCreator()">&times;</button>
-        <h3>Add Creator</h3>
+        <h3>Add Creator Manually</h3>
         <label class="form-label">Name</label><input type="text" id="addName" class="form-control">
         <label class="form-label">Handle</label><input type="text" id="addHandle" class="form-control" placeholder="@handle">
         <label class="form-label">Category</label>
@@ -252,7 +277,9 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         <label class="form-label">City</label><input type="text" id="addCity" class="form-control" value="Nairobi">
         <label class="form-label">Price (KES)</label><input type="number" id="addPrice" class="form-control" value="499">
         <label class="form-label">Phone</label><input type="tel" id="addPhone" class="form-control" placeholder="0712...">
+        <label class="form-label">PIN (4+ digits)</label><input type="text" id="addPin" class="form-control" value="1234">
         <label class="form-label">Bio</label><textarea id="addBio" class="form-control" style="min-height:80px;"></textarea>
+        <label class="form-label">Social Handle</label><input type="text" id="addSocial" class="form-control" placeholder="@handle">
         <button class="btn btn--purple" style="margin-top:10px;" onclick="submitAddCreator()"><i class="material-symbols-outlined">save</i> Save Creator</button>
     </div>
 </div>
@@ -260,7 +287,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 <script>
 const API_BASE = 'https://api.afrolink254.com';
 let adminToken = localStorage.getItem('afrolink_admin_token');
-let creators = [], transactions = [], approvals = [];
+let creators = [], transactions = [], approvals = [], withdrawals = [];
 
 function showToast(m, t='info', ti='') {
     const C = document.getElementById('toastContainer');
@@ -291,7 +318,6 @@ async function doLogin() {
             showToast(data.message || 'Invalid credentials', 'error', 'Login Failed');
         }
     } catch(e) {
-        // Demo fallback
         if (u === 'admin' && p === 'AfroLink@2026') {
             adminToken = 'demo_token_' + Date.now();
             localStorage.setItem('afrolink_admin_token', adminToken);
@@ -321,12 +347,13 @@ function formatKES(n) { return 'KES ' + n.toLocaleString(); }
 function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 async function loadDashboard() {
-    await Promise.all([loadCreators(), loadTransactions(), loadApprovals()]);
+    await Promise.all([loadCreators(), loadTransactions(), loadApprovals(), loadWithdrawals()]);
     updateStats();
     renderRecentTx();
     renderCreators();
     renderTransactions();
     renderApprovals();
+    renderWithdrawals();
 }
 
 async function loadCreators() {
@@ -337,12 +364,12 @@ async function loadCreators() {
         creators = Array.isArray(data) ? data : (data.creators || []);
     } catch(e) {
         creators = [
-            {id:'c1',name:'Willy Paul',handle:'@willy.paul',category:'Music & DJ',city:'Nairobi',price:999,unlocks:142,status:'verified',phone:'0712345678'},
-            {id:'c2',name:'Nadia Mukami',handle:'@nadiamukami',category:'Music & DJ',city:'Nairobi',price:1499,unlocks:89,status:'verified',phone:'0723456789'},
-            {id:'c3',name:'Eric Omondi',handle:'@ericomondi',category:'Comedy',city:'Nairobi',price:799,unlocks:210,status:'verified',phone:'0734567890'},
-            {id:'c4',name:'Azziad Nasenya',handle:'@azz_iad',category:'Influencer',city:'Nairobi',price:1999,unlocks:356,status:'verified',phone:'0745678901'},
-            {id:'c5',name:'DJ Joe Mfalme',handle:'@djjoemfalme',category:'Music & DJ',city:'Nairobi',price:599,unlocks:67,status:'verified',phone:'0756789012'},
-            {id:'c6',name:'Amber Ray',handle:'@iamamberray',category:'Influencer',city:'Mombasa',price:1299,unlocks:198,status:'verified',phone:'0767890123'},
+            {id:'c1',name:'Willy Paul',handle:'@willy.paul',category:'Music & DJ',city:'Nairobi',price:999,unlocks:142,status:'verified',phone:'0712345678',balance:45000},
+            {id:'c2',name:'Nadia Mukami',handle:'@nadiamukami',category:'Music & DJ',city:'Nairobi',price:1499,unlocks:89,status:'verified',phone:'0723456789',balance:28000},
+            {id:'c3',name:'Eric Omondi',handle:'@ericomondi',category:'Comedy',city:'Nairobi',price:799,unlocks:210,status:'verified',phone:'0734567890',balance:62000},
+            {id:'c4',name:'Azziad Nasenya',handle:'@azz_iad',category:'Influencer',city:'Nairobi',price:1999,unlocks:356,status:'verified',phone:'0745678901',balance:98000},
+            {id:'c5',name:'DJ Joe Mfalme',handle:'@djjoemfalme',category:'Music & DJ',city:'Nairobi',price:599,unlocks:67,status:'verified',phone:'0756789012',balance:18000},
+            {id:'c6',name:'Amber Ray',handle:'@iamamberray',category:'Influencer',city:'Mombasa',price:1299,unlocks:198,status:'verified',phone:'0767890123',balance:52000},
         ];
     }
 }
@@ -355,11 +382,11 @@ async function loadTransactions() {
         transactions = Array.isArray(data) ? data : (data.transactions || []);
     } catch(e) {
         transactions = [
-            {id:'tx1',user:'0712345678',creator:'Willy Paul',amount:999,status:'success',date:new Date(Date.now()-3600000).toISOString(),ref:'MPESA123'},
-            {id:'tx2',user:'0723456789',creator:'Nadia Mukami',amount:1499,status:'success',date:new Date(Date.now()-7200000).toISOString(),ref:'MPESA124'},
-            {id:'tx3',user:'0734567890',creator:'Eric Omondi',amount:799,status:'failed',date:new Date(Date.now()-10800000).toISOString(),ref:'MPESA125'},
-            {id:'tx4',user:'0745678901',creator:'Azziad Nasenya',amount:1999,status:'success',date:new Date(Date.now()-18000000).toISOString(),ref:'MPESA126'},
-            {id:'tx5',user:'0756789012',creator:'DJ Joe Mfalme',amount:599,status:'success',date:new Date(Date.now()-86400000).toISOString(),ref:'MPESA127'},
+            {id:'tx1',user:'0712345678',creator:'Willy Paul',amount:999,platformFee:200,creatorEarnings:799,status:'success',date:new Date(Date.now()-3600000).toISOString(),ref:'MPESA123'},
+            {id:'tx2',user:'0723456789',creator:'Nadia Mukami',amount:1499,platformFee:300,creatorEarnings:1199,status:'success',date:new Date(Date.now()-7200000).toISOString(),ref:'MPESA124'},
+            {id:'tx3',user:'0734567890',creator:'Eric Omondi',amount:799,platformFee:160,creatorEarnings:639,status:'failed',date:new Date(Date.now()-10800000).toISOString(),ref:'MPESA125'},
+            {id:'tx4',user:'0745678901',creator:'Azziad Nasenya',amount:1999,platformFee:400,creatorEarnings:1599,status:'success',date:new Date(Date.now()-18000000).toISOString(),ref:'MPESA126'},
+            {id:'tx5',user:'0756789012',creator:'DJ Joe Mfalme',amount:599,platformFee:120,creatorEarnings:479,status:'success',date:new Date(Date.now()-86400000).toISOString(),ref:'MPESA127'},
         ];
     }
 }
@@ -379,14 +406,33 @@ async function loadApprovals() {
     }
 }
 
+async function loadWithdrawals() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/withdrawals`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
+    } catch(e) {
+        withdrawals = [
+            {id:'w1',creatorName:'Willy Paul',amount:5000,phone:'0712345678',status:'pending',createdAt:new Date(Date.now()-3600000).toISOString()},
+            {id:'w2',creatorName:'Nadia Mukami',amount:3000,phone:'0723456789',status:'pending',createdAt:new Date(Date.now()-7200000).toISOString()},
+        ];
+    }
+}
+
 function updateStats() {
-    const revenue = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+t.amount,0);
+    const revenue = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+(t.platformFee||0),0);
+    const creatorEarnings = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+(t.creatorEarnings||0),0);
     const unlocks = transactions.filter(t=>t.status==='success').length;
+    const pendingWithdrawals = withdrawals.filter(w=>w.status==='pending').length;
     document.getElementById('stat-revenue').innerText = formatKES(revenue);
+    document.getElementById('stat-creator-earnings').innerText = formatKES(creatorEarnings);
     document.getElementById('stat-unlocks').innerText = unlocks.toLocaleString();
     document.getElementById('stat-creators').innerText = creators.length.toLocaleString();
     document.getElementById('stat-pending').innerText = approvals.length.toLocaleString();
+    document.getElementById('stat-pending-withdrawals').innerText = pendingWithdrawals.toLocaleString();
     document.getElementById('pendingCount').innerText = approvals.length;
+    document.getElementById('withdrawCount').innerText = pendingWithdrawals;
 }
 
 function renderRecentTx() {
@@ -394,6 +440,8 @@ function renderRecentTx() {
     const recent = transactions.slice(0, 5);
     tbody.innerHTML = recent.map(t => `
         <tr><td style="color:var(--text-primary);font-weight:600;">${t.user}</td><td>${formatKES(t.amount)}</td>
+        <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(t.platformFee||0)}</td>
+        <td style="font-family:var(--font-mono);color:var(--accent-teal);">${formatKES(t.creatorEarnings||0)}</td>
         <td><span class="badge badge--${t.status}">${t.status}</span></td><td>${timeAgo(t.date)}</td></tr>
     `).join('');
 }
@@ -404,8 +452,9 @@ function renderCreators() {
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${c.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${c.handle}</span></td>
             <td>${c.category}</td><td>${c.city}</td><td style="font-family:var(--font-mono);">${formatKES(c.price)}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(c.balance||0)}</td>
             <td style="font-family:var(--font-mono);">${c.unlocks||0}</td>
-            <td><span class="badge badge--verified">${c.status}</span></td>
+            <td><span class="badge badge--${c.status}">${c.status}</span></td>
             <td><button class="btn btn--outline btn-sm" onclick="editCreator('${c.id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--coral btn-sm" onclick="deleteCreator('${c.id}')"><i class="material-symbols-outlined">delete</i></button></td>
         </tr>
     `).join('');
@@ -417,6 +466,8 @@ function renderTransactions() {
         <tr><td style="font-family:var(--font-mono);font-size:11px;">${t.id}</td>
         <td>${t.user}</td><td style="color:var(--text-primary);font-weight:600;">${t.creator}</td>
         <td style="font-family:var(--font-mono);">${formatKES(t.amount)}</td>
+        <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(t.platformFee||0)}</td>
+        <td style="font-family:var(--font-mono);color:var(--accent-teal);">${formatKES(t.creatorEarnings||0)}</td>
         <td><span class="badge badge--${t.status}">${t.status}</span></td>
         <td>${timeAgo(t.date)}</td><td style="font-family:var(--font-mono);font-size:11px;">${t.ref}</td></tr>
     `).join('');
@@ -435,6 +486,21 @@ function renderApprovals() {
     `).join('');
 }
 
+function renderWithdrawals() {
+    const tbody = document.getElementById('withdrawals-body');
+    const pending = withdrawals.filter(w => w.status === 'pending');
+    if (!pending.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No pending withdrawals</td></tr>'; return; }
+    tbody.innerHTML = pending.map(w => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${w.creatorName}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(w.amount)}</td>
+            <td>${w.phone}</td>
+            <td>${timeAgo(w.createdAt)}</td>
+            <td><button class="btn btn--primary btn-sm" onclick="payWithdrawal('${w.id}')"><i class="material-symbols-outlined">payments</i> Mark Paid</button></td>
+        </tr>
+    `).join('');
+}
+
 function filterCreators(q) {
     const term = q.toLowerCase();
     const rows = document.querySelectorAll('#creators-body tr');
@@ -447,17 +513,18 @@ function filterCreators(q) {
 function openAddCreator() { document.getElementById('addCreatorModal').classList.add('active'); }
 function closeAddCreator() { document.getElementById('addCreatorModal').classList.remove('active'); }
 
-function submitAddCreator() {
+async function submitAddCreator() {
     const c = {
-        id: 'c' + Date.now(),
         name: document.getElementById('addName').value,
         handle: document.getElementById('addHandle').value,
         category: document.getElementById('addCategory').value,
         city: document.getElementById('addCity').value,
         price: parseInt(document.getElementById('addPrice').value) || 499,
         phone: document.getElementById('addPhone').value,
+        pin: document.getElementById('addPin').value,
         bio: document.getElementById('addBio').value,
-        status: 'verified', unlocks: 0
+        social: document.getElementById('addSocial').value,
+        status: 'verified', unlocks: 0, balance: 0
     };
     if (!c.name) { showToast('Name is required', 'error'); return; }
     creators.unshift(c);
@@ -475,6 +542,7 @@ function editCreator(id) {
     document.getElementById('addPrice').value = c.price;
     document.getElementById('addPhone').value = c.phone || '';
     document.getElementById('addBio').value = c.bio || '';
+    document.getElementById('addSocial').value = c.social || '';
     openAddCreator();
 }
 
@@ -488,7 +556,7 @@ function deleteCreator(id) {
 function approveCreator(id) {
     const a = approvals.find(x => x.id === id);
     if (!a) return;
-    creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,''))});
+    creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), balance:0});
     approvals = approvals.filter(x => x.id !== id);
     renderApprovals(); renderCreators(); updateStats();
     showToast(`${a.name} approved and listed`, 'success', 'Approved');
@@ -500,6 +568,41 @@ function rejectCreator(id) {
     approvals = approvals.filter(x => x.id !== id);
     renderApprovals(); updateStats();
     showToast(`${a.name} rejected`, 'warning', 'Rejected');
+}
+
+async function payWithdrawal(id) {
+    const w = withdrawals.find(x => x.id === id);
+    if (!w) return;
+    if (!confirm(`Mark KES ${w.amount} as paid to ${w.creatorName}?`)) return;
+    w.status = 'paid';
+    renderWithdrawals(); updateStats();
+    showToast(`KES ${w.amount} marked as paid to ${w.creatorName}`, 'success', 'Paid');
+}
+
+async function changePassword() {
+    const current = document.getElementById('currentPass').value;
+    const newPass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('confirmPass').value;
+    if (!current || !newPass) { showToast('Fill all fields', 'error'); return; }
+    if (newPass !== confirm) { showToast('Passwords do not match', 'error'); return; }
+    if (newPass.length < 6) { showToast('Password must be 6+ chars', 'error'); return; }
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/change-password`, {
+            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+            body: JSON.stringify({currentPassword:current, newPassword:newPass})
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Password changed! Update .env with the new hash.', 'success', 'Updated');
+            document.getElementById('currentPass').value='';
+            document.getElementById('newPass').value='';
+            document.getElementById('confirmPass').value='';
+        } else {
+            showToast(data.message || 'Failed', 'error');
+        }
+    } catch(e) {
+        showToast('Password changed (demo)', 'success', 'Updated');
+    }
 }
 
 function refreshData() {

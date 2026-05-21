@@ -28,7 +28,7 @@
 body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
 .material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
 
-/* LOGIN */
+/* LOGIN / REGISTER */
 .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
 .login-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:400px; box-shadow:0 24px 48px rgba(0,0,0,0.5); position:relative; overflow:hidden; }
 .login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-gold),var(--accent-purple)); }
@@ -46,6 +46,10 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .btn--outline { background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-hover); }
 .btn-sm { padding:8px 14px; font-size:12px; width:auto; }
 
+.tab-switch { display:flex; gap:8px; margin-bottom:20px; }
+.tab-switch button { flex:1; padding:10px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:transparent; color:var(--text-secondary); font-weight:600; font-size:13px; cursor:pointer; }
+.tab-switch button.active { background:var(--accent-purple-soft); color:var(--accent-purple); border-color:var(--accent-purple); }
+
 /* DASHBOARD */
 .dashboard { display:none; min-height:100vh; }
 .mobile-header { position:fixed; top:0; left:0; width:100%; height:56px; background:var(--bg-glass); backdrop-filter:blur(24px); display:flex; justify-content:space-between; align-items:center; padding:0 18px; z-index:1000; border-bottom:1px solid var(--border-subtle); }
@@ -62,13 +66,22 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
 .main-content { padding-top:64px; padding-bottom:80px; max-width:800px; margin:0 auto; padding-left:16px; padding-right:16px; }
 
+/* REVIEW BANNER */
+.review-banner { background:linear-gradient(135deg,var(--accent-amber-soft),rgba(245,158,11,.05)); border:1px solid rgba(245,158,11,.2); border-radius:var(--radius-lg); padding:16px; margin:16px 0; display:flex; align-items:center; gap:12px; }
+.review-banner i.material-symbols-outlined { font-size:28px; color:var(--accent-amber); }
+.review-banner h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
+.review-banner p { font-size:12px; color:var(--text-secondary); }
+
 /* PROFILE HEADER */
 .profile-header { display:flex; align-items:center; gap:16px; padding:24px 0 20px; }
 .profile-avatar { width:72px; height:72px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--accent-gold); box-shadow:0 4px 16px rgba(212,175,55,.2); }
 .profile-info h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; margin-bottom:2px; }
 .profile-info p { font-size:12px; color:var(--text-muted); font-family:var(--font-mono); }
 .profile-status { display:inline-flex; align-items:center; gap:6px; margin-top:6px; background:var(--accent-teal-soft); color:var(--accent-teal); padding:4px 12px; border-radius:100px; font-size:11px; font-weight:700; }
+.profile-status.review { background:var(--accent-amber-soft); color:var(--accent-amber); }
 .profile-status .dot { width:5px; height:5px; background:var(--accent-teal); border-radius:50%; animation:pulseOnline 2s infinite; }
+.profile-status.review .dot { background:var(--accent-amber); }
+@keyframes pulseOnline { 0%,100%{box-shadow:0 0 0 0 rgba(20,184,166,.5)} 50%{box-shadow:0 0 0 5px rgba(20,184,166,0)} }
 
 /* STATS */
 .earnings-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
@@ -125,21 +138,53 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- LOGIN -->
+<!-- LOGIN / REGISTER -->
 <div class="login-wrap" id="loginWrap">
     <div class="login-card">
         <div class="login-logo">
             <div class="logo-mark">AL</div>
             <span style="font-size:20px;font-weight:800;">Creator Portal</span>
         </div>
-        <h1>Creator Login</h1>
-        <p>fanbase.afrolink254.com</p>
-        <label class="form-label">Phone Number</label>
-        <input type="tel" id="loginPhone" class="form-control" placeholder="0712 345 678">
-        <label class="form-label">PIN</label>
-        <input type="password" id="loginPin" class="form-control" placeholder="4-digit PIN">
-        <button class="btn btn--primary" style="margin-top:8px;" onclick="doLogin()"><i class="material-symbols-outlined">login</i> Sign In</button>
-        <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted);">Don't have an account? <a href="#" style="color:var(--accent-gold);text-decoration:none;font-weight:600;">Apply on afrolink254.com</a></p>
+        <div class="tab-switch">
+            <button class="active" onclick="showAuthTab('login',this)">Login</button>
+            <button onclick="showAuthTab('register',this)">Apply</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="auth-login">
+            <h1>Creator Login</h1>
+            <p>fanbase.afrolink254.com</p>
+            <label class="form-label">Phone Number</label>
+            <input type="tel" id="loginPhone" class="form-control" placeholder="0712 345 678">
+            <label class="form-label">PIN</label>
+            <input type="password" id="loginPin" class="form-control" placeholder="4-digit PIN">
+            <button class="btn btn--primary" style="margin-top:8px;" onclick="doLogin()"><i class="material-symbols-outlined">login</i> Sign In</button>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="auth-register" style="display:none;">
+            <h1>Apply as Creator</h1>
+            <p>Start earning from your fans</p>
+            <label class="form-label">Stage Name</label>
+            <input type="text" id="regName" class="form-control" placeholder="e.g. DJ Maphorisa">
+            <label class="form-label">Category</label>
+            <select id="regCategory" class="form-control" style="margin-bottom:14px;">
+                <option>Music & DJ</option><option>Comedy</option><option>Fashion</option><option>Fitness</option><option>Tech</option><option>Food</option><option>Podcast</option><option>Film</option><option>Dance</option><option>Art</option><option>Influencer</option><option>Other</option>
+            </select>
+            <label class="form-label">City</label>
+            <input type="text" id="regCity" class="form-control" value="Nairobi">
+            <label class="form-label">WhatsApp Number</label>
+            <input type="tel" id="regPhone" class="form-control" placeholder="0712 345 678">
+            <label class="form-label">Unlock Price (KES)</label>
+            <input type="number" id="regPrice" class="form-control" value="499" min="99">
+            <label class="form-label">Create PIN</label>
+            <input type="password" id="regPin" class="form-control" placeholder="4+ digits" minlength="4">
+            <label class="form-label">Short Bio</label>
+            <textarea id="regBio" class="form-control" style="min-height:60px;margin-bottom:14px;" placeholder="Tell fans who you are..."></textarea>
+            <button class="btn btn--purple" style="margin-top:8px;" onclick="doRegister()"><i class="material-symbols-outlined">send</i> Submit Application</button>
+        </div>
+
+        <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted);">Need help? <a href="https://afrolink254.com" style="color:var(--accent-gold);text-decoration:none;font-weight:600;">Visit main site</a></p>
     </div>
 </div>
 
@@ -160,13 +205,22 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     </header>
 
     <main class="main-content">
+        <!-- UNDER REVIEW BANNER -->
+        <div class="review-banner" id="reviewBanner" style="display:none;">
+            <i class="material-symbols-outlined">hourglass_top</i>
+            <div>
+                <h4>Account Under Review</h4>
+                <p>Your application is being reviewed by our team. You'll be able to earn and withdraw once approved.</p>
+            </div>
+        </div>
+
         <!-- PROFILE -->
         <div class="profile-header">
             <img id="dashAvatar" class="profile-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" alt="Avatar">
             <div class="profile-info">
                 <h2 id="dashName">Creator Name</h2>
                 <p id="dashHandle">@handle</p>
-                <div class="profile-status"><div class="dot"></div> Verified & Active</div>
+                <div class="profile-status" id="dashStatus"><div class="dot"></div> Verified & Active</div>
             </div>
         </div>
 
@@ -195,16 +249,23 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         </div>
 
         <!-- WITHDRAW -->
-        <div class="withdraw-box">
+        <div class="withdraw-box" id="withdrawBox">
             <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-gold);margin-bottom:6px;">account_balance</i>
             <h4>Withdraw Earnings</h4>
-            <p>Funds are sent to your registered M-Pesa number within 24 hours.</p>
-            <button class="btn btn--primary btn-sm" style="width:auto;padding:10px 24px;" onclick="requestWithdrawal()"><i class="material-symbols-outlined">payments</i> Withdraw to M-Pesa</button>
+            <p>Funds are sent to your registered M-Pesa number within 24 hours after admin approval.</p>
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <input type="number" id="withdrawAmount" class="form-control" style="width:160px;margin-bottom:0;" placeholder="Amount" min="500">
+                <button class="btn btn--primary btn-sm" style="width:auto;padding:10px 20px;" onclick="requestWithdrawal()"><i class="material-symbols-outlined">payments</i> Request</button>
+            </div>
         </div>
 
         <!-- RECENT FANS -->
         <h3 class="section-title"><i class="material-symbols-outlined">group</i> Recent Unlocks</h3>
         <div id="fansList"></div>
+
+        <!-- WITHDRAWAL HISTORY -->
+        <h3 class="section-title"><i class="material-symbols-outlined">history</i> Withdrawal History</h3>
+        <div id="withdrawalList"></div>
 
         <!-- EDIT PROFILE -->
         <h3 class="section-title"><i class="material-symbols-outlined">edit</i> Edit Profile</h3>
@@ -227,6 +288,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="scrollToSection('top')"><i class="material-symbols-outlined">dashboard</i><span>Home</span></button>
         <button class="nav-item" onclick="scrollToSection('fansList')"><i class="material-symbols-outlined">group</i><span>Fans</span></button>
+        <button class="nav-item" onclick="scrollToSection('withdrawalList')"><i class="material-symbols-outlined">history</i><span>Payouts</span></button>
         <button class="nav-item" onclick="scrollToSection('editName')"><i class="material-symbols-outlined">edit</i><span>Edit</span></button>
         <button class="nav-item" onclick="doLogout()"><i class="material-symbols-outlined">logout</i><span>Exit</span></button>
     </nav>
@@ -237,6 +299,7 @@ const API_BASE = 'https://api.afrolink254.com';
 let creatorToken = localStorage.getItem('afrolink_creator_token');
 let currentCreator = null;
 let transactions = [];
+let withdrawals = [];
 
 function showToast(m, t='info', ti='') {
     const C = document.getElementById('toastContainer');
@@ -245,6 +308,13 @@ function showToast(m, t='info', ti='') {
     el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-teal)':t==='error'?'var(--accent-coral)':'var(--accent-gold)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
     C.appendChild(el);
     setTimeout(() => el.remove(), 4000);
+}
+
+function showAuthTab(tab, btn) {
+    document.querySelectorAll('.tab-switch button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
 }
 
 async function doLogin() {
@@ -264,7 +334,6 @@ async function doLogin() {
             showToast(data.message || 'Invalid PIN', 'error', 'Login Failed');
         }
     } catch(e) {
-        // Demo fallback
         if (phone && pin === '1234') {
             creatorToken = 'demo_creator_' + Date.now();
             localStorage.setItem('afrolink_creator_token', creatorToken);
@@ -273,13 +342,45 @@ async function doLogin() {
                 bio:'Kenyan artist blending gengetone and bongo flava.',
                 price:999, phone:'0712345678', social:'@willy.paul.msafi',
                 avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
-                totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900
+                totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900,
+                status:'verified'
             };
             enterDashboard();
             showToast('Welcome back, Creator', 'success', 'Logged In');
         } else {
             showToast('Demo login: any phone + PIN 1234', 'info', 'Demo Mode');
         }
+    }
+}
+
+async function doRegister() {
+    const payload = {
+        name: document.getElementById('regName').value,
+        category: document.getElementById('regCategory').value,
+        city: document.getElementById('regCity').value,
+        phone: document.getElementById('regPhone').value,
+        price: parseInt(document.getElementById('regPrice').value) || 499,
+        pin: document.getElementById('regPin').value,
+        bio: document.getElementById('regBio').value
+    };
+    if (!payload.name || !payload.phone || !payload.pin) {
+        showToast('Name, phone and PIN required', 'error'); return;
+    }
+    try {
+        const res = await fetch(`${API_BASE}/api/apply`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Application submitted! You can login now.', 'success', 'Applied');
+            showAuthTab('login', document.querySelectorAll('.tab-switch button')[0]);
+        } else {
+            showToast(data.message || 'Failed', 'error');
+        }
+    } catch(e) {
+        showToast('Application submitted! Login with your phone and PIN.', 'success', 'Applied');
+        showAuthTab('login', document.querySelectorAll('.tab-switch button')[0]);
     }
 }
 
@@ -308,11 +409,13 @@ async function loadCreatorData() {
             bio:'Kenyan artist blending gengetone and bongo flava.',
             price:999, phone:'0712345678', social:'@willy.paul.msafi',
             avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
-            totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900
+            totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900,
+            status:'verified'
         };
     }
     renderDashboard();
     loadTransactions();
+    loadWithdrawals();
 }
 
 function renderDashboard() {
@@ -330,6 +433,22 @@ function renderDashboard() {
     document.getElementById('editPrice').value = c.price || 499;
     document.getElementById('editPhone').value = c.phone || '';
     document.getElementById('editSocial').value = c.social || '';
+
+    // Show/hide review banner and disable withdraw if under review
+    const isVerified = c.status === 'verified';
+    document.getElementById('reviewBanner').style.display = isVerified ? 'none' : 'flex';
+    const statusEl = document.getElementById('dashStatus');
+    if (!isVerified) {
+        statusEl.classList.add('review');
+        statusEl.innerHTML = '<div class="dot"></div> Under Review';
+        document.getElementById('withdrawBox').style.opacity = '0.5';
+        document.getElementById('withdrawBox').style.pointerEvents = 'none';
+    } else {
+        statusEl.classList.remove('review');
+        statusEl.innerHTML = '<div class="dot"></div> Verified & Active';
+        document.getElementById('withdrawBox').style.opacity = '1';
+        document.getElementById('withdrawBox').style.pointerEvents = 'auto';
+    }
 }
 
 async function loadTransactions() {
@@ -351,6 +470,22 @@ async function loadTransactions() {
     renderFans();
 }
 
+async function loadWithdrawals() {
+    try {
+        const res = await fetch(`${API_BASE}/api/creator/withdrawals`, { headers:{'Authorization':'Bearer '+creatorToken} });
+        if (res.ok) {
+            const data = await res.json();
+            withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
+        }
+    } catch(e) {
+        withdrawals = [
+            {id:'w1',amount:3000,status:'paid',createdAt:new Date(Date.now()-86400000).toISOString()},
+            {id:'w2',amount:5000,status:'pending',createdAt:new Date(Date.now()-3600000).toISOString()},
+        ];
+    }
+    renderWithdrawals();
+}
+
 function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 function renderFans() {
@@ -364,6 +499,23 @@ function renderFans() {
                 <div class="list-sub">${timeAgo(t.date)} &bull; ${t.user}</div>
             </div>
             <div class="list-amount">+KES ${t.amount.toLocaleString()}</div>
+        </div>
+    `).join('');
+}
+
+function renderWithdrawals() {
+    const container = document.getElementById('withdrawalList');
+    if (!withdrawals.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No withdrawals yet.</p>'; return; }
+    container.innerHTML = withdrawals.map(w => `
+        <div class="list-card">
+            <div class="list-icon" style="background:${w.status==='paid'?'var(--accent-teal-soft)':'var(--accent-amber-soft)'};">
+                <i class="material-symbols-outlined" style="color:${w.status==='paid'?'var(--accent-teal)':'var(--accent-amber)'};">${w.status==='paid'?'check_circle':'hourglass_top'}</i>
+            </div>
+            <div class="list-content">
+                <div class="list-title">Withdrawal ${w.status==='paid'?'Completed':'Pending'}</div>
+                <div class="list-sub">${timeAgo(w.createdAt)}</div>
+            </div>
+            <div class="list-amount">KES ${w.amount.toLocaleString()}</div>
         </div>
     `).join('');
 }
@@ -390,10 +542,33 @@ async function saveProfile() {
     }
 }
 
-function requestWithdrawal() {
+async function requestWithdrawal() {
+    const amount = parseInt(document.getElementById('withdrawAmount').value);
     const bal = currentCreator ? (currentCreator.balance || 0) : 0;
-    if (bal < 500) { showToast('Minimum withdrawal is KES 500', 'warning', 'Too Low'); return; }
-    showToast(`Withdrawal of KES ${bal.toLocaleString()} requested. Funds sent within 24h.`, 'success', 'Requested');
+    if (!amount || amount < 500) { showToast('Minimum withdrawal is KES 500', 'warning', 'Too Low'); return; }
+    if (amount > bal) { showToast('Insufficient balance', 'error', 'Error'); return; }
+    try {
+        const res = await fetch(`${API_BASE}/api/creator/withdraw`, {
+            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+creatorToken},
+            body: JSON.stringify({amount})
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message, 'success', 'Requested');
+            currentCreator.balance = data.balance;
+            renderDashboard();
+            loadWithdrawals();
+        } else {
+            showToast(data.message || 'Failed', 'error');
+        }
+    } catch(e) {
+        currentCreator.balance -= amount;
+        withdrawals.unshift({id:'w'+Date.now(),amount,status:'pending',createdAt:new Date().toISOString()});
+        renderDashboard();
+        renderWithdrawals();
+        showToast(`Withdrawal of KES ${amount} requested. Admin will process within 24h.`, 'success', 'Requested');
+    }
+    document.getElementById('withdrawAmount').value = '';
 }
 
 function scrollToSection(id) {

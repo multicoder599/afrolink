@@ -3,7 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -13,24 +12,22 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3015;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'afrolink_super_secret_' + Date.now();
-const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY;
-const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET;
-const MPESA_PASSKEY = process.env.MPESA_PASSKEY;
-const MPESA_SHORTCODE = process.env.MPESA_SHORTCODE;
-const MPESA_ENV = process.env.MPESA_ENV || 'sandbox';
+const MEGAPAY_API_KEY = process.env.MEGAPAY_API_KEY;
+const MEGAPAY_EMAIL = process.env.MEGAPAY_EMAIL;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AfroLink@2026';
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20');
 
 // ===================== MIDDLEWARE =====================
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(mongoSanitize());
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -93,7 +90,7 @@ const celebSchema = new mongoose.Schema({
     balance: { type: Number, default: 0 },
     gender: { type: String, default: 'Female' },
     status: { type: String, enum: ['pending', 'verified', 'rejected', 'suspended'], default: 'pending' },
-    pin: { type: String, default: '' }, // hashed creator PIN
+    pin: { type: String, default: '' },
     appliedAt: { type: Date, default: Date.now },
     verifiedAt: { type: Date },
 }, { timestamps: true });
@@ -103,11 +100,24 @@ const transactionSchema = new mongoose.Schema({
     celebId: { type: mongoose.Schema.Types.ObjectId, ref: 'Celeb' },
     celebName: { type: String, trim: true },
     amount: { type: Number, required: true },
+    platformFee: { type: Number, default: 0 },
+    creatorEarnings: { type: Number, default: 0 },
     status: { type: String, enum: ['pending', 'success', 'failed', 'cancelled'], default: 'pending' },
     mpesaRef: { type: String, default: '' },
     refId: { type: String, required: true, unique: true },
     description: { type: String, default: '' },
     callbackData: { type: Object, default: {} },
+}, { timestamps: true });
+
+const withdrawalSchema = new mongoose.Schema({
+    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Celeb', required: true },
+    creatorName: { type: String, trim: true },
+    amount: { type: Number, required: true },
+    phone: { type: String, trim: true },
+    status: { type: String, enum: ['pending', 'paid', 'rejected'], default: 'pending' },
+    paidAt: { type: Date },
+    paidBy: { type: String },
+    notes: { type: String, default: '' },
 }, { timestamps: true });
 
 const adminLogSchema = new mongoose.Schema({
@@ -120,6 +130,7 @@ const adminLogSchema = new mongoose.Schema({
 
 const Celeb = mongoose.model('Celeb', celebSchema);
 const Transaction = mongoose.model('Transaction', transactionSchema);
+const Withdrawal = mongoose.model('Withdrawal', withdrawalSchema);
 const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 
 // ===================== AUTH MIDDLEWARE =====================
@@ -147,32 +158,13 @@ function verifyCreator(req, res, next) {
     } catch (e) { return res.status(401).json({ success: false, message: 'Invalid token' }); }
 }
 
-// ===================== MPESA HELPERS =====================
-function getTimestamp() {
-    const d = new Date();
-    return d.getFullYear() +
-        String(d.getMonth() + 1).padStart(2, '0') +
-        String(d.getDate()).padStart(2, '0') +
-        String(d.getHours()).padStart(2, '0') +
-        String(d.getMinutes()).padStart(2, '0') +
-        String(d.getSeconds()).padStart(2, '0');
-}
-
-function formatPhone(phone) {
-    let p = phone.replace(/\s/g, '').replace(/\+/g, '');
-    if (p.startsWith('0')) p = '254' + p.substring(1);
-    if (p.startsWith('7')) p = '254' + p;
-    if (p.startsWith('1')) p = '254' + p;
-    return p;
-}
-
-async function getMpesaToken() {
-    const url = MPESA_ENV === 'live'
-        ? 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-        : 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
-    const auth = Buffer.from(`${MPESA_CONSUMER_KEY}:${MPESA_CONSUMER_SECRET}`).toString('base64');
-    const res = await axios.get(url, { headers: { Authorization: `Basic ${auth}` }, timeout: 15000 });
-    return res.data.access_token;
+// ===================== MEGAPAY HELPERS =====================
+function formatPhoneMegaPay(phone) {
+    let fp = phone.replace(/\D/g, '');
+    if (fp.startsWith('0')) fp = '254' + fp.slice(1);
+    else if (/^[71]/.test(fp) && fp.length === 10) fp = '254' + fp;
+    else if (!fp.startsWith('254') && !fp.startsWith('237')) fp = '254' + fp;
+    return fp;
 }
 
 // ===================== ROUTES =====================
@@ -200,15 +192,16 @@ app.get('/api/celebs/:id', async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// -------------------- CREATOR APPLICATION --------------------
+// -------------------- CREATOR APPLICATION / REGISTRATION --------------------
 app.post('/api/apply', upload.single('photo'), async (req, res) => {
     try {
-        const { name, handle, category, city, phone, price, bio, social } = req.body;
+        const { name, handle, category, city, phone, price, bio, social, pin } = req.body;
         if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
         const existing = await Celeb.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
 
         const img = req.file ? `/uploads/${req.file.filename}` : '';
+        const hashedPin = pin ? await bcrypt.hash(pin, 10) : await bcrypt.hash('1234', 10);
         const celeb = new Celeb({
             name: name.trim(),
             handle: handle ? handle.trim() : `@${name.toLowerCase().replace(/\s/g, '')}`,
@@ -221,10 +214,10 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
             social: social || '',
             img,
             status: 'pending',
-            pin: await bcrypt.hash('1234', 10), // default PIN, creator changes later
+            pin: hashedPin,
         });
         await celeb.save();
-        res.json({ success: true, message: 'Application submitted. Await admin approval.', celebId: celeb._id });
+        res.json({ success: true, message: 'Application submitted. Await admin approval. You can login but dashboard is limited until verified.', celebId: celeb._id });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -235,11 +228,10 @@ app.post('/api/creator/login', async (req, res) => {
         if (!phone || !pin) return res.status(400).json({ success: false, message: 'Phone and PIN required' });
         const celeb = await Celeb.findOne({ phone: phone.trim() });
         if (!celeb) return res.status(404).json({ success: false, message: 'Creator not found' });
-        if (celeb.status !== 'verified') return res.status(403).json({ success: false, message: 'Account not yet approved' });
         const valid = await bcrypt.compare(pin, celeb.pin);
         if (!valid) return res.status(401).json({ success: false, message: 'Invalid PIN' });
         const token = jwt.sign({ id: celeb._id, role: 'creator', phone: celeb.phone }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ success: true, token, creator: { id: celeb._id, name: celeb.name, handle: celeb.handle, phone: celeb.phone } });
+        res.json({ success: true, token, creator: { id: celeb._id, name: celeb.name, handle: celeb.handle, phone: celeb.phone, status: celeb.status } });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -281,21 +273,40 @@ app.post('/api/creator/change-pin', verifyCreator, async (req, res) => {
 app.get('/api/creator/transactions', verifyCreator, async (req, res) => {
     try {
         const txs = await Transaction.find({ celebId: req.creator.id, status: 'success' })
-            .sort({ createdAt: -1 }).select('userPhone amount createdAt');
+            .sort({ createdAt: -1 }).select('userPhone amount creatorEarnings createdAt');
         res.json({ success: true, transactions: txs });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// -------------------- WITHDRAWALS --------------------
 app.post('/api/creator/withdraw', verifyCreator, async (req, res) => {
     try {
         const { amount } = req.body;
         const celeb = await Celeb.findById(req.creator.id);
         if (!celeb || celeb.balance < amount) return res.status(400).json({ success: false, message: 'Insufficient balance' });
         if (amount < 500) return res.status(400).json({ success: false, message: 'Minimum withdrawal KES 500' });
+        if (celeb.status !== 'verified') return res.status(403).json({ success: false, message: 'Account under review. Cannot withdraw yet.' });
+
+        const w = new Withdrawal({
+            creatorId: celeb._id,
+            creatorName: celeb.name,
+            amount: parseInt(amount),
+            phone: celeb.phone,
+            status: 'pending'
+        });
+        await w.save();
+
         celeb.balance -= amount;
         await celeb.save();
-        // TODO: Initiate B2C payout here
-        res.json({ success: true, message: `KES ${amount} withdrawal queued. Paid within 24h.`, balance: celeb.balance });
+
+        res.json({ success: true, message: `Withdrawal of KES ${amount} requested. Admin will process within 24h.`, balance: celeb.balance, withdrawalId: w._id });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/creator/withdrawals', verifyCreator, async (req, res) => {
+    try {
+        const list = await Withdrawal.find({ creatorId: req.creator.id }).sort({ createdAt: -1 });
+        res.json({ success: true, withdrawals: list });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -308,11 +319,28 @@ app.post('/api/admin/login', async (req, res) => {
         if (ADMIN_PASSWORD_HASH) {
             valid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
         } else {
-            valid = password === (process.env.ADMIN_PASSWORD || 'AfroLink@2026');
+            valid = password === ADMIN_PASSWORD;
         }
         if (!valid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
         const token = jwt.sign({ role: 'admin', username }, JWT_SECRET, { expiresIn: '1d' });
         res.json({ success: true, token });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/admin/change-password', verifyAdmin, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        if (!newPassword || newPassword.length < 6) return res.status(400).json({ success: false, message: 'Password must be 6+ chars' });
+        let valid = false;
+        if (ADMIN_PASSWORD_HASH) {
+            valid = await bcrypt.compare(currentPassword, ADMIN_PASSWORD_HASH);
+        } else {
+            valid = currentPassword === ADMIN_PASSWORD;
+        }
+        if (!valid) return res.status(401).json({ success: false, message: 'Current password incorrect' });
+        const newHash = await bcrypt.hash(newPassword, 10);
+        // In production, save newHash to DB or update .env file
+        res.json({ success: true, message: 'Password changed. Update ADMIN_PASSWORD_HASH in .env to: ' + newHash });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -321,6 +349,36 @@ app.get('/api/admin/creators', verifyAdmin, async (req, res) => {
     try {
         const celebs = await Celeb.find().select('-pin').sort({ createdAt: -1 });
         res.json({ success: true, count: celebs.length, creators: celebs });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/admin/creators', verifyAdmin, upload.single('photo'), async (req, res) => {
+    try {
+        const { name, handle, category, city, phone, price, bio, social, pin } = req.body;
+        if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
+        const existing = await Celeb.findOne({ phone: phone.trim() });
+        if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
+        const img = req.file ? `/uploads/${req.file.filename}` : '';
+        const hashedPin = pin ? await bcrypt.hash(pin, 10) : await bcrypt.hash('1234', 10);
+        const celeb = new Celeb({
+            name: name.trim(),
+            handle: handle ? handle.trim() : `@${name.toLowerCase().replace(/\s/g, '')}`,
+            category: (category || 'influencer').toLowerCase().replace(/\s/g, ''),
+            categoryName: category || 'Influencer',
+            city: city || 'Nairobi',
+            phone: phone.trim(),
+            price: parseInt(price) || 499,
+            bio: bio || '',
+            social: social || '',
+            img,
+            status: 'verified',
+            pin: hashedPin,
+            verifiedAt: new Date(),
+            isVerified: true
+        });
+        await celeb.save();
+        await new AdminLog({ action: 'manual_add_creator', adminId: req.admin.username, targetId: celeb._id, details: { name: celeb.name } }).save();
+        res.json({ success: true, message: `${celeb.name} added and verified`, celeb });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -340,7 +398,7 @@ app.get('/api/admin/approvals', verifyAdmin, async (req, res) => {
 
 app.post('/api/admin/creators/:id/approve', verifyAdmin, async (req, res) => {
     try {
-        const celeb = await Celeb.findByIdAndUpdate(req.params.id, { status: 'verified', verifiedAt: new Date() }, { new: true }).select('-pin');
+        const celeb = await Celeb.findByIdAndUpdate(req.params.id, { status: 'verified', verifiedAt: new Date(), isVerified: true }, { new: true }).select('-pin');
         if (!celeb) return res.status(404).json({ success: false, message: 'Not found' });
         await new AdminLog({ action: 'approve_creator', adminId: req.admin.username, targetId: celeb._id, details: { name: celeb.name } }).save();
         res.json({ success: true, message: `${celeb.name} approved`, celeb });
@@ -365,10 +423,12 @@ app.delete('/api/admin/creators/:id', verifyAdmin, async (req, res) => {
 
 app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
     try {
-        const totalRevenue = await Transaction.aggregate([{ $match: { status: 'success' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]);
+        const totalRevenue = await Transaction.aggregate([{ $match: { status: 'success' } }, { $group: { _id: null, total: { $sum: '$platformFee' } } }]);
         const totalUnlocks = await Transaction.countDocuments({ status: 'success' });
         const activeCreators = await Celeb.countDocuments({ status: 'verified' });
         const pendingApprovals = await Celeb.countDocuments({ status: 'pending' });
+        const totalCreatorEarnings = await Transaction.aggregate([{ $match: { status: 'success' } }, { $group: { _id: null, total: { $sum: '$creatorEarnings' } } }]);
+        const pendingWithdrawals = await Withdrawal.countDocuments({ status: 'pending' });
         res.json({
             success: true,
             stats: {
@@ -376,111 +436,146 @@ app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
                 totalUnlocks,
                 activeCreators,
                 pendingApprovals,
+                totalCreatorEarnings: totalCreatorEarnings[0]?.total || 0,
+                pendingWithdrawals,
                 totalTransactions: await Transaction.countDocuments()
             }
         });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// -------------------- MPESA STK PUSH --------------------
+// -------------------- ADMIN WITHDRAWALS --------------------
+app.get('/api/admin/withdrawals', verifyAdmin, async (req, res) => {
+    try {
+        const list = await Withdrawal.find().sort({ createdAt: -1 }).populate('creatorId', 'name phone');
+        res.json({ success: true, withdrawals: list });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/admin/withdrawals/:id/pay', verifyAdmin, async (req, res) => {
+    try {
+        const w = await Withdrawal.findByIdAndUpdate(req.params.id, { status: 'paid', paidAt: new Date(), paidBy: req.admin.username }, { new: true });
+        if (!w) return res.status(404).json({ success: false, message: 'Not found' });
+        await new AdminLog({ action: 'pay_withdrawal', adminId: req.admin.username, targetId: w._id, details: { amount: w.amount, creator: w.creatorName } }).save();
+        res.json({ success: true, message: `KES ${w.amount} marked as paid to ${w.creatorName}` });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- MEGAPAY STK PUSH (UNLOCK PAYMENT) --------------------
 app.post('/api/deposit', async (req, res) => {
     try {
-        const { userPhone, amount, description } = req.body;
+        const { userPhone, amount, description, celebId } = req.body;
         if (!userPhone || !amount || amount < 10) return res.status(400).json({ success: false, message: 'Phone and amount required' });
+        if (!celebId) return res.status(400).json({ success: false, message: 'Creator ID required' });
+
+        const celeb = await Celeb.findById(celebId);
+        if (!celeb) return res.status(404).json({ success: false, message: 'Creator not found' });
+
         const refId = 'AL' + Date.now() + Math.floor(Math.random() * 1000);
         const tx = new Transaction({
             userPhone: userPhone.trim(),
+            celebId: celeb._id,
+            celebName: celeb.name,
             amount: parseInt(amount),
+            platformFee: Math.floor(amount * PLATFORM_FEE_PERCENT / 100),
+            creatorEarnings: Math.floor(amount * (100 - PLATFORM_FEE_PERCENT) / 100),
             status: 'pending',
             refId,
-            description: description || 'AfroLink unlock'
+            description: description || `Unlock ${celeb.name}`
         });
         await tx.save();
 
-        // If no MPESA credentials, return demo success
-        if (!MPESA_CONSUMER_KEY || !MPESA_PASSKEY) {
-            return res.json({ success: true, refId, message: 'Demo mode: No M-Pesa credentials configured. Payment will auto-resolve in demo.' });
+        if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) {
+            return res.json({ success: true, refId, message: 'Demo mode: No MegaPay credentials. Payment will auto-resolve.' });
         }
 
-        const token = await getMpesaToken();
-        const timestamp = getTimestamp();
-        const password = Buffer.from(`${MPESA_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
-        const phone = formatPhone(userPhone);
+        const fp = formatPhoneMegaPay(userPhone);
+        if (fp.length !== 12) return res.status(400).json({ success: false, message: 'Invalid Safaricom number format.' });
 
         const payload = {
-            BusinessShortCode: MPESA_SHORTCODE,
-            Password: password,
-            Timestamp: timestamp,
-            TransactionType: 'CustomerPayBillOnline',
-            Amount: amount,
-            PartyA: phone,
-            PartyB: MPESA_SHORTCODE,
-            PhoneNumber: phone,
-            CallBackURL: `${BASE_URL}/api/mpesa/callback`,
-            AccountReference: refId,
-            TransactionDesc: description || 'AfroLink'
+            api_key: MEGAPAY_API_KEY,
+            email: MEGAPAY_EMAIL,
+            amount: parseInt(amount),
+            msisdn: fp,
+            callback_url: `${BASE_URL}/api/megapay/webhook`,
+            description: tx.description,
+            reference: refId
         };
 
-        const url = MPESA_ENV === 'live'
-            ? 'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-            : 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-
-        const mpesaRes = await axios.post(url, payload, {
-            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            timeout: 20000
-        });
-
-        if (mpesaRes.data.ResponseCode === '0') {
-            tx.mpesaRef = mpesaRes.data.CheckoutRequestID;
-            await tx.save();
+        try {
+            const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, {
+                headers: { 'Content-Type': 'application/json' },
+                timeout: 15000
+            });
+            const mpData = mpRes.data;
+            if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) {
+                tx.status = 'failed';
+                await tx.save();
+                return res.status(400).json({ success: false, message: mpData.errorMessage || mpData.message || 'MegaPay rejected request.' });
+            }
             res.json({ success: true, refId, message: 'STK push sent to your phone.' });
-        } else {
+        } catch (mpErr) {
             tx.status = 'failed';
             await tx.save();
-            res.status(400).json({ success: false, message: mpesaRes.data.ResponseDescription || 'M-Pesa error' });
+            return res.status(502).json({ success: false, message: 'Payment gateway failed to send STK push.' });
         }
     } catch (e) {
         console.error('Deposit error:', e.message);
-        res.status(500).json({ success: false, message: e.response?.data?.errorMessage || e.message || 'Payment service error' });
+        res.status(500).json({ success: false, message: e.message || 'Payment service error' });
     }
 });
 
-// -------------------- MPESA CALLBACK --------------------
-app.post('/api/mpesa/callback', async (req, res) => {
+// -------------------- MEGAPAY WEBHOOK --------------------
+app.post('/api/megapay/webhook', async (req, res) => {
+    res.status(200).send('OK');
+
     try {
-        const { Body } = req.body;
-        if (!Body || !Body.stkCallback) return res.sendStatus(400);
-        const cb = Body.stkCallback;
-        const checkoutId = cb.CheckoutRequestID;
-        const resultCode = cb.ResultCode;
-        const resultDesc = cb.ResultDesc;
+        const data = req.body || {};
+        const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
 
-        const tx = await Transaction.findOne({ mpesaRef: checkoutId });
-        if (!tx) return res.sendStatus(200);
-
-        if (resultCode === 0) {
-            tx.status = 'success';
-            tx.callbackData = cb;
-            const meta = cb.CallbackMetadata?.Item || [];
-            const mpesaCode = meta.find(i => i.Name === 'MpesaReceiptNumber');
-            if (mpesaCode) tx.callbackData.receipt = mpesaCode.Value;
-            await tx.save();
-
-            // Credit creator if celebId exists
-            if (tx.celebId) {
-                await Celeb.findByIdAndUpdate(tx.celebId, {
-                    $inc: { unlocks: 1, totalEarned: tx.amount * 0.7, balance: tx.amount * 0.7, monthEarned: tx.amount * 0.7 }
-                });
+        if (responseCode != 0) {
+            console.log('MegaPay webhook non-zero response code:', responseCode, data);
+            const ref = data.reference || data.BillRefNumber || data.reference || '';
+            if (ref) {
+                await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data });
             }
-        } else {
-            tx.status = 'failed';
-            tx.callbackData = { resultCode, resultDesc };
-            await tx.save();
+            return;
         }
-        res.sendStatus(200);
-    } catch (e) {
-        console.error('Callback error:', e);
-        res.sendStatus(200);
+
+        const amount = parseFloat(data.TransactionAmount || data.amount || data.Amount);
+        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID;
+        const phoneRaw = String(data.Msisdn || data.phone || data.PhoneNumber || data.msisdn || data.BillRefNumber || '');
+        const ref = data.reference || data.BillRefNumber || '';
+
+        if (isNaN(amount) || amount <= 0) { console.error('Webhook invalid amount:', data); return; }
+        if (!receipt) { console.error('Webhook missing receipt:', data); return; }
+
+        const tx = await Transaction.findOne({ refId: ref });
+        if (!tx) { console.error('Webhook transaction not found for ref:', ref); return; }
+
+        const existing = await Transaction.findOne({ mpesaRef: receipt, status: 'success' });
+        if (existing) { console.log('Webhook duplicate receipt skipped:', receipt); return; }
+
+        tx.status = 'success';
+        tx.mpesaRef = receipt;
+        tx.callbackData = data;
+        await tx.save();
+
+        // Credit creator with 80%
+        if (tx.celebId) {
+            await Celeb.findByIdAndUpdate(tx.celebId, {
+                $inc: {
+                    unlocks: 1,
+                    totalEarned: tx.creatorEarnings,
+                    balance: tx.creatorEarnings,
+                    monthEarned: tx.creatorEarnings
+                }
+            });
+        }
+
+        console.log(`Payment success: ref=${ref}, creator=${tx.celebName}, earnings=${tx.creatorEarnings}, platform=${tx.platformFee}`);
+    } catch (err) {
+        console.error('MegaPay webhook fatal error:', err.message, err.stack);
     }
 });
 
@@ -496,9 +591,7 @@ app.get('/api/mpesa/status/:refId', async (req, res) => {
 // -------------------- ERROR HANDLING --------------------
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    if (err instanceof multer.MulterError) {
-        return res.status(400).json({ success: false, message: err.message });
-    }
+    if (err instanceof multer.MulterError) return res.status(400).json({ success: false, message: err.message });
     res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
@@ -513,7 +606,7 @@ async function start() {
         console.log('MongoDB connected');
         app.listen(PORT, () => {
             console.log(`AfroLink API running on port ${PORT}`);
-            console.log(`Environment: ${MPESA_ENV}`);
+            console.log(`Platform fee: ${PLATFORM_FEE_PERCENT}%`);
         });
     } catch (e) {
         console.error('Startup error:', e);

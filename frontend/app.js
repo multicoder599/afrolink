@@ -1,5 +1,33 @@
 const API_BASE = 'https://api.afrolink254.com';
 
+/* ===================== PARTICLES ===================== */
+(function() {
+    const c = document.getElementById('particleCanvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    let w, h, particles = [];
+    const colors = ['#D4AF37','#7C3AED','#F43F5E','#14B8A6','#F59E0B'];
+    function resize() { w = c.width = innerWidth; h = c.height = innerHeight; }
+    resize(); addEventListener('resize', resize);
+    class Particle {
+        reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.size = Math.random()*2.5+0.5; this.vx = (Math.random()-.5)*0.4; this.vy = (Math.random()-.5)*0.4; this.color = colors[Math.floor(Math.random()*colors.length)]; this.alpha = Math.random()*0.5+0.2; this.phase = Math.random()*Math.PI*2; }
+        constructor() { this.reset(); }
+        update() { this.x += this.vx; this.y += this.vy; this.phase += 0.02; if (this.x<0||this.x>w||this.y<0||this.y>h) this.reset(); }
+        draw() { const a = this.alpha*(0.7+0.3*Math.sin(this.phase)); ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle = this.color; ctx.globalAlpha = a; ctx.fill(); ctx.globalAlpha = 1; }
+    }
+    for (let i=0; i<60; i++) particles.push(new Particle());
+    function loop() {
+        ctx.clearRect(0,0,w,h);
+        particles.forEach(p=>{p.update();p.draw();});
+        for (let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
+            const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
+            if (d<150){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(212,175,55,${0.08*(1-d/150)})`;ctx.lineWidth=0.5;ctx.stroke();}
+        }
+        requestAnimationFrame(loop);
+    }
+    loop();
+})();
+
 /* ===================== TOAST ===================== */
 function showToast(m, t='info', ti='', d=4000) {
     const C = document.getElementById('toastContainer');
@@ -331,7 +359,7 @@ async function processPayment() {
     try {
         const res = await fetch(`${API_BASE}/api/deposit`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink` })
+            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink`, celebId: currentActiveId })
         });
         if (!res.ok) { const t = await res.text(); let m = 'Gateway error.'; try { m = JSON.parse(t).message || m; } catch {} throw new Error(m); }
         const data = await res.json();
@@ -446,7 +474,12 @@ function previewImage(e) {
     reader.onload = () => { preview.src = reader.result; preview.style.display = 'inline-block'; };
     if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 }
-function submitListing(e) { e.preventDefault(); openMpesaModalDirect('Creator Verification', 999); }
+function submitListing(e) {
+    e.preventDefault();
+    // In real implementation, this would submit the form data to /api/apply
+    // For now, trigger payment for the verification fee
+    openMpesaModalDirect('Creator Verification', 999);
+}
 
 /* ===================== COUNTER ANIMATION ===================== */
 function animateCounters() {
