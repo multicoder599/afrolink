@@ -109,7 +109,7 @@ function genCelebs() {
             category: cat.id,
             categoryName: cat.name,
             bio: `${name} is a ${cat.name.toLowerCase()} creator based in ${city}. Unlock to connect directly via WhatsApp for business, collabs, or fan requests.`,
-            img: `../images/model (${i+1}).jpg`,
+            img: `${API_BASE}/images/model (${i+1}).jpg`,
             isVerified: true,
             isOnline: i % 3 === 0,
             price,
@@ -126,9 +126,9 @@ function genCelebs() {
 }
 
 function resolveImageUrl(url) {
-    if (!url) return '../images/model (1).jpg';
+    if (!url) return `${API_BASE}/images/model (1).jpg`;
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/images/')) return '../images/' + url.replace('/images/', '');
+    if (url.startsWith('/images/')) return API_BASE + url;
     if (url.startsWith('/uploads/')) return API_BASE + url;
     if (url.startsWith('/')) return API_BASE + url;
     return url;
@@ -213,7 +213,7 @@ function shareCurrentCeleb() { if (!currentDetailCeleb) return; shareCeleb(curre
 function celebCard(c, idx) {
     const favs = getFavs();
     const isFav = favs.includes(c.id);
-    const onerr = `this.onerror=null;this.src='../images/model (1).jpg';`;
+    const onerr = `this.onerror=null;this.src='${API_BASE}/images/model (1).jpg';`;
     const onlineDot = c.isOnline ? `<div style="display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;color:#FFF;"><div style="width:5px;height:5px;background:var(--accent-lime);border-radius:50%;animation:pulseOnline 2s infinite;"></div>Online</div>` : '';
     const tiktokHtml = c.tiktokUsername ? `<div class="tiktok-mini"><i class="fa-brands fa-tiktok"></i> ${c.tiktokUsername} &bull; ${(c.tiktokFollowers||0).toLocaleString()}</div>` : '';
     return `
