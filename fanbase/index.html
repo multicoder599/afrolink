@@ -4,58 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AfroLink Creator Dashboard — fanbase.afrolink254.com</title>
-    <meta name="theme-color" content="#0a0a0f">
+    <meta name="theme-color" content="#0a0a1e">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
 :root {
-    --bg-base:#0a0a0f; --bg-card:#12121a; --bg-elevated:#1a1a28;
-    --bg-glass:rgba(18,18,26,0.88); --text-primary:#F0F0F5;
-    --text-secondary:#8b8b9e; --text-muted:#5a5a6e;
-    --accent-gold:#D4AF37; --accent-gold-hover:#B8941F; --accent-gold-soft:rgba(212,175,55,0.12);
-    --accent-purple:#7C3AED; --accent-purple-hover:#6D28D9; --accent-purple-soft:rgba(124,58,237,0.15);
-    --accent-coral:#F43F5E; --accent-coral-hover:#E11D48; --accent-coral-soft:rgba(244,63,94,0.12);
-    --accent-teal:#14B8A6; --accent-teal-soft:rgba(20,184,166,0.12);
-    --accent-amber:#F59E0B; --accent-amber-soft:rgba(245,158,11,0.12);
-    --border-subtle:#1e1e2e; --border-hover:#2d2d42;
+    --bg-base:#0a0a1e; --bg-card:#12122a; --bg-elevated:#1a1a3e;
+    --bg-glass:rgba(18,18,42,0.92); --text-primary:#F0F0F5;
+    --text-secondary:#9b9bae; --text-muted:#6a6a7e;
+    --accent-gold:#FFD700; --accent-gold-hover:#E6C200; --accent-gold-soft:rgba(255,215,0,0.15);
+    --accent-violet:#A78BFA; --accent-violet-hover:#8B5CF6; --accent-violet-soft:rgba(167,139,250,0.15);
+    --accent-magenta:#FF2D55; --accent-magenta-hover:#E6294D; --accent-magenta-soft:rgba(255,45,85,0.15);
+    --accent-lime:#00FF88; --accent-lime-soft:rgba(0,255,136,0.15);
+    --accent-amber:#FFB800; --accent-amber-soft:rgba(255,184,0,0.15);
+    --border-subtle:#1f1f3a; --border-hover:#2f2f55;
     --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:24px;
     --font-body:'Plus Jakarta Sans',sans-serif;
     --font-mono:'JetBrains Mono',monospace;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
+body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55;
+    background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,92,246,0.12) 0%, transparent 50%),
+                      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(255,45,85,0.08) 0%, transparent 50%);
+    background-attachment: fixed;
+}
 .material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
 
 /* LOGIN / REGISTER */
 .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
 .login-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:400px; box-shadow:0 24px 48px rgba(0,0,0,0.5); position:relative; overflow:hidden; }
-.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-gold),var(--accent-purple)); }
+.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-gold),var(--accent-violet)); }
 .login-logo { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:24px; }
-.login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-coral)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#0a0a0f; }
+.login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-magenta)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#08080f; }
 .login-card h1 { font-size:22px; font-weight:800; text-align:center; margin-bottom:6px; }
 .login-card p { color:var(--text-secondary); text-align:center; font-size:13px; margin-bottom:28px; }
 .form-control { width:100%; padding:13px 14px; border:1px solid var(--border-subtle); border-radius:var(--radius-md); font-size:14px; font-family:var(--font-body); transition:all .25s; background:var(--bg-base); color:var(--text-primary); margin-bottom:14px; }
 .form-control:focus { outline:none; border-color:var(--accent-gold); box-shadow:0 0 0 3px var(--accent-gold-soft); }
 .form-label { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-mono); }
 .btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:13px 20px; border-radius:var(--radius-md); font-weight:700; font-size:13px; cursor:pointer; transition:all .3s; border:none; width:100%; font-family:var(--font-body); }
-.btn--primary { background:linear-gradient(135deg,var(--accent-gold),var(--accent-gold-hover)); color:#0a0a0f; }
-.btn--primary:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(212,175,55,.3); }
-.btn--purple { background:linear-gradient(135deg,var(--accent-purple),var(--accent-purple-hover)); color:#FFF; }
+.btn--primary { background:linear-gradient(135deg,var(--accent-gold),var(--accent-gold-hover)); color:#08080f; }
+.btn--primary:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(255,215,0,.3); }
+.btn--violet { background:linear-gradient(135deg,var(--accent-violet),var(--accent-violet-hover)); color:#FFF; }
 .btn--outline { background:rgba(255,255,255,0.04); color:var(--text-primary); border:1px solid var(--border-hover); }
 .btn-sm { padding:8px 14px; font-size:12px; width:auto; }
 
 .tab-switch { display:flex; gap:8px; margin-bottom:20px; }
 .tab-switch button { flex:1; padding:10px; border-radius:var(--radius-md); border:1px solid var(--border-subtle); background:transparent; color:var(--text-secondary); font-weight:600; font-size:13px; cursor:pointer; }
-.tab-switch button.active { background:var(--accent-purple-soft); color:var(--accent-purple); border-color:var(--accent-purple); }
+.tab-switch button.active { background:var(--accent-violet-soft); color:var(--accent-violet); border-color:var(--accent-violet); }
 
 /* DASHBOARD */
 .dashboard { display:none; min-height:100vh; }
 .mobile-header { position:fixed; top:0; left:0; width:100%; height:56px; background:var(--bg-glass); backdrop-filter:blur(24px); display:flex; justify-content:space-between; align-items:center; padding:0 18px; z-index:1000; border-bottom:1px solid var(--border-subtle); }
 .desktop-header { display:none; position:fixed; top:0; left:0; width:100%; height:64px; background:var(--bg-glass); backdrop-filter:blur(24px); border-bottom:1px solid var(--border-subtle); z-index:1000; padding:0 32px; align-items:center; justify-content:space-between; }
 .logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:var(--text-primary); text-decoration:none; }
-.logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-coral)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#0a0a0f; }
+.logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),var(--accent-magenta)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#08080f; }
 
 .bottom-nav { position:fixed; bottom:0; left:0; width:100%; height:60px; background:var(--bg-glass); backdrop-filter:blur(24px); border-top:1px solid var(--border-subtle); display:flex; justify-content:space-around; align-items:center; z-index:1000; padding-bottom:env(safe-area-inset-bottom); }
 .nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); text-decoration:none; width:56px; height:100%; transition:all .3s; cursor:pointer; position:relative; background:none; border:none; font-family:inherit; }
@@ -67,21 +71,26 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .main-content { padding-top:64px; padding-bottom:80px; max-width:800px; margin:0 auto; padding-left:16px; padding-right:16px; }
 
 /* REVIEW BANNER */
-.review-banner { background:linear-gradient(135deg,var(--accent-amber-soft),rgba(245,158,11,.05)); border:1px solid rgba(245,158,11,.2); border-radius:var(--radius-lg); padding:16px; margin:16px 0; display:flex; align-items:center; gap:12px; }
+.review-banner { background:linear-gradient(135deg,var(--accent-amber-soft),rgba(255,184,0,.05)); border:1px solid rgba(255,184,0,.2); border-radius:var(--radius-lg); padding:16px; margin:16px 0; display:flex; align-items:center; gap:12px; }
 .review-banner i.material-symbols-outlined { font-size:28px; color:var(--accent-amber); }
 .review-banner h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
 .review-banner p { font-size:12px; color:var(--text-secondary); }
 
 /* PROFILE HEADER */
 .profile-header { display:flex; align-items:center; gap:16px; padding:24px 0 20px; }
-.profile-avatar { width:72px; height:72px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--accent-gold); box-shadow:0 4px 16px rgba(212,175,55,.2); }
+.profile-avatar { width:72px; height:72px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--accent-gold); box-shadow:0 4px 16px rgba(255,215,0,.2); }
 .profile-info h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; margin-bottom:2px; }
 .profile-info p { font-size:12px; color:var(--text-muted); font-family:var(--font-mono); }
-.profile-status { display:inline-flex; align-items:center; gap:6px; margin-top:6px; background:var(--accent-teal-soft); color:var(--accent-teal); padding:4px 12px; border-radius:100px; font-size:11px; font-weight:700; }
+.profile-status { display:inline-flex; align-items:center; gap:6px; margin-top:6px; background:var(--accent-lime-soft); color:var(--accent-lime); padding:4px 12px; border-radius:100px; font-size:11px; font-weight:700; }
 .profile-status.review { background:var(--accent-amber-soft); color:var(--accent-amber); }
-.profile-status .dot { width:5px; height:5px; background:var(--accent-teal); border-radius:50%; animation:pulseOnline 2s infinite; }
+.profile-status .dot { width:5px; height:5px; background:var(--accent-lime); border-radius:50%; animation:pulseOnline 2s infinite; }
 .profile-status.review .dot { background:var(--accent-amber); }
-@keyframes pulseOnline { 0%,100%{box-shadow:0 0 0 0 rgba(20,184,166,.5)} 50%{box-shadow:0 0 0 5px rgba(20,184,166,0)} }
+@keyframes pulseOnline { 0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,.5)} 50%{box-shadow:0 0 0 5px rgba(0,255,136,0)} }
+
+/* TIKTOK BADGE */
+.tiktok-badge { display:inline-flex; align-items:center; gap:6px; margin-top:8px; background:rgba(0,0,0,.4); border:1px solid var(--border-subtle); padding:6px 12px; border-radius:100px; font-size:11px; font-weight:600; color:var(--text-secondary); }
+.tiktok-badge i.material-symbols-outlined { font-size:14px; color:var(--accent-violet); }
+.tiktok-badge strong { color:var(--accent-violet); font-family:var(--font-mono); }
 
 /* STATS */
 .earnings-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
@@ -89,26 +98,37 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .earn-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px 14px; text-align:center; }
 .earn-card .earn-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
 .earn-card .earn-value { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-gold); }
-.earn-card .earn-delta { font-size:10px; color:var(--accent-teal); margin-top:4px; font-family:var(--font-mono); }
+.earn-card .earn-delta { font-size:10px; color:var(--accent-lime); margin-top:4px; font-family:var(--font-mono); }
+
+/* REFERRAL BOX */
+.referral-box { background:linear-gradient(135deg,var(--accent-violet-soft),var(--accent-gold-soft)); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; }
+.referral-box h4 { font-size:14px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.referral-box p { font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
+.ref-code-display { display:flex; align-items:center; gap:10px; background:var(--bg-base); border:1px dashed var(--accent-gold); border-radius:var(--radius-md); padding:12px 16px; margin-bottom:12px; }
+.ref-code-display .code { font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--accent-gold); letter-spacing:1px; }
+.ref-stats-mini { display:flex; gap:16px; }
+.ref-stats-mini div { font-size:11px; color:var(--text-muted); }
+.ref-stats-mini div strong { color:var(--accent-violet); font-family:var(--font-mono); }
 
 /* SECTIONS */
 .section-title { font-size:16px; font-weight:700; margin:24px 0 12px; display:flex; align-items:center; gap:8px; }
 
 /* LIST */
 .list-card { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
-.list-card .list-icon { width:40px; height:40px; border-radius:var(--radius-sm); background:var(--accent-purple-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.list-card .list-icon i.material-symbols-outlined { color:var(--accent-purple); }
+.list-card .list-icon { width:40px; height:40px; border-radius:var(--radius-sm); background:var(--accent-violet-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.list-card .list-icon i.material-symbols-outlined { color:var(--accent-violet); }
 .list-card .list-content { flex:1; }
 .list-card .list-title { font-size:13px; font-weight:700; margin-bottom:2px; }
 .list-card .list-sub { font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
 .list-card .list-amount { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--accent-gold); }
+.list-card .list-reason { font-size:10px; padding:2px 8px; border-radius:100px; background:var(--accent-violet-soft); color:var(--accent-violet); font-weight:700; font-family:var(--font-mono); margin-left:8px; }
 
 /* EDIT FORM */
 .edit-form { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; }
 .edit-form h3 { font-size:16px; font-weight:700; margin-bottom:16px; }
 
 /* WITHDRAW */
-.withdraw-box { background:linear-gradient(135deg,var(--accent-purple-soft),var(--accent-gold-soft)); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; text-align:center; }
+.withdraw-box { background:linear-gradient(135deg,var(--accent-violet-soft),var(--accent-gold-soft)); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; text-align:center; }
 .withdraw-box h4 { font-size:14px; font-weight:700; margin-bottom:8px; }
 .withdraw-box p { font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
 
@@ -116,8 +136,8 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .toast-container { position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:3000; display:flex; flex-direction:column; gap:10px; width:92%; max-width:380px; }
 .toast { background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 16px; box-shadow:0 8px 24px rgba(0,0,0,.5); display:flex; align-items:center; gap:10px; font-size:12px; font-weight:500; animation:toastIn .3s ease; }
 @keyframes toastIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
-.toast--success { border-left:3px solid var(--accent-teal); }
-.toast--error { border-left:3px solid var(--accent-coral); }
+.toast--success { border-left:3px solid var(--accent-lime); }
+.toast--error { border-left:3px solid var(--accent-magenta); }
 
 @media(min-width:768px){
     .desktop-header { display:flex!important; }
@@ -175,13 +195,19 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <input type="text" id="regCity" class="form-control" value="Nairobi">
             <label class="form-label">WhatsApp Number</label>
             <input type="tel" id="regPhone" class="form-control" placeholder="0712 345 678">
+            <label class="form-label">TikTok Username</label>
+            <input type="text" id="regTiktok" class="form-control" placeholder="@username">
+            <label class="form-label">TikTok Followers</label>
+            <input type="number" id="regTiktokFollowers" class="form-control" placeholder="e.g. 50000" value="0">
+            <label class="form-label">Referral Code (optional)</label>
+            <input type="text" id="regReferralCode" class="form-control" placeholder="e.g. AL7F3A2B">
             <label class="form-label">Unlock Price (KES)</label>
             <input type="number" id="regPrice" class="form-control" value="499" min="99">
             <label class="form-label">Create PIN</label>
             <input type="password" id="regPin" class="form-control" placeholder="4+ digits" minlength="4">
             <label class="form-label">Short Bio</label>
             <textarea id="regBio" class="form-control" style="min-height:60px;margin-bottom:14px;" placeholder="Tell fans who you are..."></textarea>
-            <button class="btn btn--purple" style="margin-top:8px;" onclick="doRegister()"><i class="material-symbols-outlined">send</i> Submit Application</button>
+            <button class="btn btn--violet" style="margin-top:8px;" onclick="doRegister()"><i class="material-symbols-outlined">send</i> Submit Application</button>
         </div>
 
         <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted);">Need help? <a href="https://afrolink254.com" style="color:var(--accent-gold);text-decoration:none;font-weight:600;">Visit main site</a></p>
@@ -216,11 +242,15 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
         <!-- PROFILE -->
         <div class="profile-header">
-            <img id="dashAvatar" class="profile-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" alt="Avatar">
+            <img id="dashAvatar" class="profile-avatar" src="/images/model (1).jpg" alt="Avatar">
             <div class="profile-info">
                 <h2 id="dashName">Creator Name</h2>
                 <p id="dashHandle">@handle</p>
                 <div class="profile-status" id="dashStatus"><div class="dot"></div> Verified & Active</div>
+                <div class="tiktok-badge" id="tiktokBadge" style="display:none;">
+                    <i class="material-symbols-outlined">music_note</i>
+                    <span>TikTok <strong id="tiktokUser">@user</strong> &bull; <strong id="tiktokFollowers">0</strong> fans</span>
+                </div>
             </div>
         </div>
 
@@ -245,6 +275,21 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 <div class="earn-label">Balance</div>
                 <div class="earn-value" id="earnBalance">KES 0</div>
                 <div class="earn-delta">Available</div>
+            </div>
+        </div>
+
+        <!-- REFERRAL BOX -->
+        <div class="referral-box" id="referralBox">
+            <h4><i class="material-symbols-outlined" style="color:var(--accent-violet);">group_add</i> Refer & Earn</h4>
+            <p>Invite creators. Earn <strong style="color:var(--accent-gold);">5%</strong> of platform fees from every unlock they get.</p>
+            <div class="ref-code-display">
+                <span class="code" id="refCode">ALXXXXXX</span>
+                <button class="btn btn--primary btn-sm" style="width:auto;padding:6px 12px;font-size:11px;" onclick="copyRefCode()"><i class="material-symbols-outlined" style="font-size:14px;">content_copy</i> Copy</button>
+            </div>
+            <div class="ref-stats-mini">
+                <div>Referrals: <strong id="refCount">0</strong></div>
+                <div>Ref Earnings: <strong id="refEarnings">KES 0</strong></div>
+                <div>Active: <strong id="refActive">0</strong></div>
             </div>
         </div>
 
@@ -278,9 +323,13 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <input type="number" id="editPrice" class="form-control" style="margin-bottom:14px;">
             <label class="form-label">WhatsApp Number</label>
             <input type="tel" id="editPhone" class="form-control" style="margin-bottom:14px;">
+            <label class="form-label">TikTok Username</label>
+            <input type="text" id="editTiktok" class="form-control" style="margin-bottom:14px;" placeholder="@username">
+            <label class="form-label">TikTok Followers</label>
+            <input type="number" id="editTiktokFollowers" class="form-control" style="margin-bottom:14px;" placeholder="0">
             <label class="form-label">Social Handle</label>
             <input type="text" id="editSocial" class="form-control" style="margin-bottom:14px;">
-            <button class="btn btn--purple btn-sm" style="width:auto;" onclick="saveProfile()"><i class="material-symbols-outlined">save</i> Save Changes</button>
+            <button class="btn btn--violet btn-sm" style="width:auto;" onclick="saveProfile()"><i class="material-symbols-outlined">save</i> Save Changes</button>
         </div>
     </main>
 
@@ -300,12 +349,13 @@ let creatorToken = localStorage.getItem('afrolink_creator_token');
 let currentCreator = null;
 let transactions = [];
 let withdrawals = [];
+let referralStats = { totalEarnings: 0, activeCount: 0, totalCount: 0 };
 
 function showToast(m, t='info', ti='') {
     const C = document.getElementById('toastContainer');
     const el = document.createElement('div');
     el.className = `toast toast--${t}`;
-    el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-teal)':t==='error'?'var(--accent-coral)':'var(--accent-gold)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
+    el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-lime)':t==='error'?'var(--accent-magenta)':'var(--accent-gold)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
     C.appendChild(el);
     setTimeout(() => el.remove(), 4000);
 }
@@ -341,10 +391,12 @@ async function doLogin() {
                 id:'demo', name:'Willy Paul', handle:'@willy.paul.msafi',
                 bio:'Kenyan artist blending gengetone and bongo flava.',
                 price:999, phone:'0712345678', social:'@willy.paul.msafi',
-                avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+                tiktokUsername:'@willypaul', tiktokFollowers:1200000,
+                avatar:'/images/model (1).jpg',
                 totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900,
-                status:'verified'
+                referralEarnings:1200, referralCode:'ALDEMO01', status:'verified'
             };
+            referralStats = { totalEarnings: 1200, activeCount: 3, totalCount: 5 };
             enterDashboard();
             showToast('Welcome back, Creator', 'success', 'Logged In');
         } else {
@@ -359,6 +411,9 @@ async function doRegister() {
         category: document.getElementById('regCategory').value,
         city: document.getElementById('regCity').value,
         phone: document.getElementById('regPhone').value,
+        tiktokUsername: document.getElementById('regTiktok').value,
+        tiktokFollowers: parseInt(document.getElementById('regTiktokFollowers').value) || 0,
+        referralCode: document.getElementById('regReferralCode').value,
         price: parseInt(document.getElementById('regPrice').value) || 499,
         pin: document.getElementById('regPin').value,
         bio: document.getElementById('regBio').value
@@ -408,11 +463,19 @@ async function loadCreatorData() {
             id:'demo', name:'Willy Paul', handle:'@willy.paul.msafi',
             bio:'Kenyan artist blending gengetone and bongo flava.',
             price:999, phone:'0712345678', social:'@willy.paul.msafi',
-            avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
+            tiktokUsername:'@willypaul', tiktokFollowers:1200000,
+            avatar:'/images/model (1).jpg',
             totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900,
-            status:'verified'
+            referralEarnings:1200, referralCode:'ALDEMO01', status:'verified'
         };
     }
+    try {
+        const refRes = await fetch(`${API_BASE}/api/creator/referral-stats`, { headers:{'Authorization':'Bearer '+creatorToken} });
+        if (refRes.ok) {
+            const refData = await refRes.json();
+            referralStats = { totalEarnings: refData.totalEarnings||0, activeCount: refData.activeCount||0, totalCount: refData.totalCount||0 };
+        }
+    } catch(e) {}
     renderDashboard();
     loadTransactions();
     loadWithdrawals();
@@ -423,18 +486,34 @@ function renderDashboard() {
     document.getElementById('dashName').innerText = c.name;
     document.getElementById('dashHandle').innerText = c.handle;
     document.getElementById('headerName').innerText = c.name;
-    document.getElementById('dashAvatar').src = c.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop';
+    document.getElementById('dashAvatar').src = c.avatar || '/images/model (1).jpg';
     document.getElementById('earnTotal').innerText = 'KES ' + (c.totalEarned||0).toLocaleString();
     document.getElementById('earnMonth').innerText = 'KES ' + (c.monthEarned||0).toLocaleString();
     document.getElementById('earnUnlocks').innerText = (c.unlocks||0).toLocaleString();
-    document.getElementById('earnBalance').innerText = 'KES ' + (c.balance||0).toLocaleString();
+    const totalBal = (c.balance||0) + (c.referralEarnings||0);
+    document.getElementById('earnBalance').innerText = 'KES ' + totalBal.toLocaleString();
     document.getElementById('editName').value = c.name;
     document.getElementById('editBio').value = c.bio || '';
     document.getElementById('editPrice').value = c.price || 499;
     document.getElementById('editPhone').value = c.phone || '';
     document.getElementById('editSocial').value = c.social || '';
+    document.getElementById('editTiktok').value = c.tiktokUsername || '';
+    document.getElementById('editTiktokFollowers').value = c.tiktokFollowers || 0;
 
-    // Show/hide review banner and disable withdraw if under review
+    const tiktokBadge = document.getElementById('tiktokBadge');
+    if (c.tiktokUsername) {
+        tiktokBadge.style.display = 'inline-flex';
+        document.getElementById('tiktokUser').innerText = c.tiktokUsername;
+        document.getElementById('tiktokFollowers').innerText = (c.tiktokFollowers||0).toLocaleString();
+    } else {
+        tiktokBadge.style.display = 'none';
+    }
+
+    document.getElementById('refCode').innerText = c.referralCode || 'N/A';
+    document.getElementById('refCount').innerText = referralStats.totalCount || 0;
+    document.getElementById('refEarnings').innerText = 'KES ' + (referralStats.totalEarnings||0).toLocaleString();
+    document.getElementById('refActive').innerText = referralStats.activeCount || 0;
+
     const isVerified = c.status === 'verified';
     document.getElementById('reviewBanner').style.display = isVerified ? 'none' : 'flex';
     const statusEl = document.getElementById('dashStatus');
@@ -451,6 +530,16 @@ function renderDashboard() {
     }
 }
 
+function copyRefCode() {
+    const code = currentCreator?.referralCode || '';
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Referral code copied!', 'success', 'Copied');
+    }).catch(() => {
+        showToast('Code: ' + code, 'info', 'Copy manually');
+    });
+}
+
 async function loadTransactions() {
     try {
         const res = await fetch(`${API_BASE}/api/creator/transactions`, { headers:{'Authorization':'Bearer '+creatorToken} });
@@ -460,11 +549,11 @@ async function loadTransactions() {
         }
     } catch(e) {
         transactions = [
-            {id:'t1',user:'0712XXXXXX',amount:999,date:new Date(Date.now()-3600000).toISOString()},
-            {id:'t2',user:'0723XXXXXX',amount:999,date:new Date(Date.now()-7200000).toISOString()},
-            {id:'t3',user:'0734XXXXXX',amount:999,date:new Date(Date.now()-18000000).toISOString()},
-            {id:'t4',user:'0745XXXXXX',amount:999,date:new Date(Date.now()-86400000).toISOString()},
-            {id:'t5',user:'0756XXXXXX',amount:999,date:new Date(Date.now()-172800000).toISOString()},
+            {id:'t1',user:'0712XXXXXX',amount:999,fanRequestReason:'fan',date:new Date(Date.now()-3600000).toISOString()},
+            {id:'t2',user:'0723XXXXXX',amount:999,fanRequestReason:'business',date:new Date(Date.now()-7200000).toISOString()},
+            {id:'t3',user:'0734XXXXXX',amount:999,fanRequestReason:'collaboration',date:new Date(Date.now()-18000000).toISOString()},
+            {id:'t4',user:'0745XXXXXX',amount:999,fanRequestReason:'mentorship',date:new Date(Date.now()-86400000).toISOString()},
+            {id:'t5',user:'0756XXXXXX',amount:999,fanRequestReason:'fan',date:new Date(Date.now()-172800000).toISOString()},
         ];
     }
     renderFans();
@@ -498,7 +587,10 @@ function renderFans() {
                 <div class="list-title">Fan unlocked your contact</div>
                 <div class="list-sub">${timeAgo(t.date)} &bull; ${t.user}</div>
             </div>
-            <div class="list-amount">+KES ${t.amount.toLocaleString()}</div>
+            <div style="display:flex;align-items:center;">
+                <div class="list-amount">+KES ${t.amount.toLocaleString()}</div>
+                <span class="list-reason">${t.fanRequestReason||'fan'}</span>
+            </div>
         </div>
     `).join('');
 }
@@ -508,8 +600,8 @@ function renderWithdrawals() {
     if (!withdrawals.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No withdrawals yet.</p>'; return; }
     container.innerHTML = withdrawals.map(w => `
         <div class="list-card">
-            <div class="list-icon" style="background:${w.status==='paid'?'var(--accent-teal-soft)':'var(--accent-amber-soft)'};">
-                <i class="material-symbols-outlined" style="color:${w.status==='paid'?'var(--accent-teal)':'var(--accent-amber)'};">${w.status==='paid'?'check_circle':'hourglass_top'}</i>
+            <div class="list-icon" style="background:${w.status==='paid'?'var(--accent-lime-soft)':'var(--accent-amber-soft)'};">
+                <i class="material-symbols-outlined" style="color:${w.status==='paid'?'var(--accent-lime)':'var(--accent-amber)'}">${w.status==='paid'?'check_circle':'hourglass_top'}</i>
             </div>
             <div class="list-content">
                 <div class="list-title">Withdrawal ${w.status==='paid'?'Completed':'Pending'}</div>
@@ -526,7 +618,9 @@ async function saveProfile() {
         bio: document.getElementById('editBio').value,
         price: parseInt(document.getElementById('editPrice').value) || 499,
         phone: document.getElementById('editPhone').value,
-        social: document.getElementById('editSocial').value
+        social: document.getElementById('editSocial').value,
+        tiktokUsername: document.getElementById('editTiktok').value,
+        tiktokFollowers: parseInt(document.getElementById('editTiktokFollowers').value) || 0
     };
     try {
         const res = await fetch(`${API_BASE}/api/creator/me`, {
@@ -544,7 +638,7 @@ async function saveProfile() {
 
 async function requestWithdrawal() {
     const amount = parseInt(document.getElementById('withdrawAmount').value);
-    const bal = currentCreator ? (currentCreator.balance || 0) : 0;
+    const bal = currentCreator ? ((currentCreator.balance || 0) + (currentCreator.referralEarnings || 0)) : 0;
     if (!amount || amount < 500) { showToast('Minimum withdrawal is KES 500', 'warning', 'Too Low'); return; }
     if (amount > bal) { showToast('Insufficient balance', 'error', 'Error'); return; }
     try {
@@ -556,13 +650,17 @@ async function requestWithdrawal() {
         if (data.success) {
             showToast(data.message, 'success', 'Requested');
             currentCreator.balance = data.balance;
+            currentCreator.referralEarnings = data.referralEarnings;
             renderDashboard();
             loadWithdrawals();
         } else {
             showToast(data.message || 'Failed', 'error');
         }
     } catch(e) {
-        currentCreator.balance -= amount;
+        const fromBalance = Math.min(amount, currentCreator.balance || 0);
+        const fromRef = amount - fromBalance;
+        currentCreator.balance = (currentCreator.balance || 0) - fromBalance;
+        currentCreator.referralEarnings = (currentCreator.referralEarnings || 0) - fromRef;
         withdrawals.unshift({id:'w'+Date.now(),amount,status:'pending',createdAt:new Date().toISOString()});
         renderDashboard();
         renderWithdrawals();

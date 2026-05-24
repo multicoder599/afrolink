@@ -1,4 +1,5 @@
 const API_BASE = 'https://api.afrolink254.com';
+let demoModeEnabled = true;
 
 /* ===================== PARTICLES ===================== */
 (function() {
@@ -6,7 +7,7 @@ const API_BASE = 'https://api.afrolink254.com';
     if (!c) return;
     const ctx = c.getContext('2d');
     let w, h, particles = [];
-    const colors = ['#D4AF37','#7C3AED','#F43F5E','#14B8A6','#F59E0B'];
+    const colors = ['#FFD700','#A78BFA','#FF2D55','#00FF88','#FFB800'];
     function resize() { w = c.width = innerWidth; h = c.height = innerHeight; }
     resize(); addEventListener('resize', resize);
     class Particle {
@@ -21,7 +22,7 @@ const API_BASE = 'https://api.afrolink254.com';
         particles.forEach(p=>{p.update();p.draw();});
         for (let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
             const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-            if (d<150){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(212,175,55,${0.08*(1-d/150)})`;ctx.lineWidth=0.5;ctx.stroke();}
+            if (d<150){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(167,139,250,${0.08*(1-d/150)})`;ctx.lineWidth=0.5;ctx.stroke();}
         }
         requestAnimationFrame(loop);
     }
@@ -41,6 +42,17 @@ function showToast(m, t='info', ti='', d=4000) {
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
 }
 
+/* ===================== SETTINGS ===================== */
+async function loadSettings() {
+    try {
+        const res = await fetch(`${API_BASE}/api/settings`);
+        const data = await res.json();
+        demoModeEnabled = data.demoMode !== false;
+    } catch(e) {
+        demoModeEnabled = true;
+    }
+}
+
 /* ===================== CATEGORIES ===================== */
 const CATEGORIES = [
     {id:'all', name:'All', icon:'apps'},
@@ -58,42 +70,18 @@ const CATEGORIES = [
 ];
 
 /* ===================== DEMO DATA ===================== */
-const CELEB_NAMES = ["Willy Paul","Bahati","Nadia Mukami","Otile Brown","DJ Joe Mfalme","Eric Omondi","DJ Pierra Makena","Amber Ray","Vera Sidika","Bahati","Njugush","DJ Kalonje","Azziad Nasenya","Eddie Butita","Mammito","DJ Creme","Khaligraph Jones","Sauti Sol","Femi One","Mejja","Nadia Mukami","Tanasha Donna","Arrow Bwoy","Nviiri","Bensoul","H_art The Band","Otile Brown","Willy Paul","Bahati","Nadia Mukami"];
-const CELEB_HANDLES = ["@willy.paul.msafi","@bahatikenya","@nadiamukami","@otilebrown","@djjoemfalme","@ericomondi","@pierramakena","@iamamberray","@queenveebosset","@bahatikenya","@blessednjugush","@djkalonje","@azz_iad","@eddiebutita","@mammitoeunice","@djcremedelacreme","@khaligraph_jones","@sautisol","@femi_one","@mejja_genge","@nadiamukami","@tanashadonna","@arrowbwoy","@nviiri","@bensoulmusic","@harttheband","@otilebrown","@willypaul","@bahatikenya","@nadiamukami"];
-const CITIES = ["Nairobi","Mombasa","Kisumu","Nakuru","Nairobi","Nairobi","Nairobi","Nairobi","Mombasa","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi","Nairobi"];
-const BIOS = [
-    "Kenyan artist blending gengetone and bongo flava. Let's create magic together.",
-    "Award-winning gospel turned secular artist. DM for collabs and bookings.",
-    "East African songstress. For features, events & brand partnerships — unlock me.",
-    "R&B King of East Africa. Let's talk music, love, and business.",
-    "The mixmaster behind Kenya's biggest parties. Bookings open via unlock.",
-    "Comedian, content creator, and activist. Let's make Kenya laugh harder.",
-    "Queen of the decks. Corporate events, clubs & private parties — hit me up.",
-    "Socialite, entrepreneur, and brand influencer. Business inquiries only.",
-    "East Africa's original socialite. For brand deals and appearances.",
-    "From gospel to greatness. Music, fatherhood, and everything in between.",
-    "Comedian and family man. For skits, ads, and corporate MC gigs.",
-    "The baddest DJ in the 254. Mixtapes, events, and club nights.",
-    "TikTok queen and radio presenter. Let's dance into your DMs.",
-    "Comedian, director, and producer. For scripts, shows, and collabs.",
-    "Stand-up queen. For events, writing, and that good energy.",
-    "International DJ and producer. Let's take your event global.",
-    "OG Kenyan rapper. Lyrical genius available for features & cyphers.",
-    "Africa's biggest band. For festivals, private shows, and partnerships.",
-    "Femcee on the rise. Bars, business, and bold moves only.",
-    "Genge legend. For verses, hooks, and that classic Kenyan sound.",
-    "Melodies from the heart of Nairobi. Features and shows available.",
-    "Singer, model, and mother. For bookings and brand collaborations.",
-    "Love songs and good vibes. Let's make your event unforgettable.",
-    "Sol Generation star. Soulful sounds for your next project.",
-    "Soulful singer-songwriter. For intimate shows and studio sessions.",
-    "Band with heart. Weddings, corporate, and festivals — we do it all.",
-    "R&B sensation. Let's talk music, love, and everything nice.",
-    "Controversial but talented. For features that break the internet.",
-    "Hitmaker and family man. Gospel roots, secular fruits.",
-    "East African queen. For features, shows, and everything music."
+const DEMO_NAMES = [
+  "Willy Paul","Bahati","Nadia Mukami","Otile Brown","DJ Joe Mfalme","Eric Omondi","DJ Pierra Makena","Amber Ray","Vera Sidika","Njugush",
+  "DJ Kalonje","Azziad Nasenya","Eddie Butita","Mammito","DJ Creme","Khaligraph Jones","Sauti Sol","Femi One","Mejja","Tanasha Donna",
+  "Arrow Bwoy","Nviiri the Storyteller","Bensoul","H_art the Band","Brian Chweya","Sharon Mwangi","Kevin Otieno","Grace Wanjiku","James Kamau","Linda Ochieng",
+  "Victor Mutua","Diana Achieng","Allan Kipchirchir","Cynthia Muthoni","Mark Oloo","Joyce Akinyi","Paul Odhiambo","Irene Wangari","George Mwangi","Juliet Kemunto",
+  "Alex Opondo","Nancy Chebet","Peter Kiprotich","Ruth Jepchirchir","Samuel Wanyama","Betty Nyambura","Joseph Kariuki","Esther Wairimu","Charles Njoroge","Alice Wanjiru",
+  "Robert Onyango","Maria Auma","Henry Mbugua","Lucy Wacera","Thomas Kinyua","Catherine Waithaka","Emmanuel Githinji","Lilian Muriithi","Andrew Wangechi","Gladys Kamande",
+  "Stephen Wambura","Ann Oduor","Francis Wekesa","Jane Simiyu","Patrick Wanyonyi","Margaret Ongwae","Michael Wamalwa","Dorothy Khamisi","David Were","Christine Wandera",
+  "Daniel Okoth","Catherine Wanga","Matthew Otieno","Rachel Awuor","Christopher Odongo","Martha Adhiambo","Benjamin Obiero","Phyllis Winnie","Joshua Ongaro","Naomi Apondi",
+  "John Ouma","Rebecca Wandayi","Anthony Osogo","Sharon Wanyama","Timothy Otiende","Angela Wambua","Nicholas Onguso","Esther Mutiso","Edward Wanza","Lucy Kyalo",
+  "Isaac Kivuva","Irene Wavinya","Gabriel Mutua","Joy Achieng","Moses Wanjiru","Nancy Kamau","Abraham Omondi","Mary Wangui","Isaac Mbugua","Lydia Njoroge"
 ];
-const RI = a => a[Math.floor(Math.random() * a.length)];
 
 let globalCelebs = [];
 let adminCelebsLoaded = false;
@@ -103,25 +91,34 @@ let currentFilter = 'all';
 function genCelebs() {
     const arr = [];
     const cats = CATEGORIES.filter(c => c.id !== 'all');
-    for (let i = 0; i < 32; i++) {
+    const cities = ["Nairobi","Mombasa","Kisumu","Nakuru","Eldoret","Malindi","Thika","Nyeri","Meru","Kakamega"];
+    const prices = [299,499,799,999,1499,1999,2999,3999,4999];
+
+    for (let i = 0; i < 100; i++) {
         const cat = cats[i % cats.length];
-        const price = [299,499,799,999,1499,1999,2999][i % 7];
+        const name = DEMO_NAMES[i] || `Creator ${i+1}`;
+        const handle = '@' + name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const price = prices[i % prices.length];
+        const city = cities[i % cities.length];
         arr.push({
             id: 'demo_' + i,
-            name: CELEB_NAMES[i] || RI(CELEB_NAMES),
-            handle: CELEB_HANDLES[i] || '@creator' + i,
-            age: Math.floor(Math.random() * (38 - 21 + 1)) + 21,
-            city: CITIES[i] || 'Nairobi',
+            name,
+            handle,
+            age: 21 + (i % 18),
+            city,
             category: cat.id,
             categoryName: cat.name,
-            bio: BIOS[i] || RI(BIOS),
-            img: `https://images.unsplash.com/photo-${['1494790108377-be9c29b29330','1534528741775-53994a69daeb','1507003211169-0a1dd7228f2d','1524504388940-b1ea6d0f2f30','1517841905240-472988babdf9','1539571696357-5a69c17a67f8','1506794778202-cad84cf45f1d','1531746020798-e6953c6e8e04','1519085360753-af0119f7cbe6','1544005313-94ddf0286df2','1500648767791-00dcc994a43e','1492562080023-ab3db95dd229','1531123897727-8f129e1688ce','1519699047748-de8e457a634e','1529626455594-4ff0802cfb7e','1534751516642-b14c2b9cb6d2','1519345182560-3f2917c472ef','1531427186610-ecffd6a8913d','1504257432389-52343af06ae3','1521119989659-a83a488f3d4b','1507591063883-0d30b66b9aee','1496345875659-11f7bc282055','1523264939884-262f2b2a1a62','1516589178581-6cd7833ae3b2','1522071820081-009f0129c71c','1509967419530-0afdb6d0f3b3','1519058084540-e2f1d245b3b5','1524250502761-4ac7d9b0f0c1','1517849845537-4d257902454a','1508214751196-bcfd4ca60f91'][i % 30]}?w=400&h=600&fit=crop`,
+            bio: `${name} is a ${cat.name.toLowerCase()} creator based in ${city}. Unlock to connect directly via WhatsApp for business, collabs, or fan requests.`,
+            img: `/images/model (${i+1}).jpg`,
             isVerified: true,
-            isOnline: Math.random() > 0.5,
-            price: price,
-            phone: '+2547' + (10 + Math.floor(Math.random() * 89)) + Math.floor(Math.random() * 899999 + 100000),
-            unlocks: Math.floor(Math.random() * 500),
-            social: '@' + CELEB_NAMES[i].toLowerCase().replace(/\s/g,'') + '_ke',
+            isOnline: i % 3 === 0,
+            price,
+            phone: '+2547' + (10 + (i % 89)) + String(100000 + ((i * 137) % 899999)).slice(1),
+            unlocks: Math.floor(Math.random() * 500) + (i * 3),
+            social: handle,
+            tiktokUsername: i % 2 === 0 ? handle : '',
+            tiktokFollowers: i % 2 === 0 ? (10000 + i * 1200) : 0,
+            verificationBadge: true,
             isReal: false
         });
     }
@@ -129,8 +126,9 @@ function genCelebs() {
 }
 
 function resolveImageUrl(url) {
-    if (!url) return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop';
+    if (!url) return '/images/model (1).jpg';
     if (url.startsWith('http')) return url;
+    if (url.startsWith('/images/')) return url;
     if (url.startsWith('/uploads/')) return API_BASE + url;
     if (url.startsWith('/')) return API_BASE + url;
     return url;
@@ -141,7 +139,7 @@ async function loadAdminCelebs() {
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
-        const res = await fetch(`${API_BASE}/api/celebs?limit=100`, { signal: controller.signal });
+        const res = await fetch(`${API_BASE}/api/celebs?limit=200`, { signal: controller.signal });
         clearTimeout(timeout);
         if (!res.ok) throw new Error('Server error ' + res.status);
         const data = await res.json();
@@ -166,16 +164,19 @@ async function loadAdminCelebs() {
                 phone: c.phone || c.whatsapp || '',
                 unlocks: c.unlocks || Math.floor(Math.random() * 200),
                 social: c.social || c.handle || '',
+                tiktokUsername: c.tiktokUsername || '',
+                tiktokFollowers: c.tiktokFollowers || 0,
+                verificationBadge: c.verificationBadge || false,
                 isReal: true
             }));
-            globalCelebs = [...mapped, ...genCelebs()];
+            globalCelebs = demoModeEnabled ? [...mapped, ...genCelebs()] : [...mapped];
             adminCelebsLoaded = true;
         } else {
             throw new Error('Empty admin database');
         }
     } catch (err) {
         console.warn('Admin fetch failed, using demo data:', err.message);
-        globalCelebs = genCelebs();
+        globalCelebs = demoModeEnabled ? genCelebs() : [];
     }
 }
 
@@ -212,8 +213,9 @@ function shareCurrentCeleb() { if (!currentDetailCeleb) return; shareCeleb(curre
 function celebCard(c, idx) {
     const favs = getFavs();
     const isFav = favs.includes(c.id);
-    const onerr = `this.onerror=null;this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop';`;
-    const onlineDot = c.isOnline ? `<div style="display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;color:#FFF;"><div style="width:5px;height:5px;background:var(--accent-teal);border-radius:50%;animation:pulseOnline 2s infinite;"></div>Online</div>` : '';
+    const onerr = `this.onerror=null;this.src='/images/model (1).jpg';`;
+    const onlineDot = c.isOnline ? `<div style="display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;color:#FFF;"><div style="width:5px;height:5px;background:var(--accent-lime);border-radius:50%;animation:pulseOnline 2s infinite;"></div>Online</div>` : '';
+    const tiktokHtml = c.tiktokUsername ? `<div class="tiktok-mini"><i class="fa-brands fa-tiktok"></i> ${c.tiktokUsername} &bull; ${(c.tiktokFollowers||0).toLocaleString()}</div>` : '';
     return `
     <div class="celeb-card" data-id="${c.id}" onclick="openDetailModal('${c.id}')">
         <div class="card-img-wrap">
@@ -226,6 +228,7 @@ function celebCard(c, idx) {
             <div style="position:absolute;bottom:14px;left:14px;right:14px;z-index:2;">
                 <div class="card-name">${c.name}</div>
                 <div class="card-handle">${c.handle}</div>
+                ${tiktokHtml}
                 <div class="card-meta">
                     <div class="card-price">KES ${c.price.toLocaleString()}</div>
                     <div class="card-lock"><i class="material-symbols-outlined" style="font-size:14px;">lock</i></div>
@@ -237,7 +240,7 @@ function celebCard(c, idx) {
                 <span class="card-tag">${c.categoryName}</span>
                 <span class="card-tag">${c.city}</span>
             </div>
-            <button class="btn btn--coral unlock-btn" onclick="event.stopPropagation();openMpesaModalDirect('${c.name}',${c.price},'${c.id}')"><i class="material-symbols-outlined" style="font-size:16px;">lock_open</i> Unlock</button>
+            <button class="btn btn--magenta unlock-btn" onclick="event.stopPropagation();openMpesaModalDirect('${c.name}',${c.price},'${c.id}')"><i class="material-symbols-outlined" style="font-size:16px;">lock_open</i> Unlock</button>
         </div>
     </div>`;
 }
@@ -250,8 +253,8 @@ function renderCelebs(list, containerId) {
 }
 
 function renderDiscover() {
-    document.getElementById('discover-trending').innerHTML = globalCelebs.slice(0, 6).map((c, i) => celebCard(c, i)).join('');
-    document.getElementById('discover-rising').innerHTML = globalCelebs.slice(6, 12).map((c, i) => celebCard(c, i)).join('');
+    document.getElementById('discover-trending').innerHTML = globalCelebs.slice(0, 20).map((c, i) => celebCard(c, i)).join('');
+    document.getElementById('discover-rising').innerHTML = globalCelebs.slice(20, 40).map((c, i) => celebCard(c, i)).join('');
 }
 
 function renderCategoryPills(containerId, onClick) {
@@ -268,7 +271,7 @@ function filterCelebs(catId, btn) {
     if (btn) btn.classList.add('active');
     currentFilter = catId;
     const filtered = catId === 'all' ? globalCelebs : globalCelebs.filter(c => c.category === catId);
-    renderCelebs(filtered, 'all-celebs-grid');
+    renderCelebs(filtered.slice(0, 60), 'all-celebs-grid');
 }
 
 function renderCategoriesPage() {
@@ -279,7 +282,7 @@ function renderCategoriesPage() {
         return `
         <div class="celeb-card" style="aspect-ratio:16/10;" onclick="navigateTo('celebs');setTimeout(()=>filterCelebs('${cat.id}',document.querySelector('[data-cat=${cat.id}]')),300)">
             <div class="card-img-wrap" style="aspect-ratio:16/10;">
-                <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--accent-purple-soft),var(--accent-gold-soft));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--accent-violet-soft),var(--accent-gold-soft));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
                     <i class="material-symbols-outlined" style="font-size:36px;color:var(--accent-gold);">${cat.icon}</i>
                     <div style="font-size:16px;font-weight:700;color:var(--text-primary);">${cat.name}</div>
                     <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${count} creators</div>
@@ -298,7 +301,7 @@ function openDetailModal(id) {
     currentDetailCeleb = c;
     const img = document.getElementById('detail-img');
     img.src = c.img;
-    img.onerror = function() { this.src = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop'; };
+    img.onerror = function() { this.src = '/images/model (1).jpg'; };
     document.getElementById('detail-name').innerHTML = `${c.name} <i class="material-symbols-outlined" style="color:var(--accent-gold);font-size:20px;">verified</i>`;
     document.getElementById('detail-category').innerHTML = `<i class="material-symbols-outlined">category</i> ${c.categoryName} &bull; ${c.city}`;
     document.getElementById('detail-bio').innerText = c.bio || 'No bio available.';
@@ -306,8 +309,18 @@ function openDetailModal(id) {
     document.getElementById('detail-price-stat').innerText = c.price.toLocaleString();
     document.getElementById('detail-unlocks').innerText = c.unlocks.toLocaleString();
     document.getElementById('detail-city').innerText = c.city.substring(0,3).toUpperCase();
+
+    const tiktokRow = document.getElementById('detail-tiktok-row');
+    if (c.tiktokUsername) {
+        tiktokRow.style.display = 'flex';
+        document.getElementById('detail-tiktok-user').innerText = c.tiktokUsername;
+        document.getElementById('detail-tiktok-followers').innerText = (c.tiktokFollowers||0).toLocaleString();
+    } else {
+        tiktokRow.style.display = 'none';
+    }
+
     const socialDiv = document.getElementById('detail-social');
-    socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-base);border-radius:var(--radius-md);border:1px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-coral);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
+    socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-base);border-radius:var(--radius-md);border:1px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-magenta);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
     const favs = getFavs();
     const btn = document.getElementById('detailFavBtn');
     btn.innerHTML = `<i class="material-symbols-outlined">${favs.includes(c.id) ? 'favorite' : 'favorite_border'}</i>`;
@@ -329,9 +342,10 @@ function openMpesaModalDirect(name, price, id = '') {
     currentActiveName = name; currentActivePrice = price; currentActiveId = id;
     document.getElementById('modal-celeb-name').innerText = name;
     document.getElementById('modal-price').innerText = price.toLocaleString();
+    document.getElementById('fanReason').value = 'fan';
     document.querySelectorAll('.step-dot').forEach((d, i) => { d.className = 'step-dot' + (i === 0 ? ' active' : ''); });
     const btn = document.getElementById('mpesaSubmitBtn');
-    btn.disabled = false; btn.className = 'btn btn--coral btn-glow';
+    btn.disabled = false; btn.className = 'btn btn--magenta btn-glow';
     document.getElementById('btnText').innerHTML = 'Send M-Pesa Prompt';
     mpesaModal.classList.add('active');
 }
@@ -345,6 +359,7 @@ function closeMpesaModal() {
 /* ===================== PAYMENT ===================== */
 async function processPayment() {
     const phone = document.getElementById('mpesaNumber').value.trim().replace(/\s/g, '');
+    const fanReason = document.getElementById('fanReason').value;
     if (!phone || phone.length < 9) { showToast('Enter a valid Safaricom number.', 'error', 'Invalid'); return; }
     const prefixes = ['0701','0702','0703','0704','0705','0706','0707','0708','0709','0710','0711','0712','0713','0714','0715','0716','0717','0718','0719','0720','0721','0722','0723','0724','0725','0726','0727','0728','0729','0740','0741','0742','0743','0745','0746','0748','0751','0752','0753','0754','0755','0756','0757','0758','0759','0768','0769','0790','0791','0792','0793','0794','0795','0796','0797','0798','0799','0110','0111','0112','0113','0114','0115'];
     const valid = prefixes.some(p => phone.startsWith(p) || phone.startsWith('+' + p) || phone.startsWith('254' + p.substring(1)));
@@ -359,7 +374,7 @@ async function processPayment() {
     try {
         const res = await fetch(`${API_BASE}/api/deposit`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink`, celebId: currentActiveId })
+            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink`, celebId: currentActiveId, fanRequestReason: fanReason })
         });
         if (!res.ok) { const t = await res.text(); let m = 'Gateway error.'; try { m = JSON.parse(t).message || m; } catch {} throw new Error(m); }
         const data = await res.json();
@@ -420,7 +435,7 @@ function showContactReveal() {
     if (!modal || !content) return;
     modal.classList.add('active');
     content.innerHTML = `
-        <div style="width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent-teal);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+        <div style="width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent-lime);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
         <h3 style="font-size:18px;margin-bottom:6px;color:var(--text-primary);">Payment Successful!</h3>
         <p style="color:var(--text-secondary);font-size:13px;">Revealing contact...</p>
     `;
@@ -429,8 +444,8 @@ function showContactReveal() {
         let displayPhone = c && c.phone ? c.phone : '+2547' + (10 + Math.floor(Math.random() * 89)) + 'XXXXXX';
         const waLink = `https://wa.me/${displayPhone.replace(/\D/g,'')}`;
         content.innerHTML = `
-            <div style="width:64px;height:64px;border-radius:50%;background:var(--accent-teal-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:1px solid rgba(20,184,166,.3);">
-                <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-teal);">phone_in_talk</i>
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--accent-lime-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:1px solid rgba(0,255,136,.3);">
+                <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-lime);">phone_in_talk</i>
             </div>
             <h3 style="font-size:18px;margin-bottom:4px;color:var(--text-primary);">Contact Unlocked!</h3>
             <p style="color:var(--text-secondary);font-size:12px;margin-bottom:10px;">Reach out via WhatsApp</p>
@@ -452,7 +467,7 @@ function closeContactRevealModal() { document.getElementById('contactRevealModal
 
 /* ===================== CONFETTI ===================== */
 function launchConfetti() {
-    const colors = ['#D4AF37', '#7C3AED', '#F43F5E', '#14B8A6', '#F59E0B'];
+    const colors = ['#FFD700', '#A78BFA', '#FF2D55', '#00FF88', '#FFB800'];
     for (let i = 0; i < 50; i++) {
         const el = document.createElement('div');
         el.style.cssText = `position:fixed;width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};left:${Math.random()*100}vw;top:-10px;pointer-events:none;z-index:5000;animation:cf ${Math.random()*2+2}s ease-out forwards;`;
@@ -476,8 +491,6 @@ function previewImage(e) {
 }
 function submitListing(e) {
     e.preventDefault();
-    // In real implementation, this would submit the form data to /api/apply
-    // For now, trigger payment for the verification fee
     openMpesaModalDirect('Creator Verification', 999);
 }
 
@@ -513,7 +526,7 @@ function navigateTo(page) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     if (page === 'discover') { renderDiscover(); setTimeout(animateCounters, 200); }
-    if (page === 'celebs') { renderCelebs(globalCelebs, 'all-celebs-grid'); }
+    if (page === 'celebs') { renderCelebs(globalCelebs.slice(0, 60), 'all-celebs-grid'); }
     if (page === 'categories') { renderCategoriesPage(); }
     if (page === 'how') { /* static */ }
     if (page === 'listing') { /* static */ }
@@ -559,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ===================== INIT ===================== */
 window.addEventListener('load', async () => {
+    await loadSettings();
     await loadAdminCelebs();
     renderCategoryPills('category-pills', 'filterCelebs');
     renderCategoryPills('celebs-category-pills', 'filterCelebs');
