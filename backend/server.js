@@ -31,11 +31,15 @@ app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split('
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Trust proxy — required for express-rate-limit behind Nginx/Cloudflare
+app.set('trust proxy', 1);
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { xForwardedForHeader: false },
     message: { success: false, message: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
@@ -43,6 +47,7 @@ app.use('/api/', limiter);
 const strictLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 30,
+    validate: { xForwardedForHeader: false },
     message: { success: false, message: 'Too many attempts. Please wait.' }
 });
 app.use('/api/auth/', strictLimiter);
