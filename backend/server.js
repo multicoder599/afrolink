@@ -13,6 +13,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const app = express();
+app.set('trust proxy', 1);  // MUST be first — behind Nginx/Cloudflare
 const PORT = process.env.PORT || 3015;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'afrolink_super_secret_' + Date.now();
@@ -26,20 +27,17 @@ const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20'
 const REFERRAL_COMMISSION_PERCENT = parseFloat(process.env.REFERRAL_COMMISSION_PERCENT || '5');
 
 // ===================== MIDDLEWARE =====================
-app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Trust proxy — required for express-rate-limit behind Nginx/Cloudflare
-app.set('trust proxy', 1);
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 200,
     standardHeaders: true,
     legacyHeaders: false,
-    validate: { xForwardedForHeader: false },
+    validate: false,
     message: { success: false, message: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
@@ -47,7 +45,7 @@ app.use('/api/', limiter);
 const strictLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 30,
-    validate: { xForwardedForHeader: false },
+    validate: false,
     message: { success: false, message: 'Too many attempts. Please wait.' }
 });
 app.use('/api/auth/', strictLimiter);
