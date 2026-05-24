@@ -74,7 +74,7 @@ const upload = multer({
     }
 });
 app.use('/uploads', express.static(uploadsDir));
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
 // ===================== MONGOOSE SCHEMAS =====================
 
