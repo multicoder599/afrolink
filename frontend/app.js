@@ -1,10 +1,8 @@
 const API_BASE = 'https://api.afrolink254.com';
-let demoModeEnabled = true;
 let userStars = 0;
 let currentProfileCeleb = null;
 let currentRatingCeleb = null;
 let globalCelebs = [];
-let adminCelebsLoaded = false;
 let currentFilter = 'all';
 let currentUser = null;
 let userToken = localStorage.getItem('afrolink_user_token');
@@ -228,7 +226,7 @@ async function loadAdminCelebs() {
         else if (Array.isArray(data.data)) list = data.data;
         if (list.length > 0) {
             const mapped = list.map((c, i) => ({
-                id: c._id || c.id || ('admin_' + i),
+                id: String(c._id || c.id || ('admin_' + i)),
                 name: c.name || 'Unknown',
                 handle: c.handle || c.social || '@creator',
                 age: c.age || 25,
@@ -255,7 +253,6 @@ async function loadAdminCelebs() {
                 creatorStars: c.creatorStars || 0
             }));
             globalCelebs = mapped;
-            adminCelebsLoaded = true;
         } else { throw new Error('Empty admin database'); }
     } catch (err) {
         console.warn('Admin fetch failed:', err.message);
@@ -329,15 +326,25 @@ function filterCelebs(catId, btn) {
 }
 
 /* ===================== FULL PAGE PROFILE ===================== */
-function openProfilePage(id) {
-    const c = globalCelebs.find(x => x.id === id);
-    if (!c) return;
+async function openProfilePage(id) {
+    const c = globalCelebs.find(x => String(x.id) === String(id));
+    if (!c) { showToast('Creator not found', 'error'); return; }
     currentProfileCeleb = c;
 
-    document.getElementById('prof-cover').src = c.headerImg || c.img;
-    document.getElementById('prof-cover').onerror = function() { this.src = c.img; };
-    document.getElementById('prof-avatar').src = c.img;
-    document.getElementById('prof-avatar').onerror = function() { this.src = `${API_BASE}/images/model (1).jpg`; };
+    // Log profile view
+    try {
+        const headers = userToken ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken } : { 'Content-Type': 'application/json' };
+        fetch(`${API_BASE}/api/profile-views`, { method: 'POST', headers, body: JSON.stringify({ creatorId: c.id }) }).catch(()=>{});
+    } catch(e) {}
+
+    const coverImg = document.getElementById('prof-cover');
+    coverImg.src = c.headerImg || c.img;
+    coverImg.onerror = function() { this.src = c.img; };
+
+    const avatarImg = document.getElementById('prof-avatar');
+    avatarImg.src = c.img;
+    avatarImg.onerror = function() { this.src = `${API_BASE}/images/model (1).jpg`; };
+
     document.getElementById('prof-name').innerText = c.name;
     document.getElementById('prof-handle').innerText = c.handle;
     document.getElementById('prof-bio').innerText = c.bio || 'No bio available.';
@@ -374,13 +381,13 @@ function openProfilePage(id) {
     const socialDiv = document.getElementById('prof-social');
     socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-elevated);border-radius:var(--radius-md);border:1.5px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-magenta);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
 
-    document.getElementById('profilePage').classList.add('active');
-    document.body.style.overflow = 'hidden';
+    const page = document.getElementById('profilePage');
+    page.classList.add('active');
+    page.scrollTop = 0;
 }
 
 function closeProfilePage() {
     document.getElementById('profilePage').classList.remove('active');
-    document.body.style.overflow = '';
     currentProfileCeleb = null;
 }
 

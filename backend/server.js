@@ -161,6 +161,13 @@ const ratingSchema = new mongoose.Schema({
     comment: { type: String, default: '', trim: true },
 }, { timestamps: true });
 
+const profileViewSchema = new mongoose.Schema({
+    viewerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Celeb', required: true },
+    viewerPhone: { type: String, default: '', trim: true },
+    ip: { type: String, default: '' },
+}, { timestamps: true });
+
 const adminLogSchema = new mongoose.Schema({
     action: { type: String, required: true },
     adminId: { type: String },
@@ -181,6 +188,7 @@ const StarTransaction = mongoose.model('StarTransaction', starTransactionSchema)
 const Withdrawal = mongoose.model('Withdrawal', withdrawalSchema);
 const Referral = mongoose.model('Referral', referralSchema);
 const Rating = mongoose.model('Rating', ratingSchema);
+const ProfileView = mongoose.model('ProfileView', profileViewSchema);
 const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 const Settings = mongoose.model('Settings', settingsSchema);
 
@@ -252,6 +260,41 @@ app.post('/api/admin/settings', verifyAdmin, async (req, res) => {
         const { demoMode } = req.body;
         await Settings.findOneAndUpdate({ key: 'demoMode' }, { key: 'demoMode', value: demoMode !== false }, { upsert: true });
         res.json({ success: true, demoMode: demoMode !== false });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- PROFILE VIEWS --------------------
+app.post('/api/profile-views', async (req, res) => {
+    try {
+        const { creatorId } = req.body;
+        if (!creatorId) return res.status(400).json({ success: false, message: 'Creator ID required' });
+        const auth = req.headers.authorization;
+        let viewerId = null;
+        let viewerPhone = '';
+        if (auth && auth.startsWith('Bearer ')) {
+            try {
+                const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
+                if (decoded.role === 'user') { viewerId = decoded.id; viewerPhone = decoded.phone || ''; }
+            } catch(e) {}
+        }
+        const view = new ProfileView({ creatorId, viewerId, viewerPhone, ip: req.ip || req.headers['x-forwarded-for'] || '' });
+        await view.save();
+        res.json({ success: true, message: 'View logged' });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/creator/profile-views', verifyCreator, async (req, res) => {
+    try {
+        const views = await ProfileView.find({ creatorId: req.creator.id })
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .populate('viewerId', 'name phone');
+        const todayCount = await ProfileView.countDocuments({
+            creatorId: req.creator.id,
+            createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+        });
+        const totalCount = await ProfileView.countDocuments({ creatorId: req.creator.id });
+        res.json({ success: true, views, todayCount, totalCount });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
