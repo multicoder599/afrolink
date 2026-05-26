@@ -6,6 +6,9 @@
     <title>AfroLink — Connect With Kenya's Finest Creators</title>
     <meta name="description" content="Direct access to verified Kenyan celebrities, influencers, artists and creators. Unlock with stars.">
     <meta name="theme-color" content="#4F46E5">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -657,6 +660,12 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     </div>
 </div>
 
-<script src="app.js"></script>
+<script>
+// Guard functions while app.js loads
+window.openAuthModal = window.openAuthModal || function(){ showToast('Loading... please wait', 'info'); };
+window.openProfilePage = window.openProfilePage || function(id){ showToast('Loading... please wait', 'info'); };
+window.showToast = window.showToast || function(m,t,ti){ alert(m); };
+</script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
