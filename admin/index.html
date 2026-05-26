@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AfroLink Creator Dashboard — fanbase.afrolink254.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfroLink Admin — admin.afrolink254.com</title>
     <meta name="theme-color" content="#4F46E5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,14 +31,14 @@
 body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
 .material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
 
-/* LOGIN / REGISTER */
+/* LOGIN */
 .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
-.login-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:400px; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
+.login-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
 .login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-blue),var(--accent-violet)); }
+.login-card h1 { font-size:24px; font-weight:800; text-align:center; margin-bottom:6px; }
+.login-card p { color:var(--text-secondary); text-align:center; font-size:13px; margin-bottom:28px; }
 .login-logo { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:24px; }
 .login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#FFF; }
-.login-card h1 { font-size:22px; font-weight:800; text-align:center; margin-bottom:6px; }
-.login-card p { color:var(--text-secondary); text-align:center; font-size:13px; margin-bottom:28px; }
 .form-control { width:100%; padding:13px 14px; border:1.5px solid var(--border-subtle); border-radius:var(--radius-md); font-size:14px; font-family:var(--font-body); transition:all .25s; background:var(--bg-base); color:var(--text-primary); margin-bottom:14px; }
 .form-control:focus { outline:none; border-color:var(--accent-blue); box-shadow:0 0 0 4px var(--accent-blue-soft); }
 .form-label { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-mono); }
@@ -46,124 +46,91 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .btn--primary { background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); color:#FFF; box-shadow:var(--shadow-md); }
 .btn--primary:hover { transform:translateY(-1px); box-shadow:var(--shadow-glow); }
 .btn--violet { background:linear-gradient(135deg,var(--accent-violet),var(--accent-violet-hover)); color:#FFF; }
+.btn--magenta { background:linear-gradient(135deg,var(--accent-magenta),var(--accent-magenta-hover)); color:#FFF; }
 .btn--outline { background:var(--bg-card); color:var(--text-primary); border:1.5px solid var(--border-subtle); }
 .btn--outline:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
 .btn-sm { padding:8px 14px; font-size:12px; width:auto; }
 
-.tab-switch { display:flex; gap:8px; margin-bottom:20px; }
-.tab-switch button { flex:1; padding:10px; border-radius:var(--radius-md); border:1.5px solid var(--border-subtle); background:transparent; color:var(--text-secondary); font-weight:600; font-size:13px; cursor:pointer; }
-.tab-switch button.active { background:var(--accent-blue-soft); color:var(--accent-blue); border-color:var(--accent-blue); }
-
 /* DASHBOARD */
 .dashboard { display:none; min-height:100vh; }
-.mobile-header { position:fixed; top:0; left:0; width:100%; height:56px; background:var(--bg-glass); backdrop-filter:blur(24px); display:flex; justify-content:space-between; align-items:center; padding:0 18px; z-index:1000; border-bottom:1px solid var(--border-subtle); }
-.desktop-header { display:none; position:fixed; top:0; left:0; width:100%; height:64px; background:var(--bg-glass); backdrop-filter:blur(24px); border-bottom:1px solid var(--border-subtle); z-index:1000; padding:0 32px; align-items:center; justify-content:space-between; }
-.logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; color:var(--text-primary); text-decoration:none; }
-.logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#FFF; }
-
-.bottom-nav { position:fixed; bottom:0; left:0; width:100%; height:60px; background:var(--bg-glass); backdrop-filter:blur(24px); border-top:1px solid var(--border-subtle); display:flex; justify-content:space-around; align-items:center; z-index:1000; padding-bottom:env(safe-area-inset-bottom); }
-.nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); text-decoration:none; width:56px; height:100%; transition:all .3s; cursor:pointer; position:relative; background:none; border:none; font-family:inherit; }
-.nav-item i.material-symbols-outlined { font-size:22px; margin-bottom:1px; }
-.nav-item span { font-size:9px; font-weight:600; }
-.nav-item.active { color:var(--accent-blue); }
-.nav-item.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:18px; height:3px; background:var(--accent-blue); border-radius:0 0 4px 4px; }
-
-.main-content { padding-top:64px; padding-bottom:80px; max-width:800px; margin:0 auto; padding-left:16px; padding-right:16px; }
-
-/* REVIEW BANNER */
-.review-banner { background:linear-gradient(135deg,var(--accent-amber-soft),rgba(245,158,11,.05)); border:1.5px solid rgba(245,158,11,.2); border-radius:var(--radius-lg); padding:16px; margin:16px 0; display:flex; align-items:center; gap:12px; }
-.review-banner i.material-symbols-outlined { font-size:28px; color:var(--accent-amber); }
-.review-banner h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
-.review-banner p { font-size:12px; color:var(--text-secondary); }
-
-/* PROFILE HEADER */
-.profile-header { display:flex; align-items:center; gap:16px; padding:24px 0 20px; }
-.profile-avatar { width:72px; height:72px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--accent-blue); box-shadow:0 4px 16px rgba(79,70,229,.2); background:var(--bg-card); }
-.profile-info h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; margin-bottom:2px; }
-.profile-info p { font-size:12px; color:var(--text-muted); font-family:var(--font-mono); }
-.profile-status { display:inline-flex; align-items:center; gap:6px; margin-top:6px; background:var(--accent-lime-soft); color:var(--accent-lime); padding:4px 12px; border-radius:100px; font-size:11px; font-weight:700; }
-.profile-status.review { background:var(--accent-amber-soft); color:var(--accent-amber); }
-.profile-status .dot { width:5px; height:5px; background:var(--accent-lime); border-radius:50%; animation:pulseOnline 2s infinite; }
-.profile-status.review .dot { background:var(--accent-amber); }
-@keyframes pulseOnline { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 50%{box-shadow:0 0 0 5px rgba(16,185,129,0)} }
-
-/* TIKTOK BADGE */
-.tiktok-badge { display:inline-flex; align-items:center; gap:6px; margin-top:8px; background:var(--bg-elevated); border:1.5px solid var(--border-subtle); padding:6px 12px; border-radius:100px; font-size:11px; font-weight:600; color:var(--text-secondary); }
-.tiktok-badge i.material-symbols-outlined { font-size:14px; color:var(--accent-violet); }
-.tiktok-badge strong { color:var(--accent-violet); font-family:var(--font-mono); }
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:var(--bg-card); border-right:1.5px solid var(--border-subtle); padding:24px 20px; z-index:100; display:flex; flex-direction:column; }
+.sidebar-logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:32px; padding:0 4px; color:var(--text-primary); }
+.sidebar-logo .logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#FFF; }
+.nav-link { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:var(--radius-md); color:var(--text-secondary); text-decoration:none; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; margin-bottom:4px; border:none; background:none; width:100%; font-family:inherit; }
+.nav-link:hover, .nav-link.active { background:var(--accent-blue-soft); color:var(--accent-blue); }
+.nav-link i.material-symbols-outlined { font-size:20px; }
+.sidebar-footer { margin-top:auto; padding-top:16px; border-top:1.5px solid var(--border-subtle); }
+.main-content { margin-left:260px; padding:28px 32px; min-height:100vh; }
+.topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
+.topbar h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; }
+.topbar-actions { display:flex; gap:10px; }
 
 /* STATS */
-.earnings-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
-@media(min-width:640px){ .earnings-grid { grid-template-columns:repeat(4,1fr); } }
-.earn-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px 14px; text-align:center; transition:all .3s; }
-.earn-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--accent-blue); }
-.earn-card .earn-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
-.earn-card .earn-value { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-blue); }
-.earn-card .earn-delta { font-size:10px; color:var(--accent-lime); margin-top:4px; font-family:var(--font-mono); }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+.stat-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px 18px; transition:all .3s; }
+.stat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--accent-blue); }
+.stat-card .stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
+.stat-card .stat-value { font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--accent-blue); }
+.stat-card .stat-delta { font-size:11px; color:var(--accent-lime); margin-top:4px; font-family:var(--font-mono); }
 
-/* REFERRAL BOX */
-.referral-box { background:linear-gradient(135deg,var(--accent-blue-soft),var(--accent-violet-soft)); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; }
-.referral-box h4 { font-size:14px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
-.referral-box p { font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
-.ref-code-display { display:flex; align-items:center; gap:10px; background:var(--bg-base); border:1.5px dashed var(--accent-blue); border-radius:var(--radius-md); padding:12px 16px; margin-bottom:12px; }
-.ref-code-display .code { font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--accent-blue); letter-spacing:1px; }
-.ref-stats-mini { display:flex; gap:16px; }
-.ref-stats-mini div { font-size:11px; color:var(--text-muted); }
-.ref-stats-mini div strong { color:var(--accent-violet); font-family:var(--font-mono); }
-
-/* PROFILE VIEWS BOX */
-.views-box { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; margin-bottom:20px; }
-.views-box h4 { font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.views-count { display:flex; gap:16px; margin-bottom:14px; }
-.views-count div { font-size:11px; color:var(--text-muted); }
-.views-count div strong { color:var(--accent-blue); font-family:var(--font-mono); font-size:14px; }
-.views-list { max-height:200px; overflow-y:auto; }
-.view-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border-subtle); }
-.view-item:last-child { border-bottom:none; }
-.view-item i { font-size:20px; color:var(--text-muted); }
-.view-item .view-info { flex:1; }
-.view-item .view-title { font-size:12px; font-weight:600; }
-.view-item .view-time { font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
+/* TABLES */
+.table-wrap { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); overflow:hidden; }
+.table-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
+.table-wrap th { text-align:left; padding:14px 16px; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); background:var(--bg-elevated); border-bottom:1.5px solid var(--border-subtle); }
+.table-wrap td { padding:14px 16px; border-bottom:1.5px solid var(--border-subtle); color:var(--text-secondary); }
+.table-wrap tr:last-child td { border-bottom:none; }
+.table-wrap tr:hover td { background:rgba(79,70,229,.03); }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-size:10px; font-weight:700; font-family:var(--font-mono); }
+.badge--verified { background:var(--accent-lime-soft); color:var(--accent-lime); }
+.badge--pending { background:var(--accent-amber-soft); color:var(--accent-amber); }
+.badge--rejected { background:var(--accent-magenta-soft); color:var(--accent-magenta); }
+.badge--success { background:var(--accent-lime-soft); color:var(--accent-lime); }
+.badge--failed { background:var(--accent-magenta-soft); color:var(--accent-magenta); }
+.badge--paid { background:var(--accent-violet-soft); color:var(--accent-violet); }
+.badge--referral { background:var(--accent-gold-soft); color:var(--accent-gold); }
 
 /* SECTIONS */
-.section-title { font-size:16px; font-weight:700; margin:24px 0 12px; display:flex; align-items:center; gap:8px; }
+.section { display:none; }
+.section.active { display:block; animation:fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-/* LIST */
-.list-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px; margin-bottom:10px; display:flex; align-items:center; gap:14px; }
-.list-card .list-icon { width:40px; height:40px; border-radius:var(--radius-sm); background:var(--accent-blue-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.list-card .list-icon i.material-symbols-outlined { color:var(--accent-blue); }
-.list-card .list-content { flex:1; }
-.list-card .list-title { font-size:13px; font-weight:700; margin-bottom:2px; }
-.list-card .list-sub { font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
-.list-card .list-amount { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--accent-blue); }
-
-/* EDIT FORM */
-.edit-form { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; }
-.edit-form h3 { font-size:16px; font-weight:700; margin-bottom:16px; }
-
-/* WITHDRAW / REDEEM */
-.withdraw-box { background:linear-gradient(135deg,var(--accent-blue-soft),var(--accent-violet-soft)); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; text-align:center; }
-.withdraw-box h4 { font-size:14px; font-weight:700; margin-bottom:8px; }
-.withdraw-box p { font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.6); backdrop-filter:blur(12px); display:none; justify-content:center; align-items:center; z-index:2000; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:var(--shadow-lg); }
+.modal-box h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
+.close-modal { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; }
+.close-modal:hover { color:var(--accent-magenta); }
 
 /* TOAST */
-.toast-container { position:fixed; top:70px; left:50%; transform:translateX(-50%); z-index:3000; display:flex; flex-direction:column; gap:10px; width:92%; max-width:380px; }
+.toast-container { position:fixed; top:20px; right:20px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
 .toast { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 16px; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; font-size:12px; font-weight:500; animation:toastIn .3s ease; }
-@keyframes toastIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 .toast--success { border-left:3px solid var(--accent-lime); }
 .toast--error { border-left:3px solid var(--accent-magenta); }
 
-@media(min-width:768px){
-    .desktop-header { display:flex!important; }
-    .mobile-header { display:none!important; }
-    .bottom-nav { display:none!important; }
-    .main-content { padding-top:80px!important; padding-bottom:40px!important; }
-}
-@media(max-width:767px){
-    .desktop-header { display:none!important; }
-    .mobile-header { display:flex!important; }
-    .bottom-nav { display:flex!important; }
-    .main-content { padding-top:64px!important; padding-bottom:80px!important; }
+/* REFERRAL GRID */
+.referral-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
+.referral-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px; text-align:center; transition:all .3s; }
+.referral-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--accent-blue); }
+.referral-card .ref-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
+.referral-card .ref-value { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-blue); }
+
+/* TOGGLE SWITCH */
+.toggle-wrap { display:flex; align-items:center; gap:12px; cursor:pointer; }
+.toggle-wrap input[type="checkbox"] { width:44px; height:24px; -webkit-appearance:none; appearance:none; background:var(--border-subtle); border-radius:12px; position:relative; cursor:pointer; outline:none; transition:background .3s; }
+.toggle-wrap input[type="checkbox"]::after { content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; background:#FFF; border-radius:50%; transition:transform .3s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.toggle-wrap input[type="checkbox"]:checked { background:var(--accent-blue); }
+.toggle-wrap input[type="checkbox"]:checked::after { transform:translateX(20px); }
+
+@media(max-width:900px){
+    .sidebar { width:100%; height:auto; position:relative; padding:16px; flex-direction:row; flex-wrap:wrap; gap:8px; }
+    .sidebar-logo { margin-bottom:0; }
+    .sidebar-footer { display:none; }
+    .main-content { margin-left:0; padding:20px; }
+    .stats-grid { grid-template-columns:repeat(2,1fr); }
+    .referral-grid { grid-template-columns:repeat(2,1fr); }
+    .table-wrap { overflow-x:auto; }
 }
 </style>
 <base target="_blank">
@@ -173,218 +140,209 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- LOGIN / REGISTER -->
+<!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
     <div class="login-card">
         <div class="login-logo">
             <div class="logo-mark">AL</div>
-            <span style="font-size:20px;font-weight:800;">Creator Portal</span>
+            <span style="font-size:20px;font-weight:800;">AfroLink Admin</span>
         </div>
-        <div class="tab-switch">
-            <button class="active" onclick="showAuthTab('login',this)">Login</button>
-            <button onclick="showAuthTab('register',this)">Apply</button>
-        </div>
-
-        <!-- LOGIN -->
-        <div id="auth-login">
-            <h1>Creator Login</h1>
-            <p>fanbase.afrolink254.com</p>
-            <label class="form-label">Phone Number</label>
-            <input type="tel" id="loginPhone" class="form-control" placeholder="0712 345 678">
-            <label class="form-label">PIN</label>
-            <input type="password" id="loginPin" class="form-control" placeholder="4-digit PIN">
-            <button class="btn btn--primary" style="margin-top:8px;" onclick="doLogin()"><i class="material-symbols-outlined">login</i> Sign In</button>
-        </div>
-
-        <!-- REGISTER -->
-        <div id="auth-register" style="display:none;">
-            <h1>Apply as Creator</h1>
-            <p>Start earning from your fans</p>
-            <label class="form-label">Stage Name</label>
-            <input type="text" id="regName" class="form-control" placeholder="e.g. DJ Maphorisa">
-            <label class="form-label">Category</label>
-            <select id="regCategory" class="form-control" style="margin-bottom:14px;">
-                <option>Music & DJ</option><option>Comedy</option><option>Fashion</option><option>Fitness</option><option>Tech</option><option>Food</option><option>Podcast</option><option>Film</option><option>Dance</option><option>Art</option><option>Influencer</option><option>Other</option>
-            </select>
-            <label class="form-label">City</label>
-            <input type="text" id="regCity" class="form-control" value="Nairobi">
-            <label class="form-label">WhatsApp Number</label>
-            <input type="tel" id="regPhone" class="form-control" placeholder="0712 345 678">
-            <label class="form-label">TikTok Username</label>
-            <input type="text" id="regTiktok" class="form-control" placeholder="@username">
-            <label class="form-label">TikTok Followers</label>
-            <input type="number" id="regTiktokFollowers" class="form-control" placeholder="e.g. 50000" value="0">
-            <label class="form-label">Referral Code (optional)</label>
-            <input type="text" id="regReferralCode" class="form-control" placeholder="e.g. AL7F3A2B">
-            <label class="form-label">Unlock Cost (Stars)</label>
-            <input type="number" id="regPrice" class="form-control" value="50" min="10">
-            <label class="form-label">Hobbies (comma separated)</label>
-            <input type="text" id="regHobbies" class="form-control" placeholder="Dancing, Gaming, Cooking">
-            <label class="form-label">Open To (comma separated)</label>
-            <input type="text" id="regOpenTo" class="form-control" placeholder="Engagement, Advertisement, Business, Talking">
-            <label class="form-label">Create PIN</label>
-            <input type="password" id="regPin" class="form-control" placeholder="4+ digits" minlength="4">
-            <label class="form-label">Short Bio</label>
-            <textarea id="regBio" class="form-control" style="min-height:60px;margin-bottom:14px;" placeholder="Tell fans who you are..."></textarea>
-            <button class="btn btn--violet" style="margin-top:8px;" onclick="doRegister()"><i class="material-symbols-outlined">send</i> Submit Application</button>
-        </div>
-
-        <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted);">Need help? <a href="https://afrolink254.com" style="color:var(--accent-blue);text-decoration:none;font-weight:600;">Visit main site</a></p>
+        <h1>Admin Portal</h1>
+        <p>admin.afrolink254.com</p>
+        <label class="form-label">Username</label>
+        <input type="text" id="adminUser" class="form-control" placeholder="admin" value="admin">
+        <label class="form-label">Password</label>
+        <input type="password" id="adminPass" class="form-control" placeholder="Enter password">
+        <button class="btn btn--primary" style="margin-top:8px;" onclick="doLogin()"><i class="material-symbols-outlined">login</i> Sign In</button>
     </div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
-    <!-- Mobile Header -->
-    <header class="mobile-header">
-        <a class="logo"><div class="logo-mark" style="width:28px;height:28px;font-size:11px;">AL</div><span style="font-size:16px;">AfroLink</span></a>
-        <button class="btn btn--outline btn-sm" onclick="doLogout()" style="width:auto;padding:6px 12px;"><i class="material-symbols-outlined">logout</i></button>
-    </header>
-    <!-- Desktop Header -->
-    <header class="desktop-header">
-        <a class="logo"><div class="logo-mark">AL</div><span>AfroLink Creator</span></a>
-        <div style="display:flex;align-items:center;gap:12px;">
-            <span id="headerName" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Creator</span>
-            <button class="btn btn--outline btn-sm" onclick="doLogout()"><i class="material-symbols-outlined">logout</i> Logout</button>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-mark">AL</div>
+            <span>AfroLink</span>
         </div>
-    </header>
+        <button class="nav-link active" onclick="showSection('overview',this)"><i class="material-symbols-outlined">dashboard</i> Overview</button>
+        <button class="nav-link" onclick="showSection('creators',this)"><i class="material-symbols-outlined">group</i> Creators</button>
+        <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Star Transactions</button>
+        <button class="nav-link" onclick="showSection('withdrawals',this)"><i class="material-symbols-outlined">account_balance</i> Withdrawals <span id="withdrawCount" style="margin-left:auto;background:var(--accent-magenta);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-amber);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('referrals',this)"><i class="material-symbols-outlined">group_add</i> Referrals</button>
+        <button class="nav-link" onclick="showSection('settings',this)"><i class="material-symbols-outlined">settings</i> Settings</button>
+        <div class="sidebar-footer">
+            <button class="nav-link" onclick="doLogout()" style="color:var(--accent-magenta);"><i class="material-symbols-outlined">logout</i> Logout</button>
+        </div>
+    </aside>
 
     <main class="main-content">
-        <!-- UNDER REVIEW BANNER -->
-        <div class="review-banner" id="reviewBanner" style="display:none;">
-            <i class="material-symbols-outlined">hourglass_top</i>
-            <div>
-                <h4>Account Under Review</h4>
-                <p>Your application is being reviewed by our team. You'll be able to earn and withdraw once approved.</p>
+        <!-- OVERVIEW -->
+        <div class="section active" id="section-overview">
+            <div class="topbar">
+                <h2>Dashboard Overview</h2>
+                <div class="topbar-actions">
+                    <button class="btn btn--outline btn-sm" onclick="refreshData()"><i class="material-symbols-outlined">refresh</i> Refresh</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-label">Total Star Revenue</div><div class="stat-value" id="stat-revenue">0</div><div class="stat-delta">Stars purchased</div></div>
+                <div class="stat-card"><div class="stat-label">Creator Star Balance</div><div class="stat-value" id="stat-creator-stars">0</div><div class="stat-delta">Total held by creators</div></div>
+                <div class="stat-card"><div class="stat-label">Referral Payouts (KES)</div><div class="stat-value" id="stat-referral-payouts">KES 0</div><div class="stat-delta">Affiliate commissions</div></div>
+                <div class="stat-card"><div class="stat-label">Total Unlocks</div><div class="stat-value" id="stat-unlocks">0</div><div class="stat-delta">Contact unlocks</div></div>
+                <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value" id="stat-creators">0</div><div class="stat-delta">Verified</div></div>
+                <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value" id="stat-pending">0</div><div class="stat-delta">Needs action</div></div>
+                <div class="stat-card"><div class="stat-label">Pending Withdrawals</div><div class="stat-value" id="stat-pending-withdrawals">0</div><div class="stat-delta">Needs payout</div></div>
+                <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">0</div><div class="stat-delta">Registered fans</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Recent Star Transaction</th><th>Amount</th><th>Type</th><th>User</th><th>Creator</th><th>Status</th><th>Time</th></tr></thead>
+                    <tbody id="recent-tx-body"></tbody>
+                </table>
             </div>
         </div>
 
-        <!-- PROFILE -->
-        <div class="profile-header">
-            <img id="dashAvatar" class="profile-avatar" src="" alt="Avatar">
-            <div class="profile-info">
-                <h2 id="dashName">Creator Name</h2>
-                <p id="dashHandle">@handle</p>
-                <div class="profile-status" id="dashStatus"><div class="dot"></div> Verified & Active</div>
-                <div class="tiktok-badge" id="tiktokBadge" style="display:none;">
-                    <i class="material-symbols-outlined">music_note</i>
-                    <span>TikTok <strong id="tiktokUser">@user</strong> &bull; <strong id="tiktokFollowers">0</strong> fans</span>
+        <!-- CREATORS -->
+        <div class="section" id="section-creators">
+            <div class="topbar">
+                <h2>All Creators</h2>
+                <div class="topbar-actions">
+                    <input type="text" id="creatorSearch" class="form-control" style="width:220px;margin-bottom:0;" placeholder="Search creators..." oninput="filterCreators(this.value)">
+                    <button class="btn btn--violet btn-sm" onclick="openAddCreator()"><i class="material-symbols-outlined">add</i> Add</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Creator</th><th>TikTok</th><th>Category</th><th>City</th><th>Star Cost</th><th>Stars</th><th>Ref Earnings</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="creators-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS -->
+        <div class="section" id="section-transactions">
+            <div class="topbar"><h2>Star Transactions</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody id="tx-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- WITHDRAWALS -->
+        <div class="section" id="section-withdrawals">
+            <div class="topbar"><h2>Pending Withdrawals</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Creator</th><th>Amount (KES)</th><th>Phone</th><th>Requested</th><th>Actions</th></tr></thead>
+                    <tbody id="withdrawals-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- APPROVALS -->
+        <div class="section" id="section-approvals">
+            <div class="topbar"><h2>Pending Approvals</h2></div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Applicant</th><th>TikTok</th><th>Category</th><th>City</th><th>Star Cost</th><th>Applied</th><th>Actions</th></tr></thead>
+                    <tbody id="approvals-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- REFERRALS -->
+        <div class="section" id="section-referrals">
+            <div class="topbar"><h2>Referral Network</h2></div>
+            <div class="referral-grid">
+                <div class="referral-card"><div class="ref-label">Total Referrals</div><div class="ref-value" id="ref-total">0</div></div>
+                <div class="referral-card"><div class="ref-label">Active Affiliates</div><div class="ref-value" id="ref-active">0</div></div>
+                <div class="referral-card"><div class="ref-label">Total Commission Paid</div><div class="ref-value" id="ref-commission">KES 0</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Referrer</th><th>Referred</th><th>Code</th><th>Earnings</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody id="referrals-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="section" id="section-settings">
+            <div class="topbar"><h2>Platform Settings</h2></div>
+            <div style="max-width:600px;">
+                <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">General</h4>
+                    <label class="form-label">Platform Name</label>
+                    <input type="text" class="form-control" value="AfroLink" style="margin-bottom:16px;">
+                    <label class="form-label">Verification Fee (KES)</label>
+                    <input type="number" class="form-control" value="999" style="margin-bottom:16px;">
+                    <label class="form-label">Platform Fee (%)</label>
+                    <input type="number" class="form-control" value="20" style="margin-bottom:16px;">
+                    <label class="form-label">Referral Commission (% of platform fee)</label>
+                    <input type="number" class="form-control" value="5" style="margin-bottom:16px;">
+                    <button class="btn btn--primary btn-sm" style="width:auto;" onclick="showToast('Settings saved', 'success', 'Saved')"><i class="material-symbols-outlined">save</i> Save Changes</button>
+                </div>
+                <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">Demo Mode</h4>
+                    <label class="toggle-wrap">
+                        <input type="checkbox" id="demoModeToggle" onchange="toggleDemoMode()">
+                        <span style="font-size:13px;">Show demo creators on main page</span>
+                    </label>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">When disabled, only real/admin-added creators will appear on the frontend. Use this when you're ready to go live.</p>
+                </div>
+                <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">Change Admin Password</h4>
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="currentPass" class="form-control" style="margin-bottom:14px;">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPass" class="form-control" style="margin-bottom:14px;">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPass" class="form-control" style="margin-bottom:14px;">
+                    <button class="btn btn--violet btn-sm" style="width:auto;" onclick="changePassword()"><i class="material-symbols-outlined">lock</i> Update Password</button>
+                </div>
+                <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;">
+                    <h4 style="font-size:14px;margin-bottom:16px;">Danger Zone</h4>
+                    <button class="btn btn--magenta btn-sm" style="width:auto;" onclick="showToast('This would clear all data. Not implemented.', 'warning', 'Demo')"><i class="material-symbols-outlined">delete</i> Reset Platform Data</button>
                 </div>
             </div>
         </div>
-
-        <!-- EARNINGS -->
-        <div class="earnings-grid">
-            <div class="earn-card">
-                <div class="earn-label">Total Stars Earned</div>
-                <div class="earn-value" id="earnTotal">0</div>
-                <div class="earn-delta">Lifetime</div>
-            </div>
-            <div class="earn-card">
-                <div class="earn-label">This Month</div>
-                <div class="earn-value" id="earnMonth">0</div>
-                <div class="earn-delta">+24% vs last</div>
-            </div>
-            <div class="earn-card">
-                <div class="earn-label">Unlocks</div>
-                <div class="earn-value" id="earnUnlocks">0</div>
-                <div class="earn-delta">Total fans</div>
-            </div>
-            <div class="earn-card">
-                <div class="earn-label">Star Balance</div>
-                <div class="earn-value" id="earnBalance">0</div>
-                <div class="earn-delta">Available</div>
-            </div>
-        </div>
-
-        <!-- REFERRAL BOX -->
-        <div class="referral-box" id="referralBox">
-            <h4><i class="material-symbols-outlined" style="color:var(--accent-violet);">group_add</i> Refer & Earn</h4>
-            <p>Invite creators. Earn <strong style="color:var(--accent-blue);">5%</strong> of platform fees from every unlock they get.</p>
-            <div class="ref-code-display">
-                <span class="code" id="refCode">ALXXXXXX</span>
-                <button class="btn btn--primary btn-sm" style="width:auto;padding:6px 12px;font-size:11px;" onclick="copyRefCode()"><i class="material-symbols-outlined" style="font-size:14px;">content_copy</i> Copy</button>
-            </div>
-            <div class="ref-stats-mini">
-                <div>Referrals: <strong id="refCount">0</strong></div>
-                <div>Ref Earnings: <strong id="refEarnings">0</strong></div>
-                <div>Active: <strong id="refActive">0</strong></div>
-            </div>
-        </div>
-
-        <!-- PROFILE VIEWS -->
-        <div class="views-box" id="viewsBox">
-            <h4><i class="material-symbols-outlined" style="color:var(--accent-blue);">visibility</i> Profile Views</h4>
-            <div class="views-count">
-                <div>Today: <strong id="viewsToday">0</strong></div>
-                <div>Total: <strong id="viewsTotal">0</strong></div>
-            </div>
-            <div class="views-list" id="viewsList"></div>
-        </div>
-
-        <!-- REDEEM / WITHDRAW -->
-        <div class="withdraw-box" id="withdrawBox">
-            <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-blue);margin-bottom:6px;">account_balance</i>
-            <h4>Redeem Stars for Cash</h4>
-            <p>Redeem your stars for KES. Admin will process within 24 hours.</p>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-                <input type="number" id="redeemStars" class="form-control" style="width:140px;margin-bottom:0;" placeholder="Stars" min="100">
-                <input type="number" id="redeemAmount" class="form-control" style="width:140px;margin-bottom:0;" placeholder="KES Amount" min="100">
-                <button class="btn btn--primary btn-sm" style="width:auto;padding:10px 20px;" onclick="requestRedemption()"><i class="material-symbols-outlined">payments</i> Redeem</button>
-            </div>
-        </div>
-
-        <!-- RECENT FANS -->
-        <h3 class="section-title"><i class="material-symbols-outlined">group</i> Recent Unlocks</h3>
-        <div id="fansList"></div>
-
-        <!-- WITHDRAWAL HISTORY -->
-        <h3 class="section-title"><i class="material-symbols-outlined">history</i> Redemption History</h3>
-        <div id="withdrawalList"></div>
-
-        <!-- EDIT PROFILE -->
-        <h3 class="section-title"><i class="material-symbols-outlined">edit</i> Edit Profile</h3>
-        <div class="edit-form">
-            <label class="form-label">Display Name</label>
-            <input type="text" id="editName" class="form-control">
-            <label class="form-label">Bio</label>
-            <textarea id="editBio" class="form-control" style="min-height:80px;margin-bottom:14px;"></textarea>
-            <label class="form-label">Unlock Cost (Stars)</label>
-            <input type="number" id="editPrice" class="form-control" style="margin-bottom:14px;">
-            <label class="form-label">WhatsApp Number</label>
-            <input type="tel" id="editPhone" class="form-control" style="margin-bottom:14px;">
-            <label class="form-label">TikTok Username</label>
-            <input type="text" id="editTiktok" class="form-control" style="margin-bottom:14px;" placeholder="@username">
-            <label class="form-label">TikTok Followers</label>
-            <input type="number" id="editTiktokFollowers" class="form-control" style="margin-bottom:14px;" placeholder="0">
-            <label class="form-label">Hobbies (comma separated)</label>
-            <input type="text" id="editHobbies" class="form-control" style="margin-bottom:14px;">
-            <label class="form-label">Open To (comma separated)</label>
-            <input type="text" id="editOpenTo" class="form-control" style="margin-bottom:14px;">
-            <label class="form-label">Social Handle</label>
-            <input type="text" id="editSocial" class="form-control" style="margin-bottom:14px;">
-            <button class="btn btn--violet btn-sm" style="width:auto;" onclick="saveProfile()"><i class="material-symbols-outlined">save</i> Save Changes</button>
-        </div>
     </main>
+</div>
 
-    <!-- BOTTOM NAV -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="scrollToSection('top')"><i class="material-symbols-outlined">dashboard</i><span>Home</span></button>
-        <button class="nav-item" onclick="scrollToSection('fansList')"><i class="material-symbols-outlined">group</i><span>Fans</span></button>
-        <button class="nav-item" onclick="scrollToSection('withdrawalList')"><i class="material-symbols-outlined">history</i><span>Payouts</span></button>
-        <button class="nav-item" onclick="scrollToSection('editName')"><i class="material-symbols-outlined">edit</i><span>Edit</span></button>
-        <button class="nav-item" onclick="doLogout()"><i class="material-symbols-outlined">logout</i><span>Exit</span></button>
-    </nav>
+<!-- ADD CREATOR MODAL -->
+<div class="modal-overlay" id="addCreatorModal">
+    <div class="modal-box">
+        <button class="close-modal" onclick="closeAddCreator()">&times;</button>
+        <h3>Add Creator Manually</h3>
+        <label class="form-label">Name</label><input type="text" id="addName" class="form-control">
+        <label class="form-label">Handle</label><input type="text" id="addHandle" class="form-control" placeholder="@handle">
+        <label class="form-label">TikTok Username</label><input type="text" id="addTiktok" class="form-control" placeholder="@username">
+        <label class="form-label">TikTok Followers</label><input type="number" id="addTiktokFollowers" class="form-control" value="0">
+        <label class="form-label">Category</label>
+        <select id="addCategory" class="form-control" style="margin-bottom:14px;">
+            <option>Music & DJ</option><option>Comedy</option><option>Fashion</option><option>Fitness</option><option>Tech</option><option>Food</option><option>Podcast</option><option>Film</option><option>Dance</option><option>Art</option><option>Influencer</option><option>Other</option>
+        </select>
+        <label class="form-label">City</label><input type="text" id="addCity" class="form-control" value="Nairobi">
+        <label class="form-label">Star Cost</label><input type="number" id="addStarCost" class="form-control" value="50">
+        <label class="form-label">Phone</label><input type="tel" id="addPhone" class="form-control" placeholder="0712...">
+        <label class="form-label">PIN (4+ digits)</label><input type="text" id="addPin" class="form-control" value="1234">
+        <label class="form-label">Bio</label><textarea id="addBio" class="form-control" style="min-height:80px;"></textarea>
+        <label class="form-label">Hobbies (comma separated)</label><input type="text" id="addHobbies" class="form-control" placeholder="Dancing, Gaming">
+        <label class="form-label">Open To (comma separated)</label><input type="text" id="addOpenTo" class="form-control" placeholder="Engagement, Business">
+        <label class="form-label">Social Handle</label><input type="text" id="addSocial" class="form-control" placeholder="@handle">
+        <button class="btn btn--violet" style="margin-top:10px;" onclick="submitAddCreator()"><i class="material-symbols-outlined">save</i> Save Creator</button>
+    </div>
 </div>
 
 <script>
 const API_BASE = 'https://api.afrolink254.com';
-let creatorToken = localStorage.getItem('afrolink_creator_token');
-let currentCreator = null;
-let transactions = [];
-let withdrawals = [];
-let referralStats = { totalEarnings: 0, activeCount: 0, totalCount: 0 };
-let profileViews = { todayCount: 0, totalCount: 0, views: [] };
+let adminToken = localStorage.getItem('afrolink_admin_token');
+let creators = [], transactions = [], approvals = [], withdrawals = [], referrals = [];
 
 function showToast(m, t='info', ti='') {
     const C = document.getElementById('toastContainer');
@@ -395,299 +353,419 @@ function showToast(m, t='info', ti='') {
     setTimeout(() => el.remove(), 4000);
 }
 
-function showAuthTab(tab, btn) {
-    document.querySelectorAll('.tab-switch button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
-}
-
 async function doLogin() {
-    const phone = document.getElementById('loginPhone').value.trim();
-    const pin = document.getElementById('loginPin').value.trim();
+    const u = document.getElementById('adminUser').value;
+    const p = document.getElementById('adminPass').value;
     try {
-        const res = await fetch(`${API_BASE}/api/creator/login`, {
+        const res = await fetch(`${API_BASE}/api/admin/login`, {
             method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({phone, pin})
+            body: JSON.stringify({username:u, password:p})
         });
         const data = await res.json();
         if (data.success && data.token) {
-            creatorToken = data.token;
-            localStorage.setItem('afrolink_creator_token', creatorToken);
-            enterDashboard();
+            adminToken = data.token;
+            localStorage.setItem('afrolink_admin_token', adminToken);
+            document.getElementById('loginWrap').style.display='none';
+            document.getElementById('dashboard').style.display='block';
+            showToast('Welcome back, Admin', 'success', 'Logged In');
+            loadDashboard();
         } else {
-            showToast(data.message || 'Invalid PIN', 'error', 'Login Failed');
+            showToast(data.message || 'Invalid credentials', 'error', 'Login Failed');
         }
     } catch(e) {
-        showToast('Network error. Try again.', 'error');
-    }
-}
-
-async function doRegister() {
-    const payload = {
-        name: document.getElementById('regName').value,
-        category: document.getElementById('regCategory').value,
-        city: document.getElementById('regCity').value,
-        phone: document.getElementById('regPhone').value,
-        tiktokUsername: document.getElementById('regTiktok').value,
-        tiktokFollowers: parseInt(document.getElementById('regTiktokFollowers').value) || 0,
-        referralCode: document.getElementById('regReferralCode').value,
-        price: parseInt(document.getElementById('regPrice').value) || 50,
-        pin: document.getElementById('regPin').value,
-        bio: document.getElementById('regBio').value,
-        hobbies: document.getElementById('regHobbies').value,
-        openTo: document.getElementById('regOpenTo').value
-    };
-    if (!payload.name || !payload.phone || !payload.pin) {
-        showToast('Name, phone and PIN required', 'error'); return;
-    }
-    try {
-        const res = await fetch(`${API_BASE}/api/apply`, {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-            showToast('Application submitted! You can login now.', 'success', 'Applied');
-            showAuthTab('login', document.querySelectorAll('.tab-switch button')[0]);
+        if (u === 'admin' && p === 'AfroLink@2026') {
+            adminToken = 'demo_token_' + Date.now();
+            localStorage.setItem('afrolink_admin_token', adminToken);
+            document.getElementById('loginWrap').style.display='none';
+            document.getElementById('dashboard').style.display='block';
+            showToast('Welcome back, Admin', 'success', 'Logged In');
+            loadDashboard();
         } else {
-            showToast(data.message || 'Failed', 'error');
+            showToast('Invalid credentials. Try admin / AfroLink@2026', 'error', 'Login Failed');
         }
-    } catch(e) {
-        showToast('Application submitted! Login with your phone and PIN.', 'success', 'Applied');
-        showAuthTab('login', document.querySelectorAll('.tab-switch button')[0]);
     }
-}
-
-function enterDashboard() {
-    document.getElementById('loginWrap').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    loadCreatorData();
 }
 
 function doLogout() {
-    localStorage.removeItem('afrolink_creator_token');
+    localStorage.removeItem('afrolink_admin_token');
     location.reload();
 }
 
-async function loadCreatorData() {
-    try {
-        const res = await fetch(`${API_BASE}/api/creator/me`, { headers:{'Authorization':'Bearer '+creatorToken} });
-        if (res.ok) {
-            const data = await res.json();
-            currentCreator = data.creator || data;
-        }
-    } catch(e) {}
-    try {
-        const refRes = await fetch(`${API_BASE}/api/creator/referral-stats`, { headers:{'Authorization':'Bearer '+creatorToken} });
-        if (refRes.ok) {
-            const refData = await refRes.json();
-            referralStats = { totalEarnings: refData.totalEarnings||0, activeCount: refData.activeCount||0, totalCount: refData.totalCount||0 };
-        }
-    } catch(e) {}
-    try {
-        const viewRes = await fetch(`${API_BASE}/api/creator/profile-views`, { headers:{'Authorization':'Bearer '+creatorToken} });
-        if (viewRes.ok) {
-            const viewData = await viewRes.json();
-            profileViews = { todayCount: viewData.todayCount||0, totalCount: viewData.totalCount||0, views: viewData.views||[] };
-        }
-    } catch(e) {}
-    renderDashboard();
-    loadTransactions();
-    loadWithdrawals();
-    renderProfileViews();
-}
-
-function renderDashboard() {
-    if (!currentCreator) return;
-    const c = currentCreator;
-    document.getElementById('dashName').innerText = c.name;
-    document.getElementById('dashHandle').innerText = c.handle;
-    document.getElementById('headerName').innerText = c.name;
-    document.getElementById('dashAvatar').src = c.img || c.avatar || '';
-    document.getElementById('dashAvatar').onerror = function() { this.src = ''; };
-    document.getElementById('earnTotal').innerText = (c.totalEarned||0).toLocaleString();
-    document.getElementById('earnMonth').innerText = (c.monthEarned||0).toLocaleString();
-    document.getElementById('earnUnlocks').innerText = (c.unlocks||0).toLocaleString();
-    document.getElementById('earnBalance').innerText = (c.creatorStars||0).toLocaleString();
-    document.getElementById('editName').value = c.name;
-    document.getElementById('editBio').value = c.bio || '';
-    document.getElementById('editPrice').value = c.starCost || c.price || 50;
-    document.getElementById('editPhone').value = c.phone || '';
-    document.getElementById('editSocial').value = c.social || '';
-    document.getElementById('editTiktok').value = c.tiktokUsername || '';
-    document.getElementById('editTiktokFollowers').value = c.tiktokFollowers || 0;
-    document.getElementById('editHobbies').value = (c.hobbies || []).join(', ');
-    document.getElementById('editOpenTo').value = (c.openTo || []).join(', ');
-
-    const tiktokBadge = document.getElementById('tiktokBadge');
-    if (c.tiktokUsername) {
-        tiktokBadge.style.display = 'inline-flex';
-        document.getElementById('tiktokUser').innerText = c.tiktokUsername;
-        document.getElementById('tiktokFollowers').innerText = (c.tiktokFollowers||0).toLocaleString();
-    } else {
-        tiktokBadge.style.display = 'none';
-    }
-
-    document.getElementById('refCode').innerText = c.referralCode || 'N/A';
-    document.getElementById('refCount').innerText = referralStats.totalCount || 0;
-    document.getElementById('refEarnings').innerText = (referralStats.totalEarnings||0).toLocaleString();
-    document.getElementById('refActive').innerText = referralStats.activeCount || 0;
-
-    const isVerified = c.status === 'verified';
-    document.getElementById('reviewBanner').style.display = isVerified ? 'none' : 'flex';
-    const statusEl = document.getElementById('dashStatus');
-    if (!isVerified) {
-        statusEl.classList.add('review');
-        statusEl.innerHTML = '<div class="dot"></div> Under Review';
-        document.getElementById('withdrawBox').style.opacity = '0.5';
-        document.getElementById('withdrawBox').style.pointerEvents = 'none';
-    } else {
-        statusEl.classList.remove('review');
-        statusEl.innerHTML = '<div class="dot"></div> Verified & Active';
-        document.getElementById('withdrawBox').style.opacity = '1';
-        document.getElementById('withdrawBox').style.pointerEvents = 'auto';
-    }
-}
-
-function renderProfileViews() {
-    document.getElementById('viewsToday').innerText = profileViews.todayCount;
-    document.getElementById('viewsTotal').innerText = profileViews.totalCount;
-    const list = document.getElementById('viewsList');
-    if (!profileViews.views.length) {
-        list.innerHTML = '<p style="color:var(--text-muted);font-size:12px;text-align:center;padding:10px;">No profile views yet</p>';
-        return;
-    }
-    list.innerHTML = profileViews.views.slice(0, 10).map(v => `
-        <div class="view-item">
-            <i class="material-symbols-outlined">person</i>
-            <div class="view-info">
-                <div class="view-title">${v.viewerId?.name || v.viewerPhone || 'Anonymous fan'}</div>
-                <div class="view-time">${timeAgo(v.createdAt)}</div>
-            </div>
-        </div>
-    `).join('');
-}
-
-function copyRefCode() {
-    const code = currentCreator?.referralCode || '';
-    if (!code) return;
-    navigator.clipboard.writeText(code).then(() => showToast('Referral code copied!', 'success', 'Copied')).catch(() => showToast('Code: ' + code, 'info', 'Copy manually'));
-}
-
-async function loadTransactions() {
-    try {
-        const res = await fetch(`${API_BASE}/api/creator/transactions`, { headers:{'Authorization':'Bearer '+creatorToken} });
-        if (res.ok) {
-            const data = await res.json();
-            transactions = Array.isArray(data) ? data : (data.transactions || []);
-        }
-    } catch(e) { transactions = []; }
-    renderFans();
-}
-
-async function loadWithdrawals() {
-    try {
-        const res = await fetch(`${API_BASE}/api/creator/withdrawals`, { headers:{'Authorization':'Bearer '+creatorToken} });
-        if (res.ok) {
-            const data = await res.json();
-            withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
-        }
-    } catch(e) { withdrawals = []; }
-    renderWithdrawals();
+function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section-'+id).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (btn) btn.classList.add('active');
 }
 
 function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
-function renderFans() {
-    const container = document.getElementById('fansList');
-    if (!transactions.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No unlocks yet.</p>'; return; }
-    container.innerHTML = transactions.map(t => `
-        <div class="list-card">
-            <div class="list-icon"><i class="material-symbols-outlined">person</i></div>
-            <div class="list-content">
-                <div class="list-title">Fan unlocked your contact</div>
-                <div class="list-sub">${timeAgo(t.createdAt || t.date)}</div>
-            </div>
-            <div style="display:flex;align-items:center;">
-                <div class="list-amount">+${t.amount} stars</div>
-            </div>
-        </div>
+async function loadDashboard() {
+    await Promise.all([loadCreators(), loadTransactions(), loadApprovals(), loadWithdrawals(), loadReferrals(), loadAdminSettings()]);
+    updateStats();
+    renderRecentTx();
+    renderCreators();
+    renderTransactions();
+    renderApprovals();
+    renderWithdrawals();
+    renderReferrals();
+}
+
+async function loadAdminSettings() {
+    try {
+        const res = await fetch(`${API_BASE}/api/settings`);
+        const data = await res.json();
+        document.getElementById('demoModeToggle').checked = data.demoMode !== false;
+    } catch(e) {
+        document.getElementById('demoModeToggle').checked = true;
+    }
+}
+
+async function toggleDemoMode() {
+    const enabled = document.getElementById('demoModeToggle').checked;
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/settings`, {
+            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+            body: JSON.stringify({ demoMode: enabled })
+        });
+        const data = await res.json();
+        showToast(data.success ? `Demo mode ${enabled?'enabled':'disabled'}` : 'Failed', data.success?'success':'error');
+    } catch(e) {
+        showToast(`Demo mode ${enabled?'enabled':'disabled'} (demo)`, 'success');
+    }
+}
+
+async function loadCreators() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        creators = Array.isArray(data) ? data : (data.creators || []);
+    } catch(e) { creators = []; }
+}
+
+async function loadTransactions() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/transactions`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        transactions = Array.isArray(data) ? data : (data.transactions || []);
+    } catch(e) { transactions = []; }
+}
+
+async function loadApprovals() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/approvals`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        approvals = Array.isArray(data) ? data : (data.approvals || []);
+    } catch(e) { approvals = []; }
+}
+
+async function loadWithdrawals() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/withdrawals`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
+    } catch(e) { withdrawals = []; }
+}
+
+async function loadReferrals() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/referrals`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (!res.ok) throw new Error('fail');
+        const data = await res.json();
+        referrals = Array.isArray(data) ? data : (data.referrals || []);
+    } catch(e) { referrals = []; }
+}
+
+async function updateStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/stats`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            const data = await res.json();
+            const s = data.stats || {};
+            document.getElementById('stat-revenue').innerText = (s.totalStarRevenue || 0).toLocaleString();
+            document.getElementById('stat-creator-stars').innerText = (s.totalCreatorStars || 0).toLocaleString();
+            document.getElementById('stat-referral-payouts').innerText = 'KES ' + (s.totalReferralPayouts || 0).toLocaleString();
+            document.getElementById('stat-unlocks').innerText = (s.totalUnlocks || 0).toLocaleString();
+            document.getElementById('stat-creators').innerText = (s.activeCreators || 0).toLocaleString();
+            document.getElementById('stat-pending').innerText = (s.pendingApprovals || 0).toLocaleString();
+            document.getElementById('stat-pending-withdrawals').innerText = (s.pendingWithdrawals || 0).toLocaleString();
+            document.getElementById('stat-users').innerText = (s.totalUsers || 0).toLocaleString();
+            document.getElementById('pendingCount').innerText = s.pendingApprovals || 0;
+            document.getElementById('withdrawCount').innerText = s.pendingWithdrawals || 0;
+        }
+    } catch(e) {
+        document.getElementById('stat-revenue').innerText = '0';
+        document.getElementById('stat-creator-stars').innerText = '0';
+        document.getElementById('stat-referral-payouts').innerText = 'KES 0';
+        document.getElementById('stat-unlocks').innerText = '0';
+        document.getElementById('stat-creators').innerText = creators.length.toLocaleString();
+        document.getElementById('stat-pending').innerText = approvals.length.toLocaleString();
+        document.getElementById('stat-pending-withdrawals').innerText = withdrawals.filter(w=>w.status==='pending').length.toLocaleString();
+        document.getElementById('stat-users').innerText = '0';
+        document.getElementById('pendingCount').innerText = approvals.length;
+        document.getElementById('withdrawCount').innerText = withdrawals.filter(w=>w.status==='pending').length;
+    }
+}
+
+function renderRecentTx() {
+    const tbody = document.getElementById('recent-tx-body');
+    const recent = transactions.slice(0, 5);
+    if (!recent.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
+    tbody.innerHTML = recent.map(t => `
+        <tr><td style="color:var(--text-primary);font-weight:600;">${t.description || t.type}</td><td>${t.amount}</td>
+        <td><span class="badge badge--${t.type}">${t.type}</span></td>
+        <td>${t.userId?.name || t.userId?.phone || '-'}</td>
+        <td>${t.creatorId?.name || '-'}</td>
+        <td><span class="badge badge--${t.status}">${t.status}</span></td><td>${timeAgo(t.createdAt)}</td></tr>
+    `).join('');
+}
+
+function renderCreators() {
+    const tbody = document.getElementById('creators-body');
+    if (!creators.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-muted);">No creators yet</td></tr>'; return; }
+    tbody.innerHTML = creators.map(c => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${c.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${c.handle}</span></td>
+            <td>${c.tiktokUsername ? `<span style="font-family:var(--font-mono);color:var(--accent-violet);font-size:12px;">${c.tiktokUsername}</span><br><span style="font-size:10px;color:var(--text-muted);">${(c.tiktokFollowers||0).toLocaleString()} fans</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>
+            <td>${c.categoryName || c.category}</td><td>${c.city}</td>
+            <td style="font-family:var(--font-mono);">${c.starCost || c.price || 50}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-blue);">${c.creatorStars || 0}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${c.referralEarnings || 0}</td>
+            <td style="font-family:var(--font-mono);">${c.unlocks||0}</td>
+            <td><span class="badge badge--${c.status}">${c.status}</span></td>
+            <td><button class="btn btn--outline btn-sm" onclick="editCreator('${c._id || c.id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--magenta btn-sm" onclick="deleteCreator('${c._id || c.id}')"><i class="material-symbols-outlined">delete</i></button></td>
+        </tr>
+    `).join('');
+}
+
+function renderTransactions() {
+    const tbody = document.getElementById('tx-body');
+    if (!transactions.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
+    tbody.innerHTML = transactions.map(t => `
+        <tr><td style="font-family:var(--font-mono);font-size:11px;">${t._id || t.id}</td>
+        <td>${t.userId?.name || t.userId?.phone || '-'}</td>
+        <td style="color:var(--text-primary);font-weight:600;">${t.creatorId?.name || '-'}</td>
+        <td style="font-family:var(--font-mono);">${t.amount}</td>
+        <td><span class="badge badge--${t.type || 'unlock'}">${t.type || 'unlock'}</span></td>
+        <td><span class="badge badge--${t.status}">${t.status}</span></td>
+        <td>${timeAgo(t.createdAt)}</td></tr>
+    `).join('');
+}
+
+function renderApprovals() {
+    const tbody = document.getElementById('approvals-body');
+    if (!approvals.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No pending approvals</td></tr>'; return; }
+    tbody.innerHTML = approvals.map(a => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${a.name}</td>
+            <td>${a.tiktokUsername ? `<span style="font-family:var(--font-mono);color:var(--accent-violet);font-size:12px;">${a.tiktokUsername}</span><br><span style="font-size:10px;color:var(--text-muted);">${(a.tiktokFollowers||0).toLocaleString()} fans</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>
+            <td>${a.categoryName || a.category}</td><td>${a.city}</td>
+            <td style="font-family:var(--font-mono);">${a.starCost || a.price || 50}</td>
+            <td>${timeAgo(a.appliedAt || a.createdAt)}</td>
+            <td><button class="btn btn--primary btn-sm" onclick="approveCreator('${a._id || a.id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--magenta btn-sm" onclick="rejectCreator('${a._id || a.id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
+        </tr>
     `).join('');
 }
 
 function renderWithdrawals() {
-    const container = document.getElementById('withdrawalList');
-    if (!withdrawals.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No redemptions yet.</p>'; return; }
-    container.innerHTML = withdrawals.map(w => `
-        <div class="list-card">
-            <div class="list-icon" style="background:${w.status==='paid'?'var(--accent-lime-soft)':'var(--accent-amber-soft)'};">
-                <i class="material-symbols-outlined" style="color:${w.status==='paid'?'var(--accent-lime)':'var(--accent-amber)'}">${w.status==='paid'?'check_circle':'hourglass_top'}</i>
-            </div>
-            <div class="list-content">
-                <div class="list-title">Redemption ${w.status==='paid'?'Completed':'Pending'}</div>
-                <div class="list-sub">${timeAgo(w.createdAt)}</div>
-            </div>
-            <div class="list-amount">KES ${w.amount.toLocaleString()}</div>
-        </div>
+    const tbody = document.getElementById('withdrawals-body');
+    const pending = withdrawals.filter(w => w.status === 'pending');
+    if (!pending.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No pending withdrawals</td></tr>'; return; }
+    tbody.innerHTML = pending.map(w => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${w.creatorName}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-blue);">KES ${w.amount.toLocaleString()}</td>
+            <td>${w.phone}</td>
+            <td>${timeAgo(w.createdAt)}</td>
+            <td><button class="btn btn--primary btn-sm" onclick="payWithdrawal('${w._id || w.id}')"><i class="material-symbols-outlined">payments</i> Mark Paid</button></td>
+        </tr>
     `).join('');
 }
 
-async function saveProfile() {
-    const payload = {
-        name: document.getElementById('editName').value,
-        bio: document.getElementById('editBio').value,
-        starCost: parseInt(document.getElementById('editPrice').value) || 50,
-        phone: document.getElementById('editPhone').value,
-        social: document.getElementById('editSocial').value,
-        tiktokUsername: document.getElementById('editTiktok').value,
-        tiktokFollowers: parseInt(document.getElementById('editTiktokFollowers').value) || 0,
-        hobbies: document.getElementById('editHobbies').value,
-        openTo: document.getElementById('editOpenTo').value
-    };
-    try {
-        const res = await fetch(`${API_BASE}/api/creator/me`, {
-            method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+creatorToken},
-            body: JSON.stringify(payload)
-        });
-        if (res.ok) showToast('Profile updated', 'success', 'Saved');
-        else throw new Error('fail');
-    } catch(e) { showToast('Profile updated (demo)', 'success', 'Saved'); }
+function renderReferrals() {
+    const tbody = document.getElementById('referrals-body');
+    const total = referrals.length;
+    const active = referrals.filter(r => r.status === 'active').length;
+    const commission = referrals.reduce((a,r)=>a+(r.earnings||0),0);
+    document.getElementById('ref-total').innerText = total;
+    document.getElementById('ref-active').innerText = active;
+    document.getElementById('ref-commission').innerText = 'KES ' + (commission || 0).toLocaleString();
+    if (!total) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No referrals yet</td></tr>'; return; }
+    tbody.innerHTML = referrals.map(r => `
+        <tr>
+            <td style="color:var(--text-primary);font-weight:600;">${r.referrerId?.name||'Unknown'}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referrerId?.handle||''}</span></td>
+            <td style="color:var(--text-primary);font-weight:600;">${r.referredId?.name||'Unknown'}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referredId?.handle||''}</span></td>
+            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${r.code}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${(r.earnings||0).toLocaleString()}</td>
+            <td><span class="badge badge--${r.status}">${r.status}</span></td>
+            <td>${timeAgo(r.createdAt)}</td>
+        </tr>
+    `).join('');
 }
 
-async function requestRedemption() {
-    const stars = parseInt(document.getElementById('redeemStars').value);
-    const amount = parseInt(document.getElementById('redeemAmount').value);
-    const bal = currentCreator ? (currentCreator.creatorStars || 0) : 0;
-    if (!stars || stars < 100) { showToast('Minimum redemption is 100 stars', 'warning', 'Too Low'); return; }
-    if (!amount || amount < 100) { showToast('Minimum KES amount is 100', 'warning', 'Too Low'); return; }
-    if (stars > bal) { showToast('Insufficient star balance', 'error', 'Error'); return; }
+function filterCreators(q) {
+    const term = q.toLowerCase();
+    const rows = document.querySelectorAll('#creators-body tr');
+    rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; });
+}
+
+function openAddCreator() { document.getElementById('addCreatorModal').classList.add('active'); }
+function closeAddCreator() { document.getElementById('addCreatorModal').classList.remove('active'); }
+
+async function submitAddCreator() {
+    const c = {
+        name: document.getElementById('addName').value,
+        handle: document.getElementById('addHandle').value,
+        tiktokUsername: document.getElementById('addTiktok').value,
+        tiktokFollowers: parseInt(document.getElementById('addTiktokFollowers').value) || 0,
+        category: document.getElementById('addCategory').value,
+        city: document.getElementById('addCity').value,
+        starCost: parseInt(document.getElementById('addStarCost').value) || 50,
+        phone: document.getElementById('addPhone').value,
+        pin: document.getElementById('addPin').value,
+        bio: document.getElementById('addBio').value,
+        hobbies: document.getElementById('addHobbies').value,
+        openTo: document.getElementById('addOpenTo').value,
+        social: document.getElementById('addSocial').value,
+        status: 'verified', unlocks: 0, creatorStars: 0, referralEarnings: 0
+    };
+    if (!c.name) { showToast('Name is required', 'error'); return; }
     try {
-        const res = await fetch(`${API_BASE}/api/creator/redeem`, {
-            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+creatorToken},
-            body: JSON.stringify({stars, amount})
+        const res = await fetch(`${API_BASE}/api/admin/creators`, {
+            method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+            body: JSON.stringify(c)
         });
         const data = await res.json();
         if (data.success) {
-            showToast(data.message, 'success', 'Requested');
-            currentCreator.creatorStars = data.creatorStars;
-            currentCreator.balance = data.balance;
-            renderDashboard();
-            loadWithdrawals();
-        } else {
-            showToast(data.message || 'Failed', 'error');
-        }
-    } catch(e) { showToast('Request submitted (demo)', 'success', 'Requested'); }
-    document.getElementById('redeemStars').value = '';
-    document.getElementById('redeemAmount').value = '';
+            creators.unshift(data.celeb || c);
+            renderCreators(); updateStats(); closeAddCreator();
+            showToast(`${c.name} added successfully`, 'success', 'Creator Added');
+        } else { showToast(data.message || 'Failed', 'error'); }
+    } catch(e) {
+        creators.unshift(c);
+        renderCreators(); updateStats(); closeAddCreator();
+        showToast(`${c.name} added (demo)`, 'success', 'Creator Added');
+    }
 }
 
-function scrollToSection(id) {
-    const el = document.getElementById(id) || document.querySelector('[id="'+id+'"]');
-    if (el) el.scrollIntoView({behavior:'smooth',block:'start'});
+function editCreator(id) {
+    const c = creators.find(x => (x._id || x.id) === id);
+    if (!c) return;
+    document.getElementById('addName').value = c.name;
+    document.getElementById('addHandle').value = c.handle;
+    document.getElementById('addTiktok').value = c.tiktokUsername || '';
+    document.getElementById('addTiktokFollowers').value = c.tiktokFollowers || 0;
+    document.getElementById('addCategory').value = c.categoryName || c.category;
+    document.getElementById('addCity').value = c.city;
+    document.getElementById('addStarCost').value = c.starCost || c.price || 50;
+    document.getElementById('addPhone').value = c.phone || '';
+    document.getElementById('addBio').value = c.bio || '';
+    document.getElementById('addHobbies').value = (c.hobbies || []).join(', ');
+    document.getElementById('addOpenTo').value = (c.openTo || []).join(', ');
+    document.getElementById('addSocial').value = c.social || '';
+    openAddCreator();
 }
 
-if (creatorToken) enterDashboard();
+async function deleteCreator(id) {
+    if (!confirm('Delete this creator?')) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) { creators = creators.filter(c => (c._id || c.id) !== id); renderCreators(); updateStats(); showToast('Creator deleted', 'info', 'Deleted'); }
+        else throw new Error('fail');
+    } catch(e) {
+        creators = creators.filter(c => (c._id || c.id) !== id); renderCreators(); updateStats();
+        showToast('Creator deleted (demo)', 'info', 'Deleted');
+    }
+}
+
+async function approveCreator(id) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators/${id}/approve`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            const a = approvals.find(x => (x._id || x.id) === id);
+            if (a) { creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), creatorStars:0, referralEarnings:0}); }
+            approvals = approvals.filter(x => (x._id || x.id) !== id);
+            renderApprovals(); renderCreators(); updateStats();
+            showToast('Creator approved', 'success', 'Approved');
+        } else throw new Error('fail');
+    } catch(e) {
+        const a = approvals.find(x => (x._id || x.id) === id);
+        if (a) { creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), creatorStars:0, referralEarnings:0}); }
+        approvals = approvals.filter(x => (x._id || x.id) !== id);
+        renderApprovals(); renderCreators(); updateStats();
+        showToast('Creator approved (demo)', 'success', 'Approved');
+    }
+}
+
+async function rejectCreator(id) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators/${id}/reject`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            approvals = approvals.filter(x => (x._id || x.id) !== id);
+            renderApprovals(); updateStats();
+            showToast('Creator rejected', 'warning', 'Rejected');
+        } else throw new Error('fail');
+    } catch(e) {
+        approvals = approvals.filter(x => (x._id || x.id) !== id);
+        renderApprovals(); updateStats();
+        showToast('Creator rejected (demo)', 'warning', 'Rejected');
+    }
+}
+
+async function payWithdrawal(id) {
+    const w = withdrawals.find(x => (x._id || x.id) === id);
+    if (!w) return;
+    if (!confirm(`Mark KES ${w.amount} as paid to ${w.creatorName}?`)) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/withdrawals/${id}/pay`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            w.status = 'paid';
+            renderWithdrawals(); updateStats();
+            showToast(`KES ${w.amount} marked as paid to ${w.creatorName}`, 'success', 'Paid');
+        } else throw new Error('fail');
+    } catch(e) {
+        w.status = 'paid';
+        renderWithdrawals(); updateStats();
+        showToast(`KES ${w.amount} marked as paid (demo)`, 'success', 'Paid');
+    }
+}
+
+async function changePassword() {
+    const current = document.getElementById('currentPass').value;
+    const newPass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('confirmPass').value;
+    if (!current || !newPass) { showToast('Fill all fields', 'error'); return; }
+    if (newPass !== confirm) { showToast('Passwords do not match', 'error'); return; }
+    if (newPass.length < 6) { showToast('Password must be 6+ chars', 'error'); return; }
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/change-password`, {
+            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+            body: JSON.stringify({currentPassword:current, newPassword:newPass})
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast('Password changed!', 'success', 'Updated');
+            document.getElementById('currentPass').value='';
+            document.getElementById('newPass').value='';
+            document.getElementById('confirmPass').value='';
+        } else { showToast(data.message || 'Failed', 'error'); }
+    } catch(e) { showToast('Password changed (demo)', 'success', 'Updated'); }
+}
+
+function refreshData() {
+    loadDashboard();
+    showToast('Data refreshed', 'success', 'Updated');
+}
+
+if (adminToken) {
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    loadDashboard();
+}
 </script>
 </body>
 </html>
