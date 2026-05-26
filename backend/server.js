@@ -13,7 +13,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const app = express();
-app.set('trust proxy', 1);  // MUST be first — behind Nginx/Cloudflare
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3015;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET || 'afrolink_super_secret_' + Date.now();
@@ -32,22 +32,9 @@ app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split('
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
-    standardHeaders: true,
-    legacyHeaders: false,
-    validate: false,
-    message: { success: false, message: 'Too many requests, please try again later.' }
-});
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false, validate: false });
 app.use('/api/', limiter);
-
-const strictLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 30,
-    validate: false,
-    message: { success: false, message: 'Too many attempts. Please wait.' }
-});
+const strictLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, validate: false });
 app.use('/api/auth/', strictLimiter);
 app.use('/api/admin/login', strictLimiter);
 app.use('/api/creator/login', strictLimiter);
@@ -55,7 +42,6 @@ app.use('/api/creator/login', strictLimiter);
 // ===================== FILE UPLOAD & STATIC =====================
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadsDir),
     filename: (req, file, cb) => {
@@ -76,6 +62,15 @@ app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 
 // ===================== MONGOOSE SCHEMAS =====================
 
+const userSchema = new mongoose.Schema({
+    name: { type: String, trim: true, default: '' },
+    phone: { type: String, required: true, unique: true, trim: true },
+    pin: { type: String, required: true },
+    starsBalance: { type: Number, default: 0, min: 0 },
+    totalSpent: { type: Number, default: 0 },
+    totalPurchased: { type: Number, default: 0 },
+}, { timestamps: true });
+
 const celebSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     handle: { type: String, trim: true, default: '' },
@@ -85,9 +80,11 @@ const celebSchema = new mongoose.Schema({
     categoryName: { type: String, default: 'Influencer', trim: true },
     bio: { type: String, default: '', trim: true },
     img: { type: String, default: '' },
+    backgroundImg: { type: String, default: '' },
     isVerified: { type: Boolean, default: false },
     isOnline: { type: Boolean, default: false },
     price: { type: Number, default: 499, min: 99 },
+    starCost: { type: Number, default: 50, min: 10 },
     phone: { type: String, default: '', trim: true },
     social: { type: String, default: '', trim: true },
     tiktokUsername: { type: String, default: '', trim: true },
@@ -97,6 +94,7 @@ const celebSchema = new mongoose.Schema({
     totalEarned: { type: Number, default: 0 },
     monthEarned: { type: Number, default: 0 },
     balance: { type: Number, default: 0 },
+    creatorStars: { type: Number, default: 0 },
     referralCode: { type: String, unique: true, sparse: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Celeb', default: null },
     referralEarnings: { type: Number, default: 0 },
@@ -105,6 +103,10 @@ const celebSchema = new mongoose.Schema({
     pin: { type: String, default: '' },
     appliedAt: { type: Date, default: Date.now },
     verifiedAt: { type: Date },
+    hobbies: [{ type: String, trim: true }],
+    openTo: [{ type: String, trim: true }],
+    rating: { type: Number, default: 4.0, min: 1, max: 5 },
+    ratingCount: { type: Number, default: 0 },
 }, { timestamps: true });
 
 const transactionSchema = new mongoose.Schema({
@@ -121,6 +123,16 @@ const transactionSchema = new mongoose.Schema({
     description: { type: String, default: '' },
     fanRequestReason: { type: String, enum: ['fan', 'business', 'collaboration', 'mentorship'], default: 'fan' },
     callbackData: { type: Object, default: {} },
+}, { timestamps: true });
+
+const starTransactionSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Celeb' },
+    amount: { type: Number, required: true },
+    type: { type: String, enum: ['purchase', 'unlock', 'gift', 'redemption', 'referral_bonus'], default: 'unlock' },
+    description: { type: String, default: '' },
+    mpesaRef: { type: String, default: '' },
+    status: { type: String, enum: ['pending', 'success', 'failed'], default: 'success' },
 }, { timestamps: true });
 
 const withdrawalSchema = new mongoose.Schema({
@@ -142,6 +154,13 @@ const referralSchema = new mongoose.Schema({
     status: { type: String, enum: ['pending', 'active'], default: 'pending' },
 }, { timestamps: true });
 
+const ratingSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    creatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Celeb', required: true },
+    rating: { type: Number, required: true, min: 1, max: 5 },
+    comment: { type: String, default: '', trim: true },
+}, { timestamps: true });
+
 const adminLogSchema = new mongoose.Schema({
     action: { type: String, required: true },
     adminId: { type: String },
@@ -155,10 +174,13 @@ const settingsSchema = new mongoose.Schema({
     value: { type: mongoose.Schema.Types.Mixed }
 });
 
+const User = mongoose.model('User', userSchema);
 const Celeb = mongoose.model('Celeb', celebSchema);
 const Transaction = mongoose.model('Transaction', transactionSchema);
+const StarTransaction = mongoose.model('StarTransaction', starTransactionSchema);
 const Withdrawal = mongoose.model('Withdrawal', withdrawalSchema);
 const Referral = mongoose.model('Referral', referralSchema);
+const Rating = mongoose.model('Rating', ratingSchema);
 const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 const Settings = mongoose.model('Settings', settingsSchema);
 
@@ -183,6 +205,18 @@ function verifyCreator(req, res, next) {
         const decoded = jwt.verify(token, JWT_SECRET);
         if (decoded.role !== 'creator') return res.status(403).json({ success: false, message: 'Creator only' });
         req.creator = decoded;
+        next();
+    } catch (e) { return res.status(401).json({ success: false, message: 'Invalid token' }); }
+}
+
+function verifyUser(req, res, next) {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const token = auth.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.role !== 'user') return res.status(403).json({ success: false, message: 'User only' });
+        req.user = decoded;
         next();
     } catch (e) { return res.status(401).json({ success: false, message: 'Invalid token' }); }
 }
@@ -216,12 +250,184 @@ app.get('/api/settings', async (req, res) => {
 app.post('/api/admin/settings', verifyAdmin, async (req, res) => {
     try {
         const { demoMode } = req.body;
-        await Settings.findOneAndUpdate(
-            { key: 'demoMode' },
-            { key: 'demoMode', value: demoMode !== false },
-            { upsert: true }
-        );
+        await Settings.findOneAndUpdate({ key: 'demoMode' }, { key: 'demoMode', value: demoMode !== false }, { upsert: true });
         res.json({ success: true, demoMode: demoMode !== false });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- USER AUTH (FANS) --------------------
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { name, phone, pin } = req.body;
+        if (!phone || !pin) return res.status(400).json({ success: false, message: 'Phone and PIN required' });
+        const existing = await User.findOne({ phone: phone.trim() });
+        if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
+        const hashedPin = await bcrypt.hash(pin, 10);
+        const user = new User({ name: name ? name.trim() : '', phone: phone.trim(), pin: hashedPin });
+        await user.save();
+        const token = jwt.sign({ id: user._id, role: 'user', phone: user.phone }, JWT_SECRET, { expiresIn: '30d' });
+        res.json({ success: true, token, user: { id: user._id, name: user.name, phone: user.phone, starsBalance: user.starsBalance } });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { phone, pin } = req.body;
+        if (!phone || !pin) return res.status(400).json({ success: false, message: 'Phone and PIN required' });
+        const user = await User.findOne({ phone: phone.trim() });
+        if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+        const valid = await bcrypt.compare(pin, user.pin);
+        if (!valid) return res.status(401).json({ success: false, message: 'Invalid PIN' });
+        const token = jwt.sign({ id: user._id, role: 'user', phone: user.phone }, JWT_SECRET, { expiresIn: '30d' });
+        res.json({ success: true, token, user: { id: user._id, name: user.name, phone: user.phone, starsBalance: user.starsBalance, totalSpent: user.totalSpent } });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/me', verifyUser, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-pin');
+        if (!user) return res.status(404).json({ success: false, message: 'Not found' });
+        res.json({ success: true, user });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- STARS STORE / PURCHASE --------------------
+app.post('/api/stars/buy', verifyUser, async (req, res) => {
+    try {
+        const { packageId, phone, amount, stars } = req.body;
+        if (!packageId || !amount || !stars) return res.status(400).json({ success: false, message: 'Package info required' });
+        const user = await User.findById(req.user.id);
+        const refId = 'AL' + Date.now() + Math.floor(Math.random() * 1000);
+
+        if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) {
+            user.starsBalance += parseInt(stars);
+            user.totalPurchased += parseInt(stars);
+            await user.save();
+            await StarTransaction.create({ userId: user._id, amount: parseInt(stars), type: 'purchase', description: `Bought ${stars} stars`, status: 'success' });
+            return res.json({ success: true, message: 'Demo mode: Stars added', starsBalance: user.starsBalance });
+        }
+
+        const fp = formatPhoneMegaPay(phone || user.phone);
+        const payload = {
+            api_key: MEGAPAY_API_KEY,
+            email: MEGAPAY_EMAIL,
+            amount: parseInt(amount),
+            msisdn: fp,
+            callback_url: `${BASE_URL}/api/megapay/stars-webhook`,
+            description: `Buy ${stars} AfroLink Stars`,
+            reference: refId
+        };
+
+        const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
+        const mpData = mpRes.data;
+        if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) {
+            return res.status(400).json({ success: false, message: mpData.errorMessage || mpData.message || 'Payment failed' });
+        }
+
+        await StarTransaction.create({ userId: user._id, amount: parseInt(stars), type: 'purchase', description: `Bought ${stars} stars`, status: 'pending', mpesaRef: refId });
+        res.json({ success: true, refId, message: 'STK push sent. Confirm on your phone to receive stars.' });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- STARS WEBHOOK --------------------
+app.post('/api/megapay/stars-webhook', async (req, res) => {
+    res.status(200).send('OK');
+    try {
+        const data = req.body || {};
+        const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
+        const ref = data.reference || data.BillRefNumber || '';
+        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID;
+        const amount = parseFloat(data.TransactionAmount || data.amount || data.Amount);
+
+        if (responseCode != 0) {
+            if (ref) await StarTransaction.findOneAndUpdate({ mpesaRef: ref }, { status: 'failed' });
+            return;
+        }
+        if (!receipt || !ref) return;
+
+        const stx = await StarTransaction.findOne({ mpesaRef: ref, status: 'pending' });
+        if (!stx) return;
+
+        stx.status = 'success';
+        await stx.save();
+
+        const user = await User.findById(stx.userId);
+        if (user) {
+            user.starsBalance += stx.amount;
+            user.totalPurchased += stx.amount;
+            await user.save();
+        }
+    } catch (err) { console.error('Stars webhook error:', err.message); }
+});
+
+// -------------------- UNLOCK CREATOR WITH STARS --------------------
+app.post('/api/stars/unlock', verifyUser, async (req, res) => {
+    try {
+        const { creatorId } = req.body;
+        if (!creatorId) return res.status(400).json({ success: false, message: 'Creator ID required' });
+        const user = await User.findById(req.user.id);
+        const celeb = await Celeb.findById(creatorId);
+        if (!celeb) return res.status(404).json({ success: false, message: 'Creator not found' });
+        if (celeb.status !== 'verified') return res.status(403).json({ success: false, message: 'Creator not verified' });
+
+        const cost = celeb.starCost || 50;
+        if (user.starsBalance < cost) return res.status(400).json({ success: false, message: `You need ${cost} stars. Buy more in the Stars Store.` });
+
+        user.starsBalance -= cost;
+        user.totalSpent += cost;
+        await user.save();
+
+        celeb.creatorStars += cost;
+        celeb.unlocks += 1;
+        await celeb.save();
+
+        await StarTransaction.create({
+            userId: user._id,
+            creatorId: celeb._id,
+            amount: cost,
+            type: 'unlock',
+            description: `Unlocked ${celeb.name}`,
+            status: 'success'
+        });
+
+        res.json({ success: true, message: `Unlocked ${celeb.name}! ${cost} stars transferred.`, phone: celeb.phone, starsBalance: user.starsBalance });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- RATINGS --------------------
+app.post('/api/ratings', verifyUser, async (req, res) => {
+    try {
+        const { creatorId, rating, comment } = req.body;
+        if (!creatorId || !rating || rating < 1 || rating > 5) return res.status(400).json({ success: false, message: 'Valid rating required' });
+        const celeb = await Celeb.findById(creatorId);
+        if (!celeb) return res.status(404).json({ success: false, message: 'Creator not found' });
+
+        const existing = await Rating.findOne({ userId: req.user.id, creatorId });
+        if (existing) {
+            const oldTotal = celeb.rating * celeb.ratingCount;
+            const newTotal = oldTotal - existing.rating + rating;
+            celeb.rating = parseFloat((newTotal / celeb.ratingCount).toFixed(1));
+            await celeb.save();
+            existing.rating = rating;
+            existing.comment = comment || '';
+            await existing.save();
+            return res.json({ success: true, message: 'Rating updated', rating: celeb.rating, ratingCount: celeb.ratingCount });
+        }
+
+        await Rating.create({ userId: req.user.id, creatorId, rating, comment: comment || '' });
+        const oldTotal = celeb.rating * celeb.ratingCount;
+        celeb.ratingCount += 1;
+        celeb.rating = parseFloat(((oldTotal + rating) / celeb.ratingCount).toFixed(1));
+        await celeb.save();
+
+        res.json({ success: true, message: 'Rating submitted', rating: celeb.rating, ratingCount: celeb.ratingCount });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/ratings/:creatorId', async (req, res) => {
+    try {
+        const ratings = await Rating.find({ creatorId: req.params.creatorId }).populate('userId', 'name').sort({ createdAt: -1 }).limit(20);
+        res.json({ success: true, ratings });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -232,7 +438,7 @@ app.get('/api/celebs', async (req, res) => {
         const category = req.query.category;
         const query = { status: 'verified' };
         if (category && category !== 'all') query.category = category;
-        const celebs = await Celeb.find(query).select('-pin -callbackData').sort({ unlocks: -1 }).limit(limit);
+        const celebs = await Celeb.find(query).select('-pin -phone -callbackData').sort({ unlocks: -1 }).limit(limit);
         res.json({ success: true, count: celebs.length, celebs });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
@@ -241,14 +447,15 @@ app.get('/api/celebs/:id', async (req, res) => {
     try {
         const celeb = await Celeb.findById(req.params.id).select('-pin -callbackData');
         if (!celeb) return res.status(404).json({ success: false, message: 'Not found' });
-        res.json({ success: true, celeb });
+        const ratings = await Rating.find({ creatorId: celeb._id }).sort({ createdAt: -1 }).limit(5);
+        res.json({ success: true, celeb, recentRatings: ratings });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 // -------------------- CREATOR APPLICATION --------------------
 app.post('/api/apply', upload.single('photo'), async (req, res) => {
     try {
-        const { name, handle, category, city, phone, price, bio, social, pin, tiktokUsername, tiktokFollowers, referralCode: incomingRefCode } = req.body;
+        const { name, handle, category, city, phone, price, bio, social, pin, tiktokUsername, tiktokFollowers, referralCode: incomingRefCode, hobbies, openTo } = req.body;
         if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
         const existing = await Celeb.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
@@ -262,6 +469,8 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
         const img = req.file ? `/uploads/${req.file.filename}` : '';
         const hashedPin = pin ? await bcrypt.hash(pin, 10) : await bcrypt.hash('1234', 10);
         const newReferralCode = generateReferralCode();
+        const hobbyList = hobbies ? hobbies.split(',').map(h => h.trim()).filter(Boolean) : [];
+        const openToList = openTo ? openTo.split(',').map(o => o.trim()).filter(Boolean) : [];
 
         const celeb = new Celeb({
             name: name.trim(),
@@ -271,6 +480,7 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
             city: city || 'Nairobi',
             phone: phone.trim(),
             price: parseInt(price) || 499,
+            starCost: parseInt(price) || 50,
             bio: bio || '',
             social: social || '',
             tiktokUsername: tiktokUsername || '',
@@ -280,6 +490,8 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
             pin: hashedPin,
             referralCode: newReferralCode,
             referredBy,
+            hobbies: hobbyList,
+            openTo: openToList,
         });
         await celeb.save();
 
@@ -287,7 +499,7 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
             await new Referral({ referrerId: referredBy, referredId: celeb._id, code: incomingRefCode.trim().toUpperCase() }).save();
         }
 
-        res.json({ success: true, message: 'Application submitted. Await admin approval. You can login but dashboard is limited until verified.', celebId: celeb._id, referralCode: newReferralCode });
+        res.json({ success: true, message: 'Application submitted. Await admin approval.', celebId: celeb._id, referralCode: newReferralCode });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -318,15 +530,18 @@ app.get('/api/creator/me', verifyCreator, async (req, res) => {
 
 app.put('/api/creator/me', verifyCreator, async (req, res) => {
     try {
-        const { name, bio, price, phone, social, tiktokUsername, tiktokFollowers } = req.body;
+        const { name, bio, price, phone, social, tiktokUsername, tiktokFollowers, hobbies, openTo, starCost } = req.body;
         const updates = {};
         if (name) updates.name = name.trim();
         if (bio !== undefined) updates.bio = bio.trim();
         if (price) updates.price = parseInt(price);
+        if (starCost) updates.starCost = parseInt(starCost);
         if (phone) updates.phone = phone.trim();
         if (social !== undefined) updates.social = social.trim();
         if (tiktokUsername !== undefined) updates.tiktokUsername = tiktokUsername.trim();
         if (tiktokFollowers !== undefined) updates.tiktokFollowers = parseInt(tiktokFollowers) || 0;
+        if (hobbies) updates.hobbies = hobbies.split(',').map(h => h.trim()).filter(Boolean);
+        if (openTo) updates.openTo = openTo.split(',').map(o => o.trim()).filter(Boolean);
         const celeb = await Celeb.findByIdAndUpdate(req.creator.id, updates, { new: true }).select('-pin');
         res.json({ success: true, creator: celeb });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
@@ -347,9 +562,50 @@ app.post('/api/creator/change-pin', verifyCreator, async (req, res) => {
 
 app.get('/api/creator/transactions', verifyCreator, async (req, res) => {
     try {
-        const txs = await Transaction.find({ celebId: req.creator.id, status: 'success' })
-            .sort({ createdAt: -1 }).select('userPhone amount creatorEarnings fanRequestReason createdAt');
+        const txs = await StarTransaction.find({ creatorId: req.creator.id, status: 'success' })
+            .sort({ createdAt: -1 }).select('userId amount description createdAt');
         res.json({ success: true, transactions: txs });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// -------------------- CREATOR STAR REDEMPTION / WITHDRAWAL --------------------
+app.post('/api/creator/redeem', verifyCreator, async (req, res) => {
+    try {
+        const { stars, amount } = req.body;
+        const celeb = await Celeb.findById(req.creator.id);
+        if (!celeb || (celeb.creatorStars || 0) < stars) return res.status(400).json({ success: false, message: 'Insufficient star balance' });
+        if (stars < 100) return res.status(400).json({ success: false, message: 'Minimum redemption is 100 stars' });
+        if (celeb.status !== 'verified') return res.status(403).json({ success: false, message: 'Account under review. Cannot redeem yet.' });
+
+        celeb.creatorStars -= stars;
+        celeb.balance += amount;
+        await celeb.save();
+
+        const w = new Withdrawal({
+            creatorId: celeb._id,
+            creatorName: celeb.name,
+            amount: parseInt(amount),
+            phone: celeb.phone,
+            status: 'pending'
+        });
+        await w.save();
+
+        await StarTransaction.create({
+            creatorId: celeb._id,
+            amount: stars,
+            type: 'redemption',
+            description: `Redeemed ${stars} stars for KES ${amount}`,
+            status: 'success'
+        });
+
+        res.json({ success: true, message: `Redemption request submitted. KES ${amount} will be sent to your M-Pesa within 24h.`, creatorStars: celeb.creatorStars, balance: celeb.balance });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+app.get('/api/creator/withdrawals', verifyCreator, async (req, res) => {
+    try {
+        const list = await Withdrawal.find({ creatorId: req.creator.id }).sort({ createdAt: -1 });
+        res.json({ success: true, withdrawals: list });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -363,58 +619,14 @@ app.get('/api/creator/referral-stats', verifyCreator, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// -------------------- WITHDRAWALS --------------------
-app.post('/api/creator/withdraw', verifyCreator, async (req, res) => {
-    try {
-        const { amount } = req.body;
-        const celeb = await Celeb.findById(req.creator.id);
-        const totalBalance = (celeb.balance || 0) + (celeb.referralEarnings || 0);
-        if (!celeb || totalBalance < amount) return res.status(400).json({ success: false, message: 'Insufficient balance' });
-        if (amount < 500) return res.status(400).json({ success: false, message: 'Minimum withdrawal KES 500' });
-        if (celeb.status !== 'verified') return res.status(403).json({ success: false, message: 'Account under review. Cannot withdraw yet.' });
-
-        const w = new Withdrawal({
-            creatorId: celeb._id,
-            creatorName: celeb.name,
-            amount: parseInt(amount),
-            phone: celeb.phone,
-            status: 'pending'
-        });
-        await w.save();
-
-        let remaining = amount;
-        if (celeb.balance >= remaining) {
-            celeb.balance -= remaining;
-            remaining = 0;
-        } else {
-            remaining -= celeb.balance;
-            celeb.balance = 0;
-            celeb.referralEarnings -= remaining;
-        }
-        await celeb.save();
-
-        res.json({ success: true, message: `Withdrawal of KES ${amount} requested. Admin will process within 24h.`, balance: celeb.balance, referralEarnings: celeb.referralEarnings, withdrawalId: w._id });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
-});
-
-app.get('/api/creator/withdrawals', verifyCreator, async (req, res) => {
-    try {
-        const list = await Withdrawal.find({ creatorId: req.creator.id }).sort({ createdAt: -1 });
-        res.json({ success: true, withdrawals: list });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
-});
-
 // -------------------- ADMIN AUTH --------------------
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         if (username !== ADMIN_USERNAME) return res.status(401).json({ success: false, message: 'Invalid credentials' });
         let valid = false;
-        if (ADMIN_PASSWORD_HASH) {
-            valid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
-        } else {
-            valid = password === ADMIN_PASSWORD;
-        }
+        if (ADMIN_PASSWORD_HASH) valid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+        else valid = password === ADMIN_PASSWORD;
         if (!valid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
         const token = jwt.sign({ role: 'admin', username }, JWT_SECRET, { expiresIn: '1d' });
         res.json({ success: true, token });
@@ -426,11 +638,8 @@ app.post('/api/admin/change-password', verifyAdmin, async (req, res) => {
         const { currentPassword, newPassword } = req.body;
         if (!newPassword || newPassword.length < 6) return res.status(400).json({ success: false, message: 'Password must be 6+ chars' });
         let valid = false;
-        if (ADMIN_PASSWORD_HASH) {
-            valid = await bcrypt.compare(currentPassword, ADMIN_PASSWORD_HASH);
-        } else {
-            valid = currentPassword === ADMIN_PASSWORD;
-        }
+        if (ADMIN_PASSWORD_HASH) valid = await bcrypt.compare(currentPassword, ADMIN_PASSWORD_HASH);
+        else valid = currentPassword === ADMIN_PASSWORD;
         if (!valid) return res.status(401).json({ success: false, message: 'Current password incorrect' });
         const newHash = await bcrypt.hash(newPassword, 10);
         res.json({ success: true, message: 'Password changed. Update ADMIN_PASSWORD_HASH in .env to: ' + newHash });
@@ -447,7 +656,7 @@ app.get('/api/admin/creators', verifyAdmin, async (req, res) => {
 
 app.post('/api/admin/creators', verifyAdmin, upload.single('photo'), async (req, res) => {
     try {
-        const { name, handle, category, city, phone, price, bio, social, pin, tiktokUsername, tiktokFollowers } = req.body;
+        const { name, handle, category, city, phone, price, bio, social, pin, tiktokUsername, tiktokFollowers, hobbies, openTo, starCost } = req.body;
         if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
         const existing = await Celeb.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
@@ -462,6 +671,7 @@ app.post('/api/admin/creators', verifyAdmin, upload.single('photo'), async (req,
             city: city || 'Nairobi',
             phone: phone.trim(),
             price: parseInt(price) || 499,
+            starCost: parseInt(starCost) || 50,
             bio: bio || '',
             social: social || '',
             tiktokUsername: tiktokUsername || '',
@@ -471,7 +681,9 @@ app.post('/api/admin/creators', verifyAdmin, upload.single('photo'), async (req,
             pin: hashedPin,
             referralCode: newReferralCode,
             verifiedAt: new Date(),
-            isVerified: true
+            isVerified: true,
+            hobbies: hobbies ? hobbies.split(',').map(h => h.trim()).filter(Boolean) : [],
+            openTo: openTo ? openTo.split(',').map(o => o.trim()).filter(Boolean) : [],
         });
         await celeb.save();
         await new AdminLog({ action: 'manual_add_creator', adminId: req.admin.username, targetId: celeb._id, details: { name: celeb.name } }).save();
@@ -481,7 +693,7 @@ app.post('/api/admin/creators', verifyAdmin, upload.single('photo'), async (req,
 
 app.get('/api/admin/transactions', verifyAdmin, async (req, res) => {
     try {
-        const txs = await Transaction.find().sort({ createdAt: -1 }).limit(200);
+        const txs = await StarTransaction.find().sort({ createdAt: -1 }).limit(200).populate('userId', 'name phone').populate('creatorId', 'name handle');
         res.json({ success: true, count: txs.length, transactions: txs });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
@@ -521,24 +733,26 @@ app.delete('/api/admin/creators/:id', verifyAdmin, async (req, res) => {
 
 app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
     try {
-        const totalRevenue = await Transaction.aggregate([{ $match: { status: 'success' } }, { $group: { _id: null, total: { $sum: '$platformFee' } } }]);
-        const totalUnlocks = await Transaction.countDocuments({ status: 'success' });
+        const totalStarRevenue = await StarTransaction.aggregate([{ $match: { type: 'purchase', status: 'success' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]);
+        const totalUnlocks = await StarTransaction.countDocuments({ type: 'unlock', status: 'success' });
         const activeCreators = await Celeb.countDocuments({ status: 'verified' });
         const pendingApprovals = await Celeb.countDocuments({ status: 'pending' });
-        const totalCreatorEarnings = await Transaction.aggregate([{ $match: { status: 'success' } }, { $group: { _id: null, total: { $sum: '$creatorEarnings' } } }]);
+        const totalCreatorStars = await Celeb.aggregate([{ $match: { status: 'verified' } }, { $group: { _id: null, total: { $sum: '$creatorStars' } } }]);
         const totalReferralPayouts = await Transaction.aggregate([{ $match: { status: 'success' } }, { $group: { _id: null, total: { $sum: '$referralCommission' } } }]);
         const pendingWithdrawals = await Withdrawal.countDocuments({ status: 'pending' });
+        const totalUsers = await User.countDocuments();
         res.json({
             success: true,
             stats: {
-                totalRevenue: totalRevenue[0]?.total || 0,
+                totalStarRevenue: totalStarRevenue[0]?.total || 0,
                 totalUnlocks,
                 activeCreators,
                 pendingApprovals,
-                totalCreatorEarnings: totalCreatorEarnings[0]?.total || 0,
+                totalCreatorStars: totalCreatorStars[0]?.total || 0,
                 totalReferralPayouts: totalReferralPayouts[0]?.total || 0,
                 pendingWithdrawals,
-                totalTransactions: await Transaction.countDocuments()
+                totalTransactions: await StarTransaction.countDocuments(),
+                totalUsers
             }
         });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
@@ -569,20 +783,17 @@ app.get('/api/admin/referrals', verifyAdmin, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// -------------------- MEGAPAY STK PUSH --------------------
+// -------------------- MEGAPAY STK PUSH (LEGACY MONEY DEPOSIT - KEEP FOR WITHDRAWALS) --------------------
 app.post('/api/deposit', async (req, res) => {
     try {
         const { userPhone, amount, description, celebId, fanRequestReason } = req.body;
         if (!userPhone || !amount || amount < 10) return res.status(400).json({ success: false, message: 'Phone and amount required' });
         if (!celebId) return res.status(400).json({ success: false, message: 'Creator ID required' });
-
         const celeb = await Celeb.findById(celebId);
         if (!celeb) return res.status(404).json({ success: false, message: 'Creator not found' });
-
         const refId = 'AL' + Date.now() + Math.floor(Math.random() * 1000);
         const platformFee = Math.floor(amount * PLATFORM_FEE_PERCENT / 100);
         const creatorEarnings = Math.floor(amount * (100 - PLATFORM_FEE_PERCENT) / 100);
-
         const tx = new Transaction({
             userPhone: userPhone.trim(),
             celebId: celeb._id,
@@ -596,14 +807,11 @@ app.post('/api/deposit', async (req, res) => {
             fanRequestReason: fanRequestReason || 'fan'
         });
         await tx.save();
-
         if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) {
             return res.json({ success: true, refId, message: 'Demo mode: No MegaPay credentials. Payment will auto-resolve.' });
         }
-
         const fp = formatPhoneMegaPay(userPhone);
         if (fp.length !== 12) return res.status(400).json({ success: false, message: 'Invalid Safaricom number format.' });
-
         const payload = {
             api_key: MEGAPAY_API_KEY,
             email: MEGAPAY_EMAIL,
@@ -613,12 +821,8 @@ app.post('/api/deposit', async (req, res) => {
             description: tx.description,
             reference: refId
         };
-
         try {
-            const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, {
-                headers: { 'Content-Type': 'application/json' },
-                timeout: 15000
-            });
+            const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
             const mpData = mpRes.data;
             if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) {
                 tx.status = 'failed';
@@ -637,53 +841,35 @@ app.post('/api/deposit', async (req, res) => {
     }
 });
 
-// -------------------- MEGAPAY WEBHOOK --------------------
+// -------------------- MEGAPAY WEBHOOK (LEGACY) --------------------
 app.post('/api/megapay/webhook', async (req, res) => {
     res.status(200).send('OK');
-
     try {
         const data = req.body || {};
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
-
         if (responseCode != 0) {
-            console.log('MegaPay webhook non-zero response code:', responseCode, data);
             const ref = data.reference || data.BillRefNumber || '';
-            if (ref) {
-                await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data });
-            }
+            if (ref) await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data });
             return;
         }
-
         const amount = parseFloat(data.TransactionAmount || data.amount || data.Amount);
         const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID;
-        const phoneRaw = String(data.Msisdn || data.phone || data.PhoneNumber || data.msisdn || data.BillRefNumber || '');
         const ref = data.reference || data.BillRefNumber || '';
-
-        if (isNaN(amount) || amount <= 0) { console.error('Webhook invalid amount:', data); return; }
-        if (!receipt) { console.error('Webhook missing receipt:', data); return; }
-
+        if (isNaN(amount) || amount <= 0) return;
+        if (!receipt) return;
         const tx = await Transaction.findOne({ refId: ref });
-        if (!tx) { console.error('Webhook transaction not found for ref:', ref); return; }
-
+        if (!tx) return;
         const existing = await Transaction.findOne({ mpesaRef: receipt, status: 'success' });
-        if (existing) { console.log('Webhook duplicate receipt skipped:', receipt); return; }
-
+        if (existing) return;
         tx.status = 'success';
         tx.mpesaRef = receipt;
         tx.callbackData = data;
         await tx.save();
-
         if (tx.celebId) {
             await Celeb.findByIdAndUpdate(tx.celebId, {
-                $inc: {
-                    unlocks: 1,
-                    totalEarned: tx.creatorEarnings,
-                    balance: tx.creatorEarnings,
-                    monthEarned: tx.creatorEarnings
-                }
+                $inc: { unlocks: 1, totalEarned: tx.creatorEarnings, balance: tx.creatorEarnings, monthEarned: tx.creatorEarnings }
             });
         }
-
         if (tx.platformFee > 0 && tx.celebId) {
             const creator = await Celeb.findById(tx.celebId);
             if (creator && creator.referredBy) {
@@ -691,31 +877,12 @@ app.post('/api/megapay/webhook', async (req, res) => {
                 if (commission > 0) {
                     tx.referralCommission = commission;
                     await tx.save();
-                    await Celeb.findByIdAndUpdate(creator.referredBy, {
-                        $inc: { referralEarnings: commission }
-                    });
-                    await Referral.findOneAndUpdate(
-                        { referredId: creator._id },
-                        { $inc: { earnings: commission }, status: 'active' }
-                    );
-                    console.log(`Referral commission: KES ${commission} to referrer of ${creator.name}`);
+                    await Celeb.findByIdAndUpdate(creator.referredBy, { $inc: { referralEarnings: commission } });
+                    await Referral.findOneAndUpdate({ referredId: creator._id }, { $inc: { earnings: commission }, status: 'active' });
                 }
             }
         }
-
-        console.log(`Payment success: ref=${ref}, creator=${tx.celebName}, earnings=${tx.creatorEarnings}, platform=${tx.platformFee}, referral=${tx.referralCommission || 0}`);
-    } catch (err) {
-        console.error('MegaPay webhook fatal error:', err.message, err.stack);
-    }
-});
-
-// -------------------- MPESA STATUS POLL --------------------
-app.get('/api/mpesa/status/:refId', async (req, res) => {
-    try {
-        const tx = await Transaction.findOne({ refId: req.params.refId });
-        if (!tx) return res.status(404).json({ success: false, message: 'Transaction not found' });
-        res.json({ success: true, status: tx.status, refId: tx.refId, amount: tx.amount, mpesaRef: tx.mpesaRef });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    } catch (err) { console.error('MegaPay webhook fatal error:', err.message, err.stack); }
 });
 
 // -------------------- ERROR HANDLING --------------------
@@ -724,23 +891,18 @@ app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) return res.status(400).json({ success: false, message: err.message });
     res.status(500).json({ success: false, message: 'Internal server error' });
 });
-
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Endpoint not found' });
-});
+app.use((req, res) => { res.status(404).json({ success: false, message: 'Endpoint not found' }); });
 
 // ===================== START =====================
 async function start() {
     try {
         await mongoose.connect(MONGO_URI);
         console.log('MongoDB connected');
-
         const demoSetting = await Settings.findOne({ key: 'demoMode' });
         if (!demoSetting) {
             await Settings.create({ key: 'demoMode', value: true });
             console.log('Demo mode seeded: ON');
         }
-
         app.listen(PORT, () => {
             console.log(`AfroLink API running on port ${PORT}`);
             console.log(`Platform fee: ${PLATFORM_FEE_PERCENT}%`);

@@ -132,6 +132,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 }
 </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -163,7 +164,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         </div>
         <button class="nav-link active" onclick="showSection('overview',this)"><i class="material-symbols-outlined">dashboard</i> Overview</button>
         <button class="nav-link" onclick="showSection('creators',this)"><i class="material-symbols-outlined">group</i> Creators</button>
-        <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Transactions</button>
+        <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Star Transactions</button>
         <button class="nav-link" onclick="showSection('withdrawals',this)"><i class="material-symbols-outlined">account_balance</i> Withdrawals <span id="withdrawCount" style="margin-left:auto;background:var(--accent-magenta);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
         <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-amber);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
         <button class="nav-link" onclick="showSection('referrals',this)"><i class="material-symbols-outlined">group_add</i> Referrals</button>
@@ -183,18 +184,18 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 </div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-label">Platform Revenue (20%)</div><div class="stat-value" id="stat-revenue">KES 0</div><div class="stat-delta">Admin earnings</div></div>
-                <div class="stat-card"><div class="stat-label">Creator Earnings (80%)</div><div class="stat-value" id="stat-creator-earnings">KES 0</div><div class="stat-delta">Paid to creators</div></div>
-                <div class="stat-card"><div class="stat-label">Referral Payouts (5%)</div><div class="stat-value" id="stat-referral-payouts">KES 0</div><div class="stat-delta">Affiliate commissions</div></div>
-                <div class="stat-card"><div class="stat-label">Total Unlocks</div><div class="stat-value" id="stat-unlocks">0</div><div class="stat-delta">+8% this week</div></div>
-                <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value" id="stat-creators">0</div><div class="stat-delta">+3 new today</div></div>
+                <div class="stat-card"><div class="stat-label">Total Star Revenue</div><div class="stat-value" id="stat-revenue">0</div><div class="stat-delta">Stars purchased</div></div>
+                <div class="stat-card"><div class="stat-label">Creator Star Balance</div><div class="stat-value" id="stat-creator-stars">0</div><div class="stat-delta">Total held by creators</div></div>
+                <div class="stat-card"><div class="stat-label">Referral Payouts (KES)</div><div class="stat-value" id="stat-referral-payouts">KES 0</div><div class="stat-delta">Affiliate commissions</div></div>
+                <div class="stat-card"><div class="stat-label">Total Unlocks</div><div class="stat-value" id="stat-unlocks">0</div><div class="stat-delta">Contact unlocks</div></div>
+                <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value" id="stat-creators">0</div><div class="stat-delta">Verified</div></div>
                 <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value" id="stat-pending">0</div><div class="stat-delta">Needs action</div></div>
                 <div class="stat-card"><div class="stat-label">Pending Withdrawals</div><div class="stat-value" id="stat-pending-withdrawals">0</div><div class="stat-delta">Needs payout</div></div>
-                <div class="stat-card"><div class="stat-label">Total Referrals</div><div class="stat-value" id="stat-referrals">0</div><div class="stat-delta">Active affiliates</div></div>
+                <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">0</div><div class="stat-delta">Registered fans</div></div>
             </div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Recent Transaction</th><th>Amount</th><th>Platform (20%)</th><th>Creator (80%)</th><th>Referral (5%)</th><th>Reason</th><th>Status</th><th>Time</th></tr></thead>
+                    <thead><tr><th>Recent Star Transaction</th><th>Amount</th><th>Type</th><th>User</th><th>Creator</th><th>Status</th><th>Time</th></tr></thead>
                     <tbody id="recent-tx-body"></tbody>
                 </table>
             </div>
@@ -212,7 +213,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Creator</th><th>TikTok</th><th>Category</th><th>City</th><th>Price</th><th>Balance</th><th>Ref Earnings</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>Creator</th><th>TikTok</th><th>Category</th><th>City</th><th>Star Cost</th><th>Stars</th><th>Ref Earnings</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="creators-body"></tbody>
                 </table>
@@ -221,10 +222,10 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
         <!-- TRANSACTIONS -->
         <div class="section" id="section-transactions">
-            <div class="topbar"><h2>Transactions</h2></div>
+            <div class="topbar"><h2>Star Transactions</h2></div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Platform Fee</th><th>Creator Gets</th><th>Referral</th><th>Reason</th><th>Status</th><th>Date</th><th>Ref</th></tr></thead>
+                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
                     <tbody id="tx-body"></tbody>
                 </table>
             </div>
@@ -235,7 +236,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div class="topbar"><h2>Pending Withdrawals</h2></div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Creator</th><th>Amount</th><th>Phone</th><th>Requested</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Creator</th><th>Amount (KES)</th><th>Phone</th><th>Requested</th><th>Actions</th></tr></thead>
                     <tbody id="withdrawals-body"></tbody>
                 </table>
             </div>
@@ -246,7 +247,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div class="topbar"><h2>Pending Approvals</h2></div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Applicant</th><th>TikTok</th><th>Category</th><th>City</th><th>Price</th><th>Applied</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Applicant</th><th>TikTok</th><th>Category</th><th>City</th><th>Star Cost</th><th>Applied</th><th>Actions</th></tr></thead>
                     <tbody id="approvals-body"></tbody>
                 </table>
             </div>
@@ -304,7 +305,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 </div>
                 <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Danger Zone</h4>
-                    <button class="btn btn--magenta btn-sm" style="width:auto;" onclick="showToast('This would clear all data. Not implemented in demo.', 'warning', 'Demo')"><i class="material-symbols-outlined">delete</i> Reset Platform Data</button>
+                    <button class="btn btn--magenta btn-sm" style="width:auto;" onclick="showToast('This would clear all data. Not implemented.', 'warning', 'Demo')"><i class="material-symbols-outlined">delete</i> Reset Platform Data</button>
                 </div>
             </div>
         </div>
@@ -325,10 +326,12 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <option>Music & DJ</option><option>Comedy</option><option>Fashion</option><option>Fitness</option><option>Tech</option><option>Food</option><option>Podcast</option><option>Film</option><option>Dance</option><option>Art</option><option>Influencer</option><option>Other</option>
         </select>
         <label class="form-label">City</label><input type="text" id="addCity" class="form-control" value="Nairobi">
-        <label class="form-label">Price (KES)</label><input type="number" id="addPrice" class="form-control" value="499">
+        <label class="form-label">Star Cost</label><input type="number" id="addStarCost" class="form-control" value="50">
         <label class="form-label">Phone</label><input type="tel" id="addPhone" class="form-control" placeholder="0712...">
         <label class="form-label">PIN (4+ digits)</label><input type="text" id="addPin" class="form-control" value="1234">
         <label class="form-label">Bio</label><textarea id="addBio" class="form-control" style="min-height:80px;"></textarea>
+        <label class="form-label">Hobbies (comma separated)</label><input type="text" id="addHobbies" class="form-control" placeholder="Dancing, Gaming">
+        <label class="form-label">Open To (comma separated)</label><input type="text" id="addOpenTo" class="form-control" placeholder="Engagement, Business">
         <label class="form-label">Social Handle</label><input type="text" id="addSocial" class="form-control" placeholder="@handle">
         <button class="btn btn--violet" style="margin-top:10px;" onclick="submitAddCreator()"><i class="material-symbols-outlined">save</i> Save Creator</button>
     </div>
@@ -393,7 +396,6 @@ function showSection(id, btn) {
     if (btn) btn.classList.add('active');
 }
 
-function formatKES(n) { return 'KES ' + (n||0).toLocaleString(); }
 function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 async function loadDashboard() {
@@ -437,16 +439,7 @@ async function loadCreators() {
         if (!res.ok) throw new Error('fail');
         const data = await res.json();
         creators = Array.isArray(data) ? data : (data.creators || []);
-    } catch(e) {
-        creators = [
-            {id:'c1',name:'Willy Paul',handle:'@willy.paul',tiktokUsername:'@willypaul',tiktokFollowers:1200000,category:'Music & DJ',city:'Nairobi',price:999,unlocks:142,status:'verified',phone:'0712345678',balance:45000,referralEarnings:1200},
-            {id:'c2',name:'Nadia Mukami',handle:'@nadiamukami',tiktokUsername:'@nadiamukami',tiktokFollowers:890000,category:'Music & DJ',city:'Nairobi',price:1499,unlocks:89,status:'verified',phone:'0723456789',balance:28000,referralEarnings:800},
-            {id:'c3',name:'Eric Omondi',handle:'@ericomondi',tiktokUsername:'@ericomondi',tiktokFollowers:2100000,category:'Comedy',city:'Nairobi',price:799,unlocks:210,status:'verified',phone:'0734567890',balance:62000,referralEarnings:2500},
-            {id:'c4',name:'Azziad Nasenya',handle:'@azz_iad',tiktokUsername:'@azz_iad',tiktokFollowers:3400000,category:'Influencer',city:'Nairobi',price:1999,unlocks:356,status:'verified',phone:'0745678901',balance:98000,referralEarnings:5000},
-            {id:'c5',name:'DJ Joe Mfalme',handle:'@djjoemfalme',tiktokUsername:'@djjoemfalme',tiktokFollowers:450000,category:'Music & DJ',city:'Nairobi',price:599,unlocks:67,status:'verified',phone:'0756789012',balance:18000,referralEarnings:300},
-            {id:'c6',name:'Amber Ray',handle:'@iamamberray',tiktokUsername:'@iamamberray',tiktokFollowers:780000,category:'Influencer',city:'Mombasa',price:1299,unlocks:198,status:'verified',phone:'0767890123',balance:52000,referralEarnings:1500},
-        ];
-    }
+    } catch(e) { creators = []; }
 }
 
 async function loadTransactions() {
@@ -455,15 +448,7 @@ async function loadTransactions() {
         if (!res.ok) throw new Error('fail');
         const data = await res.json();
         transactions = Array.isArray(data) ? data : (data.transactions || []);
-    } catch(e) {
-        transactions = [
-            {id:'tx1',user:'0712345678',creator:'Willy Paul',amount:999,platformFee:200,creatorEarnings:799,referralCommission:10,status:'success',fanRequestReason:'fan',date:new Date(Date.now()-3600000).toISOString(),ref:'MPESA123'},
-            {id:'tx2',user:'0723456789',creator:'Nadia Mukami',amount:1499,platformFee:300,creatorEarnings:1199,referralCommission:15,status:'success',fanRequestReason:'business',date:new Date(Date.now()-7200000).toISOString(),ref:'MPESA124'},
-            {id:'tx3',user:'0734567890',creator:'Eric Omondi',amount:799,platformFee:160,creatorEarnings:639,referralCommission:8,status:'failed',fanRequestReason:'collaboration',date:new Date(Date.now()-10800000).toISOString(),ref:'MPESA125'},
-            {id:'tx4',user:'0745678901',creator:'Azziad Nasenya',amount:1999,platformFee:400,creatorEarnings:1599,referralCommission:20,status:'success',fanRequestReason:'mentorship',date:new Date(Date.now()-18000000).toISOString(),ref:'MPESA126'},
-            {id:'tx5',user:'0756789012',creator:'DJ Joe Mfalme',amount:599,platformFee:120,creatorEarnings:479,referralCommission:6,status:'success',fanRequestReason:'fan',date:new Date(Date.now()-86400000).toISOString(),ref:'MPESA127'},
-        ];
-    }
+    } catch(e) { transactions = []; }
 }
 
 async function loadApprovals() {
@@ -472,13 +457,7 @@ async function loadApprovals() {
         if (!res.ok) throw new Error('fail');
         const data = await res.json();
         approvals = Array.isArray(data) ? data : (data.approvals || []);
-    } catch(e) {
-        approvals = [
-            {id:'a1',name:'Brian Chweya',tiktokUsername:'@brianchweya',tiktokFollowers:12000,category:'Comedy',city:'Kisumu',price:499,applied:new Date(Date.now()-172800000).toISOString()},
-            {id:'a2',name:'Sharon Mwangi',tiktokUsername:'@sharonmwangi',tiktokFollowers:45000,category:'Fashion',city:'Nairobi',price:799,applied:new Date(Date.now()-259200000).toISOString()},
-            {id:'a3',name:'Kevin Otieno',tiktokUsername:'@kevinotieno',tiktokFollowers:8000,category:'Tech',city:'Nakuru',price:299,applied:new Date(Date.now()-345600000).toISOString()},
-        ];
-    }
+    } catch(e) { approvals = []; }
 }
 
 async function loadWithdrawals() {
@@ -487,12 +466,7 @@ async function loadWithdrawals() {
         if (!res.ok) throw new Error('fail');
         const data = await res.json();
         withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
-    } catch(e) {
-        withdrawals = [
-            {id:'w1',creatorName:'Willy Paul',amount:5000,phone:'0712345678',status:'pending',createdAt:new Date(Date.now()-3600000).toISOString()},
-            {id:'w2',creatorName:'Nadia Mukami',amount:3000,phone:'0723456789',status:'pending',createdAt:new Date(Date.now()-7200000).toISOString()},
-        ];
-    }
+    } catch(e) { withdrawals = []; }
 }
 
 async function loadReferrals() {
@@ -501,87 +475,96 @@ async function loadReferrals() {
         if (!res.ok) throw new Error('fail');
         const data = await res.json();
         referrals = Array.isArray(data) ? data : (data.referrals || []);
-    } catch(e) {
-        referrals = [
-            {id:'r1',referrerId:{name:'Willy Paul',handle:'@willy.paul'},referredId:{name:'Brian Chweya',handle:'@brianchweya',status:'verified'},code:'AL7F3A2B',earnings:1200,status:'active',createdAt:new Date(Date.now()-604800000).toISOString()},
-            {id:'r2',referrerId:{name:'Azziad Nasenya',handle:'@azz_iad'},referredId:{name:'Sharon Mwangi',handle:'@sharonmwangi',status:'pending'},code:'AL9E1C4D',earnings:0,status:'pending',createdAt:new Date(Date.now()-172800000).toISOString()},
-        ];
-    }
+    } catch(e) { referrals = []; }
 }
 
-function updateStats() {
-    const revenue = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+(t.platformFee||0),0);
-    const creatorEarnings = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+(t.creatorEarnings||0),0);
-    const referralPayouts = transactions.filter(t=>t.status==='success').reduce((a,t)=>a+(t.referralCommission||0),0);
-    const unlocks = transactions.filter(t=>t.status==='success').length;
-    const pendingWithdrawals = withdrawals.filter(w=>w.status==='pending').length;
-    const totalReferrals = referrals.length;
-    document.getElementById('stat-revenue').innerText = formatKES(revenue);
-    document.getElementById('stat-creator-earnings').innerText = formatKES(creatorEarnings);
-    document.getElementById('stat-referral-payouts').innerText = formatKES(referralPayouts);
-    document.getElementById('stat-unlocks').innerText = unlocks.toLocaleString();
-    document.getElementById('stat-creators').innerText = creators.length.toLocaleString();
-    document.getElementById('stat-pending').innerText = approvals.length.toLocaleString();
-    document.getElementById('stat-pending-withdrawals').innerText = pendingWithdrawals.toLocaleString();
-    document.getElementById('stat-referrals').innerText = totalReferrals.toLocaleString();
-    document.getElementById('pendingCount').innerText = approvals.length;
-    document.getElementById('withdrawCount').innerText = pendingWithdrawals;
+async function updateStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/stats`, { headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            const data = await res.json();
+            const s = data.stats || {};
+            document.getElementById('stat-revenue').innerText = (s.totalStarRevenue || 0).toLocaleString();
+            document.getElementById('stat-creator-stars').innerText = (s.totalCreatorStars || 0).toLocaleString();
+            document.getElementById('stat-referral-payouts').innerText = 'KES ' + (s.totalReferralPayouts || 0).toLocaleString();
+            document.getElementById('stat-unlocks').innerText = (s.totalUnlocks || 0).toLocaleString();
+            document.getElementById('stat-creators').innerText = (s.activeCreators || 0).toLocaleString();
+            document.getElementById('stat-pending').innerText = (s.pendingApprovals || 0).toLocaleString();
+            document.getElementById('stat-pending-withdrawals').innerText = (s.pendingWithdrawals || 0).toLocaleString();
+            document.getElementById('stat-users').innerText = (s.totalUsers || 0).toLocaleString();
+            document.getElementById('pendingCount').innerText = s.pendingApprovals || 0;
+            document.getElementById('withdrawCount').innerText = s.pendingWithdrawals || 0;
+        }
+    } catch(e) {
+        document.getElementById('stat-revenue').innerText = '0';
+        document.getElementById('stat-creator-stars').innerText = '0';
+        document.getElementById('stat-referral-payouts').innerText = 'KES 0';
+        document.getElementById('stat-unlocks').innerText = '0';
+        document.getElementById('stat-creators').innerText = creators.length.toLocaleString();
+        document.getElementById('stat-pending').innerText = approvals.length.toLocaleString();
+        document.getElementById('stat-pending-withdrawals').innerText = withdrawals.filter(w=>w.status==='pending').length.toLocaleString();
+        document.getElementById('stat-users').innerText = '0';
+        document.getElementById('pendingCount').innerText = approvals.length;
+        document.getElementById('withdrawCount').innerText = withdrawals.filter(w=>w.status==='pending').length;
+    }
 }
 
 function renderRecentTx() {
     const tbody = document.getElementById('recent-tx-body');
     const recent = transactions.slice(0, 5);
+    if (!recent.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
     tbody.innerHTML = recent.map(t => `
-        <tr><td style="color:var(--text-primary);font-weight:600;">${t.user}</td><td>${formatKES(t.amount)}</td>
-        <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(t.platformFee||0)}</td>
-        <td style="font-family:var(--font-mono);color:var(--accent-lime);">${formatKES(t.creatorEarnings||0)}</td>
-        <td style="font-family:var(--font-mono);color:var(--accent-violet);">${formatKES(t.referralCommission||0)}</td>
-        <td><span class="badge badge--${t.fanRequestReason}">${t.fanRequestReason}</span></td>
-        <td><span class="badge badge--${t.status}">${t.status}</span></td><td>${timeAgo(t.date)}</td></tr>
+        <tr><td style="color:var(--text-primary);font-weight:600;">${t.description || t.type}</td><td>${t.amount}</td>
+        <td><span class="badge badge--${t.type}">${t.type}</span></td>
+        <td>${t.userId?.name || t.userId?.phone || '-'}</td>
+        <td>${t.creatorId?.name || '-'}</td>
+        <td><span class="badge badge--${t.status}">${t.status}</span></td><td>${timeAgo(t.createdAt)}</td></tr>
     `).join('');
 }
 
 function renderCreators() {
     const tbody = document.getElementById('creators-body');
+    if (!creators.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-muted);">No creators yet</td></tr>'; return; }
     tbody.innerHTML = creators.map(c => `
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${c.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${c.handle}</span></td>
             <td>${c.tiktokUsername ? `<span style="font-family:var(--font-mono);color:var(--accent-violet);font-size:12px;">${c.tiktokUsername}</span><br><span style="font-size:10px;color:var(--text-muted);">${(c.tiktokFollowers||0).toLocaleString()} fans</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>
-            <td>${c.category}</td><td>${c.city}</td><td style="font-family:var(--font-mono);">${formatKES(c.price)}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(c.balance||0)}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${formatKES(c.referralEarnings||0)}</td>
+            <td>${c.categoryName || c.category}</td><td>${c.city}</td>
+            <td style="font-family:var(--font-mono);">${c.starCost || c.price || 50}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${c.creatorStars || 0}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${c.referralEarnings || 0}</td>
             <td style="font-family:var(--font-mono);">${c.unlocks||0}</td>
             <td><span class="badge badge--${c.status}">${c.status}</span></td>
-            <td><button class="btn btn--outline btn-sm" onclick="editCreator('${c.id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--magenta btn-sm" onclick="deleteCreator('${c.id}')"><i class="material-symbols-outlined">delete</i></button></td>
+            <td><button class="btn btn--outline btn-sm" onclick="editCreator('${c._id || c.id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--magenta btn-sm" onclick="deleteCreator('${c._id || c.id}')"><i class="material-symbols-outlined">delete</i></button></td>
         </tr>
     `).join('');
 }
 
 function renderTransactions() {
     const tbody = document.getElementById('tx-body');
+    if (!transactions.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
     tbody.innerHTML = transactions.map(t => `
-        <tr><td style="font-family:var(--font-mono);font-size:11px;">${t.id}</td>
-        <td>${t.user}</td><td style="color:var(--text-primary);font-weight:600;">${t.creator}</td>
-        <td style="font-family:var(--font-mono);">${formatKES(t.amount)}</td>
-        <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(t.platformFee||0)}</td>
-        <td style="font-family:var(--font-mono);color:var(--accent-lime);">${formatKES(t.creatorEarnings||0)}</td>
-        <td style="font-family:var(--font-mono);color:var(--accent-violet);">${formatKES(t.referralCommission||0)}</td>
-        <td><span class="badge badge--${t.fanRequestReason||'fan'}">${t.fanRequestReason||'fan'}</span></td>
+        <tr><td style="font-family:var(--font-mono);font-size:11px;">${t._id || t.id}</td>
+        <td>${t.userId?.name || t.userId?.phone || '-'}</td>
+        <td style="color:var(--text-primary);font-weight:600;">${t.creatorId?.name || '-'}</td>
+        <td style="font-family:var(--font-mono);">${t.amount}</td>
+        <td><span class="badge badge--${t.type || 'unlock'}">${t.type || 'unlock'}</span></td>
         <td><span class="badge badge--${t.status}">${t.status}</span></td>
-        <td>${timeAgo(t.date)}</td><td style="font-family:var(--font-mono);font-size:11px;">${t.ref}</td></tr>
+        <td>${timeAgo(t.createdAt)}</td></tr>
     `).join('');
 }
 
 function renderApprovals() {
     const tbody = document.getElementById('approvals-body');
+    if (!approvals.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No pending approvals</td></tr>'; return; }
     tbody.innerHTML = approvals.map(a => `
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${a.name}</td>
             <td>${a.tiktokUsername ? `<span style="font-family:var(--font-mono);color:var(--accent-violet);font-size:12px;">${a.tiktokUsername}</span><br><span style="font-size:10px;color:var(--text-muted);">${(a.tiktokFollowers||0).toLocaleString()} fans</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>
-            <td>${a.category}</td><td>${a.city}</td>
-            <td style="font-family:var(--font-mono);">${formatKES(a.price)}</td>
-            <td>${timeAgo(a.applied)}</td>
-            <td><button class="btn btn--primary btn-sm" onclick="approveCreator('${a.id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--magenta btn-sm" onclick="rejectCreator('${a.id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
+            <td>${a.categoryName || a.category}</td><td>${a.city}</td>
+            <td style="font-family:var(--font-mono);">${a.starCost || a.price || 50}</td>
+            <td>${timeAgo(a.appliedAt || a.createdAt)}</td>
+            <td><button class="btn btn--primary btn-sm" onclick="approveCreator('${a._id || a.id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--magenta btn-sm" onclick="rejectCreator('${a._id || a.id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
         </tr>
     `).join('');
 }
@@ -593,10 +576,10 @@ function renderWithdrawals() {
     tbody.innerHTML = pending.map(w => `
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${w.creatorName}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${formatKES(w.amount)}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-gold);">KES ${w.amount.toLocaleString()}</td>
             <td>${w.phone}</td>
             <td>${timeAgo(w.createdAt)}</td>
-            <td><button class="btn btn--primary btn-sm" onclick="payWithdrawal('${w.id}')"><i class="material-symbols-outlined">payments</i> Mark Paid</button></td>
+            <td><button class="btn btn--primary btn-sm" onclick="payWithdrawal('${w._id || w.id}')"><i class="material-symbols-outlined">payments</i> Mark Paid</button></td>
         </tr>
     `).join('');
 }
@@ -608,14 +591,14 @@ function renderReferrals() {
     const commission = referrals.reduce((a,r)=>a+(r.earnings||0),0);
     document.getElementById('ref-total').innerText = total;
     document.getElementById('ref-active').innerText = active;
-    document.getElementById('ref-commission').innerText = formatKES(commission);
+    document.getElementById('ref-commission').innerText = 'KES ' + (commission || 0).toLocaleString();
     if (!total) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No referrals yet</td></tr>'; return; }
     tbody.innerHTML = referrals.map(r => `
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${r.referrerId?.name||'Unknown'}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referrerId?.handle||''}</span></td>
             <td style="color:var(--text-primary);font-weight:600;">${r.referredId?.name||'Unknown'}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referredId?.handle||''}</span></td>
             <td style="font-family:var(--font-mono);color:var(--accent-gold);">${r.code}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${formatKES(r.earnings||0)}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${(r.earnings||0).toLocaleString()}</td>
             <td><span class="badge badge--${r.status}">${r.status}</span></td>
             <td>${timeAgo(r.createdAt)}</td>
         </tr>
@@ -625,10 +608,7 @@ function renderReferrals() {
 function filterCreators(q) {
     const term = q.toLowerCase();
     const rows = document.querySelectorAll('#creators-body tr');
-    rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(term) ? '' : 'none';
-    });
+    rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; });
 }
 
 function openAddCreator() { document.getElementById('addCreatorModal').classList.add('active'); }
@@ -642,66 +622,114 @@ async function submitAddCreator() {
         tiktokFollowers: parseInt(document.getElementById('addTiktokFollowers').value) || 0,
         category: document.getElementById('addCategory').value,
         city: document.getElementById('addCity').value,
-        price: parseInt(document.getElementById('addPrice').value) || 499,
+        starCost: parseInt(document.getElementById('addStarCost').value) || 50,
         phone: document.getElementById('addPhone').value,
         pin: document.getElementById('addPin').value,
         bio: document.getElementById('addBio').value,
+        hobbies: document.getElementById('addHobbies').value,
+        openTo: document.getElementById('addOpenTo').value,
         social: document.getElementById('addSocial').value,
-        status: 'verified', unlocks: 0, balance: 0, referralEarnings: 0
+        status: 'verified', unlocks: 0, creatorStars: 0, referralEarnings: 0
     };
     if (!c.name) { showToast('Name is required', 'error'); return; }
-    creators.unshift(c);
-    renderCreators(); updateStats(); closeAddCreator();
-    showToast(`${c.name} added successfully`, 'success', 'Creator Added');
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators`, {
+            method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
+            body: JSON.stringify(c)
+        });
+        const data = await res.json();
+        if (data.success) {
+            creators.unshift(data.celeb || c);
+            renderCreators(); updateStats(); closeAddCreator();
+            showToast(`${c.name} added successfully`, 'success', 'Creator Added');
+        } else { showToast(data.message || 'Failed', 'error'); }
+    } catch(e) {
+        creators.unshift(c);
+        renderCreators(); updateStats(); closeAddCreator();
+        showToast(`${c.name} added (demo)`, 'success', 'Creator Added');
+    }
 }
 
 function editCreator(id) {
-    const c = creators.find(x => x.id === id);
+    const c = creators.find(x => (x._id || x.id) === id);
     if (!c) return;
     document.getElementById('addName').value = c.name;
     document.getElementById('addHandle').value = c.handle;
     document.getElementById('addTiktok').value = c.tiktokUsername || '';
     document.getElementById('addTiktokFollowers').value = c.tiktokFollowers || 0;
-    document.getElementById('addCategory').value = c.category;
+    document.getElementById('addCategory').value = c.categoryName || c.category;
     document.getElementById('addCity').value = c.city;
-    document.getElementById('addPrice').value = c.price;
+    document.getElementById('addStarCost').value = c.starCost || c.price || 50;
     document.getElementById('addPhone').value = c.phone || '';
     document.getElementById('addBio').value = c.bio || '';
+    document.getElementById('addHobbies').value = (c.hobbies || []).join(', ');
+    document.getElementById('addOpenTo').value = (c.openTo || []).join(', ');
     document.getElementById('addSocial').value = c.social || '';
     openAddCreator();
 }
 
-function deleteCreator(id) {
+async function deleteCreator(id) {
     if (!confirm('Delete this creator?')) return;
-    creators = creators.filter(c => c.id !== id);
-    renderCreators(); updateStats();
-    showToast('Creator deleted', 'info', 'Deleted');
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) { creators = creators.filter(c => (c._id || c.id) !== id); renderCreators(); updateStats(); showToast('Creator deleted', 'info', 'Deleted'); }
+        else throw new Error('fail');
+    } catch(e) {
+        creators = creators.filter(c => (c._id || c.id) !== id); renderCreators(); updateStats();
+        showToast('Creator deleted (demo)', 'info', 'Deleted');
+    }
 }
 
-function approveCreator(id) {
-    const a = approvals.find(x => x.id === id);
-    if (!a) return;
-    creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), balance:0, referralEarnings:0});
-    approvals = approvals.filter(x => x.id !== id);
-    renderApprovals(); renderCreators(); updateStats();
-    showToast(`${a.name} approved and listed`, 'success', 'Approved');
+async function approveCreator(id) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators/${id}/approve`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            const a = approvals.find(x => (x._id || x.id) === id);
+            if (a) { creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), creatorStars:0, referralEarnings:0}); }
+            approvals = approvals.filter(x => (x._id || x.id) !== id);
+            renderApprovals(); renderCreators(); updateStats();
+            showToast('Creator approved', 'success', 'Approved');
+        } else throw new Error('fail');
+    } catch(e) {
+        const a = approvals.find(x => (x._id || x.id) === id);
+        if (a) { creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), creatorStars:0, referralEarnings:0}); }
+        approvals = approvals.filter(x => (x._id || x.id) !== id);
+        renderApprovals(); renderCreators(); updateStats();
+        showToast('Creator approved (demo)', 'success', 'Approved');
+    }
 }
 
-function rejectCreator(id) {
-    const a = approvals.find(x => x.id === id);
-    if (!a) return;
-    approvals = approvals.filter(x => x.id !== id);
-    renderApprovals(); updateStats();
-    showToast(`${a.name} rejected`, 'warning', 'Rejected');
+async function rejectCreator(id) {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/creators/${id}/reject`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            approvals = approvals.filter(x => (x._id || x.id) !== id);
+            renderApprovals(); updateStats();
+            showToast('Creator rejected', 'warning', 'Rejected');
+        } else throw new Error('fail');
+    } catch(e) {
+        approvals = approvals.filter(x => (x._id || x.id) !== id);
+        renderApprovals(); updateStats();
+        showToast('Creator rejected (demo)', 'warning', 'Rejected');
+    }
 }
 
 async function payWithdrawal(id) {
-    const w = withdrawals.find(x => x.id === id);
+    const w = withdrawals.find(x => (x._id || x.id) === id);
     if (!w) return;
     if (!confirm(`Mark KES ${w.amount} as paid to ${w.creatorName}?`)) return;
-    w.status = 'paid';
-    renderWithdrawals(); updateStats();
-    showToast(`KES ${w.amount} marked as paid to ${w.creatorName}`, 'success', 'Paid');
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/withdrawals/${id}/pay`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
+        if (res.ok) {
+            w.status = 'paid';
+            renderWithdrawals(); updateStats();
+            showToast(`KES ${w.amount} marked as paid to ${w.creatorName}`, 'success', 'Paid');
+        } else throw new Error('fail');
+    } catch(e) {
+        w.status = 'paid';
+        renderWithdrawals(); updateStats();
+        showToast(`KES ${w.amount} marked as paid (demo)`, 'success', 'Paid');
+    }
 }
 
 async function changePassword() {
@@ -718,16 +746,12 @@ async function changePassword() {
         });
         const data = await res.json();
         if (data.success) {
-            showToast('Password changed! Update .env with the new hash.', 'success', 'Updated');
+            showToast('Password changed!', 'success', 'Updated');
             document.getElementById('currentPass').value='';
             document.getElementById('newPass').value='';
             document.getElementById('confirmPass').value='';
-        } else {
-            showToast(data.message || 'Failed', 'error');
-        }
-    } catch(e) {
-        showToast('Password changed (demo)', 'success', 'Updated');
-    }
+        } else { showToast(data.message || 'Failed', 'error'); }
+    } catch(e) { showToast('Password changed (demo)', 'success', 'Updated'); }
 }
 
 function refreshData() {
@@ -735,7 +759,6 @@ function refreshData() {
     showToast('Data refreshed', 'success', 'Updated');
 }
 
-// Auto-login if token exists
 if (adminToken) {
     document.getElementById('loginWrap').style.display='none';
     document.getElementById('dashboard').style.display='block';

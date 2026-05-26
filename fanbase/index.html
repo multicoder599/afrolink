@@ -121,13 +121,12 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .list-card .list-title { font-size:13px; font-weight:700; margin-bottom:2px; }
 .list-card .list-sub { font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
 .list-card .list-amount { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--accent-gold); }
-.list-card .list-reason { font-size:10px; padding:2px 8px; border-radius:100px; background:var(--accent-violet-soft); color:var(--accent-violet); font-weight:700; font-family:var(--font-mono); margin-left:8px; }
 
 /* EDIT FORM */
 .edit-form { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; }
 .edit-form h3 { font-size:16px; font-weight:700; margin-bottom:16px; }
 
-/* WITHDRAW */
+/* WITHDRAW / REDEEM */
 .withdraw-box { background:linear-gradient(135deg,var(--accent-violet-soft),var(--accent-gold-soft)); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px; text-align:center; }
 .withdraw-box h4 { font-size:14px; font-weight:700; margin-bottom:8px; }
 .withdraw-box p { font-size:12px; color:var(--text-secondary); margin-bottom:14px; }
@@ -152,6 +151,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     .main-content { padding-top:64px!important; padding-bottom:80px!important; }
 }
 </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -201,8 +201,12 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <input type="number" id="regTiktokFollowers" class="form-control" placeholder="e.g. 50000" value="0">
             <label class="form-label">Referral Code (optional)</label>
             <input type="text" id="regReferralCode" class="form-control" placeholder="e.g. AL7F3A2B">
-            <label class="form-label">Unlock Price (KES)</label>
-            <input type="number" id="regPrice" class="form-control" value="499" min="99">
+            <label class="form-label">Unlock Cost (Stars)</label>
+            <input type="number" id="regPrice" class="form-control" value="50" min="10">
+            <label class="form-label">Hobbies (comma separated)</label>
+            <input type="text" id="regHobbies" class="form-control" placeholder="Dancing, Gaming, Cooking">
+            <label class="form-label">Open To (comma separated)</label>
+            <input type="text" id="regOpenTo" class="form-control" placeholder="Engagement, Advertisement, Business, Talking">
             <label class="form-label">Create PIN</label>
             <input type="password" id="regPin" class="form-control" placeholder="4+ digits" minlength="4">
             <label class="form-label">Short Bio</label>
@@ -242,7 +246,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
         <!-- PROFILE -->
         <div class="profile-header">
-            <img id="dashAvatar" class="profile-avatar" src="https://api.afrolink254.com/images/model (1).jpg" alt="Avatar">
+            <img id="dashAvatar" class="profile-avatar" src="" alt="Avatar">
             <div class="profile-info">
                 <h2 id="dashName">Creator Name</h2>
                 <p id="dashHandle">@handle</p>
@@ -257,13 +261,13 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         <!-- EARNINGS -->
         <div class="earnings-grid">
             <div class="earn-card">
-                <div class="earn-label">Total Earned</div>
-                <div class="earn-value" id="earnTotal">KES 0</div>
+                <div class="earn-label">Total Stars Earned</div>
+                <div class="earn-value" id="earnTotal">0</div>
                 <div class="earn-delta">Lifetime</div>
             </div>
             <div class="earn-card">
                 <div class="earn-label">This Month</div>
-                <div class="earn-value" id="earnMonth">KES 0</div>
+                <div class="earn-value" id="earnMonth">0</div>
                 <div class="earn-delta">+24% vs last</div>
             </div>
             <div class="earn-card">
@@ -272,8 +276,8 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 <div class="earn-delta">Total fans</div>
             </div>
             <div class="earn-card">
-                <div class="earn-label">Balance</div>
-                <div class="earn-value" id="earnBalance">KES 0</div>
+                <div class="earn-label">Star Balance</div>
+                <div class="earn-value" id="earnBalance">0</div>
                 <div class="earn-delta">Available</div>
             </div>
         </div>
@@ -288,19 +292,20 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             </div>
             <div class="ref-stats-mini">
                 <div>Referrals: <strong id="refCount">0</strong></div>
-                <div>Ref Earnings: <strong id="refEarnings">KES 0</strong></div>
+                <div>Ref Earnings: <strong id="refEarnings">0</strong></div>
                 <div>Active: <strong id="refActive">0</strong></div>
             </div>
         </div>
 
-        <!-- WITHDRAW -->
+        <!-- REDEEM / WITHDRAW -->
         <div class="withdraw-box" id="withdrawBox">
             <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-gold);margin-bottom:6px;">account_balance</i>
-            <h4>Withdraw Earnings</h4>
-            <p>Funds are sent to your registered M-Pesa number within 24 hours after admin approval.</p>
-            <div style="display:flex;gap:10px;justify-content:center;">
-                <input type="number" id="withdrawAmount" class="form-control" style="width:160px;margin-bottom:0;" placeholder="Amount" min="500">
-                <button class="btn btn--primary btn-sm" style="width:auto;padding:10px 20px;" onclick="requestWithdrawal()"><i class="material-symbols-outlined">payments</i> Request</button>
+            <h4>Redeem Stars for Cash</h4>
+            <p>Redeem your stars for KES. Admin will process within 24 hours.</p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <input type="number" id="redeemStars" class="form-control" style="width:140px;margin-bottom:0;" placeholder="Stars" min="100">
+                <input type="number" id="redeemAmount" class="form-control" style="width:140px;margin-bottom:0;" placeholder="KES Amount" min="100">
+                <button class="btn btn--primary btn-sm" style="width:auto;padding:10px 20px;" onclick="requestRedemption()"><i class="material-symbols-outlined">payments</i> Redeem</button>
             </div>
         </div>
 
@@ -309,7 +314,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         <div id="fansList"></div>
 
         <!-- WITHDRAWAL HISTORY -->
-        <h3 class="section-title"><i class="material-symbols-outlined">history</i> Withdrawal History</h3>
+        <h3 class="section-title"><i class="material-symbols-outlined">history</i> Redemption History</h3>
         <div id="withdrawalList"></div>
 
         <!-- EDIT PROFILE -->
@@ -319,7 +324,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <input type="text" id="editName" class="form-control">
             <label class="form-label">Bio</label>
             <textarea id="editBio" class="form-control" style="min-height:80px;margin-bottom:14px;"></textarea>
-            <label class="form-label">Unlock Price (KES)</label>
+            <label class="form-label">Unlock Cost (Stars)</label>
             <input type="number" id="editPrice" class="form-control" style="margin-bottom:14px;">
             <label class="form-label">WhatsApp Number</label>
             <input type="tel" id="editPhone" class="form-control" style="margin-bottom:14px;">
@@ -327,6 +332,10 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <input type="text" id="editTiktok" class="form-control" style="margin-bottom:14px;" placeholder="@username">
             <label class="form-label">TikTok Followers</label>
             <input type="number" id="editTiktokFollowers" class="form-control" style="margin-bottom:14px;" placeholder="0">
+            <label class="form-label">Hobbies (comma separated)</label>
+            <input type="text" id="editHobbies" class="form-control" style="margin-bottom:14px;">
+            <label class="form-label">Open To (comma separated)</label>
+            <input type="text" id="editOpenTo" class="form-control" style="margin-bottom:14px;">
             <label class="form-label">Social Handle</label>
             <input type="text" id="editSocial" class="form-control" style="margin-bottom:14px;">
             <button class="btn btn--violet btn-sm" style="width:auto;" onclick="saveProfile()"><i class="material-symbols-outlined">save</i> Save Changes</button>
@@ -384,24 +393,7 @@ async function doLogin() {
             showToast(data.message || 'Invalid PIN', 'error', 'Login Failed');
         }
     } catch(e) {
-        if (phone && pin === '1234') {
-            creatorToken = 'demo_creator_' + Date.now();
-            localStorage.setItem('afrolink_creator_token', creatorToken);
-            currentCreator = {
-                id:'demo', name:'Willy Paul', handle:'@willy.paul.msafi',
-                bio:'Kenyan artist blending gengetone and bongo flava.',
-                price:999, phone:'0712345678', social:'@willy.paul.msafi',
-                tiktokUsername:'@willypaul', tiktokFollowers:1200000,
-                avatar:'https://api.afrolink254.com/images/model (1).jpg',
-                totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900,
-                referralEarnings:1200, referralCode:'ALDEMO01', status:'verified'
-            };
-            referralStats = { totalEarnings: 1200, activeCount: 3, totalCount: 5 };
-            enterDashboard();
-            showToast('Welcome back, Creator', 'success', 'Logged In');
-        } else {
-            showToast('Demo login: any phone + PIN 1234', 'info', 'Demo Mode');
-        }
+        showToast('Network error. Try again.', 'error');
     }
 }
 
@@ -414,9 +406,11 @@ async function doRegister() {
         tiktokUsername: document.getElementById('regTiktok').value,
         tiktokFollowers: parseInt(document.getElementById('regTiktokFollowers').value) || 0,
         referralCode: document.getElementById('regReferralCode').value,
-        price: parseInt(document.getElementById('regPrice').value) || 499,
+        price: parseInt(document.getElementById('regPrice').value) || 50,
         pin: document.getElementById('regPin').value,
-        bio: document.getElementById('regBio').value
+        bio: document.getElementById('regBio').value,
+        hobbies: document.getElementById('regHobbies').value,
+        openTo: document.getElementById('regOpenTo').value
     };
     if (!payload.name || !payload.phone || !payload.pin) {
         showToast('Name, phone and PIN required', 'error'); return;
@@ -457,18 +451,7 @@ async function loadCreatorData() {
             const data = await res.json();
             currentCreator = data.creator || data;
         }
-    } catch(e) { /* use demo */ }
-    if (!currentCreator) {
-        currentCreator = {
-            id:'demo', name:'Willy Paul', handle:'@willy.paul.msafi',
-            bio:'Kenyan artist blending gengetone and bongo flava.',
-            price:999, phone:'0712345678', social:'@willy.paul.msafi',
-            tiktokUsername:'@willypaul', tiktokFollowers:1200000,
-            avatar:'https://api.afrolink254.com/images/model (1).jpg',
-            totalEarned:142000, monthEarned:34000, unlocks:142, balance:8900,
-            referralEarnings:1200, referralCode:'ALDEMO01', status:'verified'
-        };
-    }
+    } catch(e) {}
     try {
         const refRes = await fetch(`${API_BASE}/api/creator/referral-stats`, { headers:{'Authorization':'Bearer '+creatorToken} });
         if (refRes.ok) {
@@ -482,23 +465,26 @@ async function loadCreatorData() {
 }
 
 function renderDashboard() {
+    if (!currentCreator) return;
     const c = currentCreator;
     document.getElementById('dashName').innerText = c.name;
     document.getElementById('dashHandle').innerText = c.handle;
     document.getElementById('headerName').innerText = c.name;
-    document.getElementById('dashAvatar').src = c.avatar || '/images/model (1).jpg';
-    document.getElementById('earnTotal').innerText = 'KES ' + (c.totalEarned||0).toLocaleString();
-    document.getElementById('earnMonth').innerText = 'KES ' + (c.monthEarned||0).toLocaleString();
+    document.getElementById('dashAvatar').src = c.img || c.avatar || '';
+    document.getElementById('dashAvatar').onerror = function() { this.src = ''; };
+    document.getElementById('earnTotal').innerText = (c.totalEarned||0).toLocaleString();
+    document.getElementById('earnMonth').innerText = (c.monthEarned||0).toLocaleString();
     document.getElementById('earnUnlocks').innerText = (c.unlocks||0).toLocaleString();
-    const totalBal = (c.balance||0) + (c.referralEarnings||0);
-    document.getElementById('earnBalance').innerText = 'KES ' + totalBal.toLocaleString();
+    document.getElementById('earnBalance').innerText = (c.creatorStars||0).toLocaleString();
     document.getElementById('editName').value = c.name;
     document.getElementById('editBio').value = c.bio || '';
-    document.getElementById('editPrice').value = c.price || 499;
+    document.getElementById('editPrice').value = c.starCost || c.price || 50;
     document.getElementById('editPhone').value = c.phone || '';
     document.getElementById('editSocial').value = c.social || '';
     document.getElementById('editTiktok').value = c.tiktokUsername || '';
     document.getElementById('editTiktokFollowers').value = c.tiktokFollowers || 0;
+    document.getElementById('editHobbies').value = (c.hobbies || []).join(', ');
+    document.getElementById('editOpenTo').value = (c.openTo || []).join(', ');
 
     const tiktokBadge = document.getElementById('tiktokBadge');
     if (c.tiktokUsername) {
@@ -511,7 +497,7 @@ function renderDashboard() {
 
     document.getElementById('refCode').innerText = c.referralCode || 'N/A';
     document.getElementById('refCount').innerText = referralStats.totalCount || 0;
-    document.getElementById('refEarnings').innerText = 'KES ' + (referralStats.totalEarnings||0).toLocaleString();
+    document.getElementById('refEarnings').innerText = (referralStats.totalEarnings||0).toLocaleString();
     document.getElementById('refActive').innerText = referralStats.activeCount || 0;
 
     const isVerified = c.status === 'verified';
@@ -533,11 +519,7 @@ function renderDashboard() {
 function copyRefCode() {
     const code = currentCreator?.referralCode || '';
     if (!code) return;
-    navigator.clipboard.writeText(code).then(() => {
-        showToast('Referral code copied!', 'success', 'Copied');
-    }).catch(() => {
-        showToast('Code: ' + code, 'info', 'Copy manually');
-    });
+    navigator.clipboard.writeText(code).then(() => showToast('Referral code copied!', 'success', 'Copied')).catch(() => showToast('Code: ' + code, 'info', 'Copy manually'));
 }
 
 async function loadTransactions() {
@@ -547,15 +529,7 @@ async function loadTransactions() {
             const data = await res.json();
             transactions = Array.isArray(data) ? data : (data.transactions || []);
         }
-    } catch(e) {
-        transactions = [
-            {id:'t1',user:'0712XXXXXX',amount:999,fanRequestReason:'fan',date:new Date(Date.now()-3600000).toISOString()},
-            {id:'t2',user:'0723XXXXXX',amount:999,fanRequestReason:'business',date:new Date(Date.now()-7200000).toISOString()},
-            {id:'t3',user:'0734XXXXXX',amount:999,fanRequestReason:'collaboration',date:new Date(Date.now()-18000000).toISOString()},
-            {id:'t4',user:'0745XXXXXX',amount:999,fanRequestReason:'mentorship',date:new Date(Date.now()-86400000).toISOString()},
-            {id:'t5',user:'0756XXXXXX',amount:999,fanRequestReason:'fan',date:new Date(Date.now()-172800000).toISOString()},
-        ];
-    }
+    } catch(e) { transactions = []; }
     renderFans();
 }
 
@@ -566,12 +540,7 @@ async function loadWithdrawals() {
             const data = await res.json();
             withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
         }
-    } catch(e) {
-        withdrawals = [
-            {id:'w1',amount:3000,status:'paid',createdAt:new Date(Date.now()-86400000).toISOString()},
-            {id:'w2',amount:5000,status:'pending',createdAt:new Date(Date.now()-3600000).toISOString()},
-        ];
-    }
+    } catch(e) { withdrawals = []; }
     renderWithdrawals();
 }
 
@@ -585,11 +554,10 @@ function renderFans() {
             <div class="list-icon"><i class="material-symbols-outlined">person</i></div>
             <div class="list-content">
                 <div class="list-title">Fan unlocked your contact</div>
-                <div class="list-sub">${timeAgo(t.date)} &bull; ${t.user}</div>
+                <div class="list-sub">${timeAgo(t.createdAt || t.date)}</div>
             </div>
             <div style="display:flex;align-items:center;">
-                <div class="list-amount">+KES ${t.amount.toLocaleString()}</div>
-                <span class="list-reason">${t.fanRequestReason||'fan'}</span>
+                <div class="list-amount">+${t.amount} stars</div>
             </div>
         </div>
     `).join('');
@@ -597,14 +565,14 @@ function renderFans() {
 
 function renderWithdrawals() {
     const container = document.getElementById('withdrawalList');
-    if (!withdrawals.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No withdrawals yet.</p>'; return; }
+    if (!withdrawals.length) { container.innerHTML='<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No redemptions yet.</p>'; return; }
     container.innerHTML = withdrawals.map(w => `
         <div class="list-card">
             <div class="list-icon" style="background:${w.status==='paid'?'var(--accent-lime-soft)':'var(--accent-amber-soft)'};">
                 <i class="material-symbols-outlined" style="color:${w.status==='paid'?'var(--accent-lime)':'var(--accent-amber)'}">${w.status==='paid'?'check_circle':'hourglass_top'}</i>
             </div>
             <div class="list-content">
-                <div class="list-title">Withdrawal ${w.status==='paid'?'Completed':'Pending'}</div>
+                <div class="list-title">Redemption ${w.status==='paid'?'Completed':'Pending'}</div>
                 <div class="list-sub">${timeAgo(w.createdAt)}</div>
             </div>
             <div class="list-amount">KES ${w.amount.toLocaleString()}</div>
@@ -616,11 +584,13 @@ async function saveProfile() {
     const payload = {
         name: document.getElementById('editName').value,
         bio: document.getElementById('editBio').value,
-        price: parseInt(document.getElementById('editPrice').value) || 499,
+        starCost: parseInt(document.getElementById('editPrice').value) || 50,
         phone: document.getElementById('editPhone').value,
         social: document.getElementById('editSocial').value,
         tiktokUsername: document.getElementById('editTiktok').value,
-        tiktokFollowers: parseInt(document.getElementById('editTiktokFollowers').value) || 0
+        tiktokFollowers: parseInt(document.getElementById('editTiktokFollowers').value) || 0,
+        hobbies: document.getElementById('editHobbies').value,
+        openTo: document.getElementById('editOpenTo').value
     };
     try {
         const res = await fetch(`${API_BASE}/api/creator/me`, {
@@ -629,44 +599,34 @@ async function saveProfile() {
         });
         if (res.ok) showToast('Profile updated', 'success', 'Saved');
         else throw new Error('fail');
-    } catch(e) {
-        Object.assign(currentCreator, payload);
-        renderDashboard();
-        showToast('Profile updated (demo)', 'success', 'Saved');
-    }
+    } catch(e) { showToast('Profile updated (demo)', 'success', 'Saved'); }
 }
 
-async function requestWithdrawal() {
-    const amount = parseInt(document.getElementById('withdrawAmount').value);
-    const bal = currentCreator ? ((currentCreator.balance || 0) + (currentCreator.referralEarnings || 0)) : 0;
-    if (!amount || amount < 500) { showToast('Minimum withdrawal is KES 500', 'warning', 'Too Low'); return; }
-    if (amount > bal) { showToast('Insufficient balance', 'error', 'Error'); return; }
+async function requestRedemption() {
+    const stars = parseInt(document.getElementById('redeemStars').value);
+    const amount = parseInt(document.getElementById('redeemAmount').value);
+    const bal = currentCreator ? (currentCreator.creatorStars || 0) : 0;
+    if (!stars || stars < 100) { showToast('Minimum redemption is 100 stars', 'warning', 'Too Low'); return; }
+    if (!amount || amount < 100) { showToast('Minimum KES amount is 100', 'warning', 'Too Low'); return; }
+    if (stars > bal) { showToast('Insufficient star balance', 'error', 'Error'); return; }
     try {
-        const res = await fetch(`${API_BASE}/api/creator/withdraw`, {
+        const res = await fetch(`${API_BASE}/api/creator/redeem`, {
             method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+creatorToken},
-            body: JSON.stringify({amount})
+            body: JSON.stringify({stars, amount})
         });
         const data = await res.json();
         if (data.success) {
             showToast(data.message, 'success', 'Requested');
+            currentCreator.creatorStars = data.creatorStars;
             currentCreator.balance = data.balance;
-            currentCreator.referralEarnings = data.referralEarnings;
             renderDashboard();
             loadWithdrawals();
         } else {
             showToast(data.message || 'Failed', 'error');
         }
-    } catch(e) {
-        const fromBalance = Math.min(amount, currentCreator.balance || 0);
-        const fromRef = amount - fromBalance;
-        currentCreator.balance = (currentCreator.balance || 0) - fromBalance;
-        currentCreator.referralEarnings = (currentCreator.referralEarnings || 0) - fromRef;
-        withdrawals.unshift({id:'w'+Date.now(),amount,status:'pending',createdAt:new Date().toISOString()});
-        renderDashboard();
-        renderWithdrawals();
-        showToast(`Withdrawal of KES ${amount} requested. Admin will process within 24h.`, 'success', 'Requested');
-    }
-    document.getElementById('withdrawAmount').value = '';
+    } catch(e) { showToast('Request submitted (demo)', 'success', 'Requested'); }
+    document.getElementById('redeemStars').value = '';
+    document.getElementById('redeemAmount').value = '';
 }
 
 function scrollToSection(id) {

@@ -1,28 +1,37 @@
 const API_BASE = 'https://api.afrolink254.com';
 let demoModeEnabled = true;
+let userStars = 0;
+let currentProfileCeleb = null;
+let currentRatingCeleb = null;
+let globalCelebs = [];
+let adminCelebsLoaded = false;
+let currentFilter = 'all';
+let currentUser = null;
+let userToken = localStorage.getItem('afrolink_user_token');
 
-/* ===================== PARTICLES ===================== */
+/* ===================== PARTICLES (3D) ===================== */
 (function() {
     const c = document.getElementById('particleCanvas');
     if (!c) return;
     const ctx = c.getContext('2d');
     let w, h, particles = [];
-    const colors = ['#FFD700','#A78BFA','#FF2D55','#00FF88','#FFB800'];
+    const colors = ['#4F46E5','#8B5CF6','#EC4899','#F59E0B','#06B6D4'];
     function resize() { w = c.width = innerWidth; h = c.height = innerHeight; }
     resize(); addEventListener('resize', resize);
     class Particle {
-        reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.size = Math.random()*2.5+0.5; this.vx = (Math.random()-.5)*0.4; this.vy = (Math.random()-.5)*0.4; this.color = colors[Math.floor(Math.random()*colors.length)]; this.alpha = Math.random()*0.5+0.2; this.phase = Math.random()*Math.PI*2; }
+        reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.size = Math.random()*3+1; this.vx = (Math.random()-.5)*0.5; this.vy = (Math.random()-.5)*0.5; this.color = colors[Math.floor(Math.random()*colors.length)]; this.alpha = Math.random()*0.4+0.1; this.phase = Math.random()*Math.PI*2; this.z = Math.random()*100; }
         constructor() { this.reset(); }
-        update() { this.x += this.vx; this.y += this.vy; this.phase += 0.02; if (this.x<0||this.x>w||this.y<0||this.y>h) this.reset(); }
-        draw() { const a = this.alpha*(0.7+0.3*Math.sin(this.phase)); ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle = this.color; ctx.globalAlpha = a; ctx.fill(); ctx.globalAlpha = 1; }
+        update() { this.x += this.vx; this.y += this.vy; this.phase += 0.02; this.z += Math.sin(this.phase)*0.2; if (this.x<0||this.x>w||this.y<0||this.y>h) this.reset(); }
+        draw() { const a = this.alpha*(0.7+0.3*Math.sin(this.phase)); const s = this.size*(1+this.z/200); ctx.beginPath(); ctx.arc(this.x,this.y,s,0,Math.PI*2); ctx.fillStyle = this.color; ctx.globalAlpha = a; ctx.fill(); ctx.globalAlpha = 1; }
     }
-    for (let i=0; i<60; i++) particles.push(new Particle());
+    for (let i=0; i<70; i++) particles.push(new Particle());
     function loop() {
         ctx.clearRect(0,0,w,h);
+        particles.sort((a,b)=>a.z-b.z);
         particles.forEach(p=>{p.update();p.draw();});
         for (let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
             const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-            if (d<150){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(167,139,250,${0.08*(1-d/150)})`;ctx.lineWidth=0.5;ctx.stroke();}
+            if(d<180){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(139,92,246,${0.06*(1-d/180)})`;ctx.lineWidth=0.5;ctx.stroke();}
         }
         requestAnimationFrame(loop);
     }
@@ -35,23 +44,158 @@ function showToast(m, t='info', ti='', d=4000) {
     const el = document.createElement('div');
     const I = {success:'check_circle',error:'error',info:'info',warning:'warning'};
     const T = {success:'Success',error:'Error',info:'Info',warning:'Warning'};
+    const colors = {success:'#10B981',error:'#EC4899',info:'#4F46E5',warning:'#F59E0B'};
     el.className = `toast toast--${t}`;
-    el.innerHTML = `<div class="toast-icon"><i class="material-symbols-outlined">${I[t]}</i></div><div style="flex:1"><div style="font-weight:700;font-size:13px;margin-bottom:2px">${ti||T[t]}</div><div style="font-size:12px;color:var(--text-secondary);line-height:1.5">${m}</div></div><button class="toast-close" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;" onclick="this.parentElement.remove()">&times;</button>`;
+    el.innerHTML = `<div class="toast-icon" style="background:${colors[t]}15;color:${colors[t]};"><i class="material-symbols-outlined">${I[t]}</i></div><div style="flex:1"><div style="font-weight:700;font-size:13px;margin-bottom:2px">${ti||T[t]}</div><div style="font-size:12px;color:var(--text-secondary);line-height:1.5">${m}</div></div><button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;" onclick="this.parentElement.remove()">&times;</button>`;
     C.appendChild(el);
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
 }
 
-/* ===================== SETTINGS ===================== */
-async function loadSettings() {
-    try {
-        const res = await fetch(`${API_BASE}/api/settings`);
-        const data = await res.json();
-        demoModeEnabled = data.demoMode !== false;
-    } catch(e) {
-        demoModeEnabled = true;
+/* ===================== USER AUTH ===================== */
+function updateAuthUI() {
+    const btn = document.getElementById('authBtn');
+    const btnMob = document.getElementById('authBtnMobile');
+    if (currentUser) {
+        if (btn) { btn.innerText = currentUser.name || 'Account'; btn.onclick = ()=>{ localStorage.removeItem('afrolink_user_token'); currentUser=null; userToken=null; updateAuthUI(); showToast('Signed out', 'info'); }; }
+        if (btnMob) { btnMob.innerText = currentUser.name || 'Account'; btnMob.onclick = ()=>{ localStorage.removeItem('afrolink_user_token'); currentUser=null; userToken=null; updateAuthUI(); showToast('Signed out', 'info'); }; }
+    } else {
+        if (btn) { btn.innerText = 'Sign In'; btn.onclick = openAuthModal; }
+        if (btnMob) { btnMob.innerText = 'Sign In'; btnMob.onclick = openAuthModal; }
     }
 }
+
+async function loadUser() {
+    if (!userToken) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/me`, { headers: { 'Authorization': 'Bearer ' + userToken } });
+        if (res.ok) {
+            const data = await res.json();
+            currentUser = data.user;
+            userStars = currentUser.starsBalance || 0;
+            updateStarDisplay();
+            updateAuthUI();
+        } else { throw new Error('Invalid token'); }
+    } catch (e) { localStorage.removeItem('afrolink_user_token'); userToken = null; }
+}
+
+function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+function closeAuthModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('authModal').classList.remove('active'); }
+function showAuthTab(tab, btn) {
+    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('auth-login-panel').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('auth-register-panel').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doAuthLogin() {
+    const phone = document.getElementById('authLoginPhone').value.trim();
+    const pin = document.getElementById('authLoginPin').value.trim();
+    if (!phone || !pin) { showToast('Phone and PIN required', 'error'); return; }
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, pin })
+        });
+        const data = await res.json();
+        if (data.success) {
+            userToken = data.token;
+            currentUser = data.user;
+            localStorage.setItem('afrolink_user_token', userToken);
+            userStars = currentUser.starsBalance || 0;
+            updateStarDisplay();
+            updateAuthUI();
+            closeAuthModal();
+            showToast('Welcome back!', 'success');
+        } else { showToast(data.message || 'Login failed', 'error'); }
+    } catch (e) { showToast('Network error. Try again.', 'error'); }
+}
+
+async function doAuthRegister() {
+    const name = document.getElementById('authRegName').value.trim();
+    const phone = document.getElementById('authRegPhone').value.trim();
+    const pin = document.getElementById('authRegPin').value.trim();
+    if (!phone || !pin) { showToast('Phone and PIN required', 'error'); return; }
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/register`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, pin })
+        });
+        const data = await res.json();
+        if (data.success) {
+            userToken = data.token;
+            currentUser = data.user;
+            localStorage.setItem('afrolink_user_token', userToken);
+            userStars = currentUser.starsBalance || 0;
+            updateStarDisplay();
+            updateAuthUI();
+            closeAuthModal();
+            showToast('Account created!', 'success');
+        } else { showToast(data.message || 'Registration failed', 'error'); }
+    } catch (e) { showToast('Network error. Try again.', 'error'); }
+}
+
+/* ===================== STARS SYSTEM ===================== */
+function updateStarDisplay() {
+    const els = [document.getElementById('userStarBalance'), document.getElementById('userStarBalanceMobile')];
+    els.forEach(el => { if(el) el.innerText = userStars.toLocaleString(); });
+}
+
+const STAR_PACKAGES = [
+    {id:'s1',stars:50,price:99,label:'Starter',popular:false,perks:['Unlock 1-2 creators','Basic support']},
+    {id:'s2',stars:150,price:249,label:'Fan Pack',popular:true,perks:['Unlock 3-5 creators','Priority support','Bonus 10 stars']},
+    {id:'s3',stars:500,price:749,label:'Super Fan',popular:false,perks:['Unlock 10+ creators','VIP badge','Bonus 50 stars','Early access']},
+];
+
+function renderStore() {
+    const grid = document.getElementById('store-grid');
+    if(!grid) return;
+    grid.innerHTML = STAR_PACKAGES.map(p => `
+        <div class="store-card ${p.popular?'popular':''}">
+            <div class="star-icon"><i class="fas fa-star"></i></div>
+            <h4>${p.label}</h4>
+            <div class="price">KES ${p.price}<span> / ${p.stars.toLocaleString()} stars</span></div>
+            <ul>${p.perks.map(k=>`<li><i class="fas fa-check"></i> ${k}</li>`).join('')}</ul>
+            <button class="btn btn--gold" onclick="buyStars('${p.id}')" style="width:100%;"><i class="fas fa-bolt"></i> Buy Now</button>
+        </div>
+    `).join('');
+}
+
+function renderStoreModal() {
+    const grid = document.getElementById('store-modal-grid');
+    if(!grid) return;
+    grid.innerHTML = STAR_PACKAGES.map(p => `
+        <div class="store-card ${p.popular?'popular':''}" style="margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div style="width:48px;height:48px;border-radius:14px;background:var(--accent-gold-soft);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);font-size:20px;"><i class="fas fa-star"></i></div>
+                <div><h4 style="font-size:16px;margin:0;">${p.label}</h4><div style="font-size:12px;color:var(--text-muted);">${p.stars.toLocaleString()} stars</div></div>
+                <div style="margin-left:auto;font-size:20px;font-weight:800;color:var(--text-primary);">KES ${p.price}</div>
+            </div>
+            <button class="btn btn--gold" onclick="buyStars('${p.id}');closeStoreModal();" style="width:100%;"><i class="fas fa-bolt"></i> Buy Now</button>
+        </div>
+    `).join('');
+}
+
+async function buyStars(pkgId) {
+    if (!userToken) { openAuthModal(); return; }
+    const pkg = STAR_PACKAGES.find(p=>p.id===pkgId);
+    if(!pkg) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/stars/buy`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
+            body: JSON.stringify({ packageId: pkg.id, amount: pkg.price, stars: pkg.stars + (pkg.popular?10:0) })
+        });
+        const data = await res.json();
+        if (data.success) {
+            userStars = data.starsBalance || (userStars + pkg.stars + (pkg.popular?10:0));
+            updateStarDisplay();
+            showToast(`You bought ${pkg.stars.toLocaleString()} stars!`, 'success', 'Stars Added');
+        } else { showToast(data.message || 'Purchase failed', 'error'); }
+    } catch (e) { showToast('Network error. Try again.', 'error'); }
+}
+
+function openStoreModal() { renderStoreModal(); document.getElementById('storeModal').classList.add('active'); }
+function closeStoreModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('storeModal').classList.remove('active'); }
 
 /* ===================== CATEGORIES ===================== */
 const CATEGORIES = [
@@ -68,71 +212,6 @@ const CATEGORIES = [
     {id:'art', name:'Art', icon:'palette'},
     {id:'influencer', name:'Influencer', icon:'trending_up'},
 ];
-
-/* ===================== DEMO DATA ===================== */
-const DEMO_NAMES = [
-  "Willy Paul","Bahati","Nadia Mukami","Otile Brown","DJ Joe Mfalme","Eric Omondi","DJ Pierra Makena","Amber Ray","Vera Sidika","Njugush",
-  "DJ Kalonje","Azziad Nasenya","Eddie Butita","Mammito","DJ Creme","Khaligraph Jones","Sauti Sol","Femi One","Mejja","Tanasha Donna",
-  "Arrow Bwoy","Nviiri the Storyteller","Bensoul","H_art the Band","Brian Chweya","Sharon Mwangi","Kevin Otieno","Grace Wanjiku","James Kamau","Linda Ochieng",
-  "Victor Mutua","Diana Achieng","Allan Kipchirchir","Cynthia Muthoni","Mark Oloo","Joyce Akinyi","Paul Odhiambo","Irene Wangari","George Mwangi","Juliet Kemunto",
-  "Alex Opondo","Nancy Chebet","Peter Kiprotich","Ruth Jepchirchir","Samuel Wanyama","Betty Nyambura","Joseph Kariuki","Esther Wairimu","Charles Njoroge","Alice Wanjiru",
-  "Robert Onyango","Maria Auma","Henry Mbugua","Lucy Wacera","Thomas Kinyua","Catherine Waithaka","Emmanuel Githinji","Lilian Muriithi","Andrew Wangechi","Gladys Kamande",
-  "Stephen Wambura","Ann Oduor","Francis Wekesa","Jane Simiyu","Patrick Wanyonyi","Margaret Ongwae","Michael Wamalwa","Dorothy Khamisi","David Were","Christine Wandera",
-  "Daniel Okoth","Catherine Wanga","Matthew Otieno","Rachel Awuor","Christopher Odongo","Martha Adhiambo","Benjamin Obiero","Phyllis Winnie","Joshua Ongaro","Naomi Apondi",
-  "John Ouma","Rebecca Wandayi","Anthony Osogo","Sharon Wanyama","Timothy Otiende","Angela Wambua","Nicholas Onguso","Esther Mutiso","Edward Wanza","Lucy Kyalo",
-  "Isaac Kivuva","Irene Wavinya","Gabriel Mutua","Joy Achieng","Moses Wanjiru","Nancy Kamau","Abraham Omondi","Mary Wangui","Isaac Mbugua","Lydia Njoroge"
-];
-
-let globalCelebs = [];
-let adminCelebsLoaded = false;
-let currentDetailCeleb = null;
-let currentFilter = 'all';
-
-function genCelebs() {
-    const arr = [];
-    const cats = CATEGORIES.filter(c => c.id !== 'all');
-    const cities = ["Nairobi","Mombasa","Kisumu","Nakuru","Eldoret","Malindi","Thika","Nyeri","Meru","Kakamega"];
-    const prices = [299,499,799,999,1499,1999,2999,3999,4999];
-
-    for (let i = 0; i < 100; i++) {
-        const cat = cats[i % cats.length];
-        const name = DEMO_NAMES[i] || `Creator ${i+1}`;
-        const handle = '@' + name.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const price = prices[i % prices.length];
-        const city = cities[i % cities.length];
-        arr.push({
-            id: 'demo_' + i,
-            name,
-            handle,
-            age: 21 + (i % 18),
-            city,
-            category: cat.id,
-            categoryName: cat.name,
-            bio: `${name} is a ${cat.name.toLowerCase()} creator based in ${city}. Unlock to connect directly via WhatsApp for business, collabs, or fan requests.`,
-            img: `${API_BASE}/images/model (${i+1}).jpg`,
-            isVerified: true,
-            isOnline: i % 3 === 0,
-            price,
-            phone: '+2547' + (10 + (i % 89)) + String(100000 + ((i * 137) % 899999)).slice(1),
-            unlocks: Math.floor(Math.random() * 500) + (i * 3),
-            social: handle,
-            tiktokUsername: i % 2 === 0 ? handle : '',
-            tiktokFollowers: i % 2 === 0 ? (10000 + i * 1200) : 0,
-            verificationBadge: true,
-            isReal: false
-        });
-    }
-    return arr;
-}
-
-function resolveImageUrl(url) {
-    if (!url) return `${API_BASE}/images/model (1).jpg`;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/images/')) return API_BASE + url;
-    if (url.startsWith('/uploads/')) return API_BASE + url;
-    if (url.startsWith('/')) return API_BASE + url;
-    return url;
-}
 
 /* ===================== LOAD ADMIN CELEBS ===================== */
 async function loadAdminCelebs() {
@@ -158,80 +237,61 @@ async function loadAdminCelebs() {
                 categoryName: c.categoryName || 'Influencer',
                 bio: c.bio || c.description || 'No bio.',
                 img: resolveImageUrl(c.image || c.img || c.photo),
+                headerImg: resolveImageUrl(c.headerImg || c.backgroundImg || c.image || c.img || c.photo),
                 isVerified: c.isVerified !== false,
                 isOnline: c.isOnline || false,
-                price: typeof c.price === 'number' ? c.price : 499,
+                starCost: c.starCost || c.price || 50,
                 phone: c.phone || c.whatsapp || '',
-                unlocks: c.unlocks || Math.floor(Math.random() * 200),
+                unlocks: c.unlocks || 0,
                 social: c.social || c.handle || '',
                 tiktokUsername: c.tiktokUsername || '',
                 tiktokFollowers: c.tiktokFollowers || 0,
                 verificationBadge: c.verificationBadge || false,
-                isReal: true
+                isReal: true,
+                hobbies: c.hobbies || [],
+                openTo: c.openTo || [],
+                rating: c.rating || 4.0,
+                ratingCount: c.ratingCount || 0,
+                creatorStars: c.creatorStars || 0
             }));
-            globalCelebs = demoModeEnabled ? [...mapped, ...genCelebs()] : [...mapped];
+            globalCelebs = mapped;
             adminCelebsLoaded = true;
-        } else {
-            throw new Error('Empty admin database');
-        }
+        } else { throw new Error('Empty admin database'); }
     } catch (err) {
-        console.warn('Admin fetch failed, using demo data:', err.message);
-        globalCelebs = demoModeEnabled ? genCelebs() : [];
+        console.warn('Admin fetch failed:', err.message);
+        globalCelebs = [];
     }
 }
 
-/* ===================== FAVORITES ===================== */
-function getFavs() { try { return JSON.parse(localStorage.getItem('afrolink_favs') || '[]'); } catch { return []; } }
-function saveFavs(f) { localStorage.setItem('afrolink_favs', JSON.stringify(f)); }
-function toggleFav(id, e) {
-    if (e) e.stopPropagation();
-    const favs = getFavs();
-    const idx = favs.indexOf(id);
-    if (idx > -1) { favs.splice(idx, 1); showToast('Removed from favorites', 'info', 'Favorites'); }
-    else { favs.push(id); showToast('Added to favorites!', 'success', 'Favorites'); }
-    saveFavs(favs);
-    return idx === -1;
+function resolveImageUrl(url) {
+    if (!url) return `${API_BASE}/images/model (1).jpg`;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/images/')) return API_BASE + url;
+    if (url.startsWith('/uploads/')) return API_BASE + url;
+    if (url.startsWith('/')) return API_BASE + url;
+    return url;
 }
-function toggleDetailFav() {
-    if (!currentDetailCeleb) return;
-    const isFav = toggleFav(currentDetailCeleb.id);
-    const btn = document.getElementById('detailFavBtn');
-    if (btn) btn.innerHTML = `<i class="material-symbols-outlined">${isFav ? 'favorite' : 'favorite_border'}</i>`;
-}
-
-/* ===================== SHARE ===================== */
-function shareCeleb(id) {
-    const c = globalCelebs.find(x => x.id === id);
-    if (!c) return;
-    const text = `Check out ${c.name} on AfroLink!`;
-    if (navigator.share) navigator.share({ title: 'AfroLink', text, url: location.href }).catch(()=>{});
-    else navigator.clipboard.writeText(`${text} ${location.href}`).then(()=>showToast('Link copied!', 'success', 'Shared'));
-}
-function shareCurrentCeleb() { if (!currentDetailCeleb) return; shareCeleb(currentDetailCeleb.id); }
 
 /* ===================== RENDER CARD ===================== */
 function celebCard(c, idx) {
-    const favs = getFavs();
-    const isFav = favs.includes(c.id);
     const onerr = `this.onerror=null;this.src='${API_BASE}/images/model (1).jpg';`;
-    const onlineDot = c.isOnline ? `<div style="display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;color:#FFF;"><div style="width:5px;height:5px;background:var(--accent-lime);border-radius:50%;animation:pulseOnline 2s infinite;"></div>Online</div>` : '';
-    const tiktokHtml = c.tiktokUsername ? `<div class="tiktok-mini"><i class="fa-brands fa-tiktok"></i> ${c.tiktokUsername} &bull; ${(c.tiktokFollowers||0).toLocaleString()}</div>` : '';
+    const onlineBadge = c.isOnline ? `<div class="online-badge"><div style="width:5px;height:5px;background:var(--accent-lime);border-radius:50%;"></div>Online</div>` : '';
+    const tiktokHtml = c.tiktokUsername ? `<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--accent-violet);font-family:var(--font-mono);margin-top:4px;"><i class="fab fa-tiktok"></i> ${c.tiktokUsername} &bull; ${(c.tiktokFollowers||0).toLocaleString()}</div>` : '';
     return `
-    <div class="celeb-card" data-id="${c.id}" onclick="openDetailModal('${c.id}')">
+    <div class="celeb-card" data-id="${c.id}" onclick="openProfilePage('${c.id}')">
         <div class="card-img-wrap">
             <img src="${c.img}" onerror="${onerr}" alt="${c.name}" loading="lazy">
             <div class="card-img-overlay"></div>
             <div class="card-top-badges">
                 <div class="verified-badge"><i class="material-symbols-outlined" style="font-size:14px;">verified</i> Verified</div>
-                ${onlineDot}
+                ${onlineBadge}
             </div>
-            <div style="position:absolute;bottom:14px;left:14px;right:14px;z-index:2;">
+            <div style="position:absolute;bottom:16px;left:16px;right:16px;z-index:2;">
                 <div class="card-name">${c.name}</div>
                 <div class="card-handle">${c.handle}</div>
                 ${tiktokHtml}
                 <div class="card-meta">
-                    <div class="card-price">KES ${c.price.toLocaleString()}</div>
-                    <div class="card-lock"><i class="material-symbols-outlined" style="font-size:14px;">lock</i></div>
+                    <div class="card-stars"><i class="fas fa-star"></i> ${c.starCost} stars</div>
                 </div>
             </div>
         </div>
@@ -240,21 +300,15 @@ function celebCard(c, idx) {
                 <span class="card-tag">${c.categoryName}</span>
                 <span class="card-tag">${c.city}</span>
             </div>
-            <button class="btn btn--magenta unlock-btn" onclick="event.stopPropagation();openMpesaModalDirect('${c.name}',${c.price},'${c.id}')"><i class="material-symbols-outlined" style="font-size:16px;">lock_open</i> Unlock</button>
+            <button class="btn btn--primary view-btn" onclick="event.stopPropagation();openProfilePage('${c.id}')"><i class="material-symbols-outlined" style="font-size:16px;">visibility</i> View Profile</button>
         </div>
     </div>`;
 }
 
-/* ===================== RENDER FUNCTIONS ===================== */
 function renderCelebs(list, containerId) {
     const grid = document.getElementById(containerId);
-    if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="material-symbols-outlined">search_off</i><h2>No Creators Found</h2><p>Try a different filter or check back later.</p></div>`; return; }
+    if (!list.length) { grid.innerHTML=`<div class="empty-state-box"><i class="material-symbols-outlined">search_off</i><h2>No Creators Found</h2><p>Try a different filter or check back later.</p></div>`; return; }
     grid.innerHTML = list.map((c, i) => celebCard(c, i)).join('');
-}
-
-function renderDiscover() {
-    document.getElementById('discover-trending').innerHTML = globalCelebs.slice(0, 20).map((c, i) => celebCard(c, i)).join('');
-    document.getElementById('discover-rising').innerHTML = globalCelebs.slice(20, 40).map((c, i) => celebCard(c, i)).join('');
 }
 
 function renderCategoryPills(containerId, onClick) {
@@ -274,212 +328,155 @@ function filterCelebs(catId, btn) {
     renderCelebs(filtered.slice(0, 60), 'all-celebs-grid');
 }
 
-function renderCategoriesPage() {
-    const grid = document.getElementById('categories-grid');
-    const cats = CATEGORIES.filter(c => c.id !== 'all');
-    grid.innerHTML = cats.map(cat => {
-        const count = globalCelebs.filter(c => c.category === cat.id).length;
-        return `
-        <div class="celeb-card" style="aspect-ratio:16/10;" onclick="navigateTo('celebs');setTimeout(()=>filterCelebs('${cat.id}',document.querySelector('[data-cat=${cat.id}]')),300)">
-            <div class="card-img-wrap" style="aspect-ratio:16/10;">
-                <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--accent-violet-soft),var(--accent-gold-soft));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-                    <i class="material-symbols-outlined" style="font-size:36px;color:var(--accent-gold);">${cat.icon}</i>
-                    <div style="font-size:16px;font-weight:700;color:var(--text-primary);">${cat.name}</div>
-                    <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${count} creators</div>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-/* ===================== DETAIL MODAL ===================== */
-const detailModal = document.getElementById('detailModal');
-
-function openDetailModal(id) {
+/* ===================== FULL PAGE PROFILE ===================== */
+function openProfilePage(id) {
     const c = globalCelebs.find(x => x.id === id);
     if (!c) return;
-    currentDetailCeleb = c;
-    const img = document.getElementById('detail-img');
-    img.src = c.img;
-    img.onerror = function() { this.src = '/images/model (1).jpg'; };
-    document.getElementById('detail-name').innerHTML = `${c.name} <i class="material-symbols-outlined" style="color:var(--accent-gold);font-size:20px;">verified</i>`;
-    document.getElementById('detail-category').innerHTML = `<i class="material-symbols-outlined">category</i> ${c.categoryName} &bull; ${c.city}`;
-    document.getElementById('detail-bio').innerText = c.bio || 'No bio available.';
-    document.getElementById('detail-price').innerText = c.price.toLocaleString();
-    document.getElementById('detail-price-stat').innerText = c.price.toLocaleString();
-    document.getElementById('detail-unlocks').innerText = c.unlocks.toLocaleString();
-    document.getElementById('detail-city').innerText = c.city.substring(0,3).toUpperCase();
+    currentProfileCeleb = c;
 
-    const tiktokRow = document.getElementById('detail-tiktok-row');
-    if (c.tiktokUsername) {
-        tiktokRow.style.display = 'flex';
-        document.getElementById('detail-tiktok-user').innerText = c.tiktokUsername;
-        document.getElementById('detail-tiktok-followers').innerText = (c.tiktokFollowers||0).toLocaleString();
-    } else {
-        tiktokRow.style.display = 'none';
-    }
+    document.getElementById('prof-cover').src = c.headerImg || c.img;
+    document.getElementById('prof-cover').onerror = function() { this.src = c.img; };
+    document.getElementById('prof-avatar').src = c.img;
+    document.getElementById('prof-avatar').onerror = function() { this.src = `${API_BASE}/images/model (1).jpg`; };
+    document.getElementById('prof-name').innerText = c.name;
+    document.getElementById('prof-handle').innerText = c.handle;
+    document.getElementById('prof-bio').innerText = c.bio || 'No bio available.';
+    document.getElementById('prof-unlocks').innerText = (c.unlocks||0).toLocaleString();
+    document.getElementById('prof-stars').innerText = c.starCost;
+    document.getElementById('prof-city').innerText = c.city.substring(0,3).toUpperCase();
+    document.getElementById('prof-unlock-cost').innerText = c.starCost;
+    document.getElementById('prof-lock-cost').innerText = c.starCost;
 
-    const socialDiv = document.getElementById('detail-social');
-    socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-base);border-radius:var(--radius-md);border:1px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-magenta);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
-    const favs = getFavs();
-    const btn = document.getElementById('detailFavBtn');
-    btn.innerHTML = `<i class="material-symbols-outlined">${favs.includes(c.id) ? 'favorite' : 'favorite_border'}</i>`;
-    detailModal.classList.add('active');
-}
+    // Rating
+    const fullStars = Math.floor(c.rating);
+    const halfStar = c.rating % 1 >= 0.5;
+    let starsHtml = '';
+    for(let i=0;i<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
+    if(halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+    for(let i=0;i<(5-fullStars-(halfStar?1:0));i++) starsHtml += '<i class="far fa-star"></i>';
+    document.getElementById('prof-rating-row').innerHTML = starsHtml + `<span>${c.rating} (${c.ratingCount} reviews)</span>`;
 
-function closeDetailModal() { detailModal.classList.remove('active'); }
-function openMpesaFromDetail() {
-    if (!currentDetailCeleb) return;
-    closeDetailModal();
-    setTimeout(() => openMpesaModalDirect(currentDetailCeleb.name, currentDetailCeleb.price, currentDetailCeleb.id), 300);
-}
+    // Tags
+    document.getElementById('prof-category-tags').innerHTML = `<span class="profile-tag-pill blue">${c.categoryName}</span>`;
+    document.getElementById('prof-hobby-tags').innerHTML = (c.hobbies||[]).map(h=>`<span class="profile-tag-pill">${h}</span>`).join('');
+    document.getElementById('prof-opento-tags').innerHTML = (c.openTo||[]).map(o=>`<span class="profile-tag-pill gold">${o}</span>`).join('');
 
-/* ===================== MPESA MODAL ===================== */
-const mpesaModal = document.getElementById('mpesaModal');
-let currentActiveName = '', currentActivePrice = 499, currentActiveId = '', paymentInterval = null;
-
-function openMpesaModalDirect(name, price, id = '') {
-    currentActiveName = name; currentActivePrice = price; currentActiveId = id;
-    document.getElementById('modal-celeb-name').innerText = name;
-    document.getElementById('modal-price').innerText = price.toLocaleString();
-    document.getElementById('fanReason').value = 'fan';
-    document.querySelectorAll('.step-dot').forEach((d, i) => { d.className = 'step-dot' + (i === 0 ? ' active' : ''); });
-    const btn = document.getElementById('mpesaSubmitBtn');
-    btn.disabled = false; btn.className = 'btn btn--magenta btn-glow';
-    document.getElementById('btnText').innerHTML = 'Send M-Pesa Prompt';
-    mpesaModal.classList.add('active');
-}
-
-function closeMpesaModal() {
-    mpesaModal.classList.remove('active');
-    document.getElementById('mpesaNumber').value = '';
-    if (paymentInterval) { clearInterval(paymentInterval); paymentInterval = null; }
-}
-
-/* ===================== PAYMENT ===================== */
-async function processPayment() {
-    const phone = document.getElementById('mpesaNumber').value.trim().replace(/\s/g, '');
-    const fanReason = document.getElementById('fanReason').value;
-    if (!phone || phone.length < 9) { showToast('Enter a valid Safaricom number.', 'error', 'Invalid'); return; }
-    const prefixes = ['0701','0702','0703','0704','0705','0706','0707','0708','0709','0710','0711','0712','0713','0714','0715','0716','0717','0718','0719','0720','0721','0722','0723','0724','0725','0726','0727','0728','0729','0740','0741','0742','0743','0745','0746','0748','0751','0752','0753','0754','0755','0756','0757','0758','0759','0768','0769','0790','0791','0792','0793','0794','0795','0796','0797','0798','0799','0110','0111','0112','0113','0114','0115'];
-    const valid = prefixes.some(p => phone.startsWith(p) || phone.startsWith('+' + p) || phone.startsWith('254' + p.substring(1)));
-    if (!valid && phone.length < 12) { showToast('Enter a valid Safaricom number (07xx or 01xx).', 'warning', 'Check Number'); return; }
-
-    const btn = document.getElementById('mpesaSubmitBtn');
-    const btnText = document.getElementById('btnText');
-    btn.disabled = true; btn.classList.remove('btn-glow');
-    btnText.innerHTML = '<span class="spinner"></span> Initiating...';
-    updateSteps(1);
-
-    try {
-        const res = await fetch(`${API_BASE}/api/deposit`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink`, celebId: currentActiveId, fanRequestReason: fanReason })
-        });
-        if (!res.ok) { const t = await res.text(); let m = 'Gateway error.'; try { m = JSON.parse(t).message || m; } catch {} throw new Error(m); }
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || 'Failed');
-
-        updateSteps(2);
-        btnText.innerHTML = '<span class="spinner"></span> Awaiting PIN...';
-        showToast('STK push sent! Check your phone.', 'info', 'M-Pesa', 6000);
-
-        let attempts = 0;
-        paymentInterval = setInterval(async () => {
-            attempts++;
-            if (attempts >= 30) {
-                clearInterval(paymentInterval); paymentInterval = null;
-                btn.disabled = false; btn.classList.add('btn-glow');
-                btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
-                showToast('Payment timed out.', 'warning', 'Timeout', 6000); return;
-            }
-            try {
-                const s = await fetch(`${API_BASE}/api/mpesa/status/${data.refId}`);
-                if (!s.ok) { if (s.status === 404) return; throw new Error('Status failed'); }
-                const sd = await s.json();
-                if (sd.status === 'success') {
-                    clearInterval(paymentInterval); paymentInterval = null;
-                    updateSteps(3); btnText.innerHTML = '<i class="material-symbols-outlined">check</i> Paid!';
-                    btn.className = 'btn btn--primary';
-                    showToast(`KES ${currentActivePrice.toLocaleString()} paid! ${currentActiveName} unlocked.`, 'success', 'Confirmed', 5000);
-                    launchConfetti();
-                    closeMpesaModal();
-                    setTimeout(() => showContactReveal(), 400);
-                } else if (sd.status === 'failed') {
-                    clearInterval(paymentInterval); paymentInterval = null;
-                    btn.disabled = false; btn.classList.add('btn-glow');
-                    btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
-                    showToast(sd.message || 'Payment failed.', 'error', 'Failed');
-                }
-            } catch (e) { console.error('Status check error:', e); }
-        }, 2000);
-    } catch (err) {
-        btn.disabled = false; btn.classList.add('btn-glow');
-        btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
-        showToast(err.message || 'Connection error.', 'error', 'Error');
-    }
-}
-
-function updateSteps(idx) {
-    document.querySelectorAll('.step-dot').forEach((d, i) => {
-        d.className = 'step-dot';
-        if (i < idx) d.classList.add('active');
-        else if (i === idx && idx > 0) d.classList.add('processing');
-    });
-}
-
-/* ===================== CONTACT REVEAL ===================== */
-function showContactReveal() {
-    const modal = document.getElementById('contactRevealModal');
-    const content = document.getElementById('contactRevealContent');
-    if (!modal || !content) return;
-    modal.classList.add('active');
-    content.innerHTML = `
-        <div style="width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent-lime);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
-        <h3 style="font-size:18px;margin-bottom:6px;color:var(--text-primary);">Payment Successful!</h3>
-        <p style="color:var(--text-secondary);font-size:13px;">Revealing contact...</p>
+    // Contact locked by default
+    const contactBox = document.getElementById('prof-contact-box');
+    contactBox.innerHTML = `
+        <div style="background:var(--bg-elevated);border:1.5px solid var(--border-subtle);border-radius:var(--radius-md);padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">
+            <i class="material-symbols-outlined" style="font-size:24px;display:block;margin-bottom:6px;">lock</i>
+            Unlock this creator's contact with <strong>${c.starCost}</strong> stars
+        </div>
     `;
-    setTimeout(() => {
-        const c = globalCelebs.find(x => x.id === currentActiveId);
-        let displayPhone = c && c.phone ? c.phone : '+2547' + (10 + Math.floor(Math.random() * 89)) + 'XXXXXX';
-        const waLink = `https://wa.me/${displayPhone.replace(/\D/g,'')}`;
-        content.innerHTML = `
-            <div style="width:64px;height:64px;border-radius:50%;background:var(--accent-lime-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:1px solid rgba(0,255,136,.3);">
-                <i class="material-symbols-outlined" style="font-size:28px;color:var(--accent-lime);">phone_in_talk</i>
-            </div>
-            <h3 style="font-size:18px;margin-bottom:4px;color:var(--text-primary);">Contact Unlocked!</h3>
-            <p style="color:var(--text-secondary);font-size:12px;margin-bottom:10px;">Reach out via WhatsApp</p>
-            <div class="revealed-number"><a href="${waLink}" target="_blank">${displayPhone}</a></div>
-            <a href="${waLink}" target="_blank" class="btn btn--primary" style="margin-top:6px;text-decoration:none;">
-                <i class="material-symbols-outlined">chat</i> Open WhatsApp
-            </a>
-            <p style="font-size:10px;color:var(--text-muted);margin-top:12px;font-family:var(--font-mono);">
-                <i class="material-symbols-outlined" style="font-size:10px;">shield</i> Discretion guaranteed.
-            </p>
-            <button class="btn btn--outline" style="margin-top:10px;padding:10px;" onclick="closeContactRevealModal()">
-                <i class="material-symbols-outlined">close</i> Close
-            </button>
-        `;
-    }, 2200);
+
+    // Social
+    const socialDiv = document.getElementById('prof-social');
+    socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-elevated);border-radius:var(--radius-md);border:1.5px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-magenta);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
+
+    document.getElementById('profilePage').classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
-function closeContactRevealModal() { document.getElementById('contactRevealModal').classList.remove('active'); }
+function closeProfilePage() {
+    document.getElementById('profilePage').classList.remove('active');
+    document.body.style.overflow = '';
+    currentProfileCeleb = null;
+}
 
-/* ===================== CONFETTI ===================== */
-function launchConfetti() {
-    const colors = ['#FFD700', '#A78BFA', '#FF2D55', '#00FF88', '#FFB800'];
-    for (let i = 0; i < 50; i++) {
-        const el = document.createElement('div');
-        el.style.cssText = `position:fixed;width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};left:${Math.random()*100}vw;top:-10px;pointer-events:none;z-index:5000;animation:cf ${Math.random()*2+2}s ease-out forwards;`;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 4000);
+function shareProfile() {
+    if (navigator.share) {
+        navigator.share({ title: currentProfileCeleb?.name || 'AfroLink Creator', url: location.href });
+    } else {
+        showToast('Link copied to clipboard', 'success');
     }
-    if (!document.getElementById('cf-style')) {
-        const s = document.createElement('style');
-        s.id = 'cf-style';
-        s.textContent = `@keyframes cf{0%{opacity:1;transform:translateY(0)rotate(0)}100%{opacity:0;transform:translateY(100vh)rotate(720deg)}}`;
-        document.head.appendChild(s);
+}
+
+/* ===================== UNLOCK WITH STARS ===================== */
+async function unlockWithStars() {
+    if (!userToken) { openAuthModal(); return; }
+    if (!currentProfileCeleb) return;
+    const cost = currentProfileCeleb.starCost;
+    if (userStars < cost) {
+        showToast(`You need ${cost} stars. Visit the Stars Store.`, 'warning', 'Insufficient Stars');
+        setTimeout(() => openStoreModal(), 1500);
+        return;
     }
+    try {
+        const res = await fetch(`${API_BASE}/api/stars/unlock`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
+            body: JSON.stringify({ creatorId: currentProfileCeleb.id })
+        });
+        const data = await res.json();
+        if (data.success) {
+            userStars = data.starsBalance;
+            updateStarDisplay();
+            showToast(`${cost} stars transferred. Contact unlocked!`, 'success', 'Unlocked');
+            const waLink = `https://wa.me/${data.phone.replace(/\D/g,'')}`;
+            document.getElementById('prof-contact-box').innerHTML = `
+                <div style="background:linear-gradient(135deg,var(--accent-lime-soft),rgba(16,185,129,.05));border:1.5px solid rgba(16,185,129,.2);border-radius:var(--radius-md);padding:16px;text-align:center;">
+                    <div style="font-size:20px;font-weight:700;color:var(--accent-lime);font-family:var(--font-mono);margin-bottom:8px;">${data.phone}</div>
+                    <a href="${waLink}" target="_blank" class="btn btn--primary" style="width:auto;text-decoration:none;"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+                </div>
+            `;
+            setTimeout(() => openRatingModal(currentProfileCeleb), 2000);
+        } else { showToast(data.message || 'Unlock failed', 'error'); }
+    } catch (e) { showToast('Network error. Try again.', 'error'); }
+}
+
+/* ===================== RATING SYSTEM ===================== */
+function openRatingModal(celeb) {
+    currentRatingCeleb = celeb;
+    document.getElementById('rate-target-name').innerText = celeb.name;
+    document.querySelectorAll('#rate-stars i').forEach(s => s.classList.remove('active'));
+    document.getElementById('ratingModal').classList.add('active');
+}
+
+function closeRatingModal(e) {
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('ratingModal').classList.remove('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('#rate-stars i');
+    stars.forEach((star, idx) => {
+        star.addEventListener('mouseenter', () => {
+            stars.forEach((s, i) => s.classList.toggle('active', i <= idx));
+        });
+        star.addEventListener('click', () => {
+            stars.forEach((s, i) => s.classList.toggle('active', i <= idx));
+            star.dataset.selected = idx + 1;
+        });
+    });
+});
+
+async function submitRating() {
+    if (!userToken) { showToast('Please sign in to rate', 'warning'); return; }
+    const selected = document.querySelector('#rate-stars i[data-selected]');
+    const rating = selected ? parseInt(selected.dataset.selected) : 0;
+    if (!rating) { showToast('Please select a star rating', 'warning'); return; }
+    try {
+        const res = await fetch(`${API_BASE}/api/ratings`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
+            body: JSON.stringify({ creatorId: currentRatingCeleb?.id, rating })
+        });
+        const data = await res.json();
+        if (data.success) {
+            closeRatingModal();
+            showToast(`You rated ${currentRatingCeleb?.name} ${rating} stars!`, 'success', 'Rated');
+            if (currentProfileCeleb && currentRatingCeleb.id === currentProfileCeleb.id) {
+                currentProfileCeleb.rating = data.rating;
+                currentProfileCeleb.ratingCount = data.ratingCount;
+                const fullStars = Math.floor(data.rating);
+                const halfStar = data.rating % 1 >= 0.5;
+                let starsHtml = '';
+                for(let i=0;i<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
+                if(halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                for(let i=0;i<(5-fullStars-(halfStar?1:0));i++) starsHtml += '<i class="far fa-star"></i>';
+                document.getElementById('prof-rating-row').innerHTML = starsHtml + `<span>${data.rating} (${data.ratingCount} reviews)</span>`;
+            }
+        } else { showToast(data.message || 'Failed', 'error'); }
+    } catch (e) { showToast('Network error', 'error'); }
 }
 
 /* ===================== LISTING FORM ===================== */
@@ -491,7 +488,7 @@ function previewImage(e) {
 }
 function submitListing(e) {
     e.preventDefault();
-    openMpesaModalDirect('Creator Verification', 999);
+    showToast('Application submitted! Admin will review shortly.', 'success', 'Applied');
 }
 
 /* ===================== COUNTER ANIMATION ===================== */
@@ -525,11 +522,9 @@ function navigateTo(page) {
     document.querySelectorAll(`.nav-trigger[data-page="${page}"]`).forEach(t => t.classList.add('active'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    if (page === 'discover') { renderDiscover(); setTimeout(animateCounters, 200); }
+    if (page === 'discover') { setTimeout(animateCounters, 200); }
     if (page === 'celebs') { renderCelebs(globalCelebs.slice(0, 60), 'all-celebs-grid'); }
-    if (page === 'categories') { renderCategoriesPage(); }
-    if (page === 'how') { /* static */ }
-    if (page === 'listing') { /* static */ }
+    if (page === 'store') { renderStore(); }
 
     observeReveals();
 }
@@ -545,38 +540,28 @@ triggers.forEach(t => {
 window.addEventListener('popstate', e => { navigateTo(e.state ? e.state.page : 'discover'); });
 
 /* ===================== MODAL CLICK OUTSIDE ===================== */
-document.querySelectorAll('.modal-overlay').forEach(o => {
+document.querySelectorAll('.rating-modal-overlay, .store-modal-overlay, .auth-modal-overlay').forEach(o => {
     o.addEventListener('click', e => {
         if (e.target === o) {
-            if (o.id === 'detailModal') closeDetailModal();
-            if (o.id === 'mpesaModal') closeMpesaModal();
-            if (o.id === 'contactRevealModal') closeContactRevealModal();
+            if (o.id === 'ratingModal') closeRatingModal();
+            if (o.id === 'storeModal') closeStoreModal();
+            if (o.id === 'authModal') closeAuthModal();
         }
     });
 });
 
 /* ===================== KEYBOARD ===================== */
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDetailModal(); closeMpesaModal(); closeContactRevealModal(); }
-});
-
-/* ===================== MOBILE KEYBOARD FIX ===================== */
-document.addEventListener('DOMContentLoaded', () => {
-    const mpesaInput = document.getElementById('mpesaNumber');
-    if (mpesaInput) {
-        mpesaInput.addEventListener('focus', () => {
-            setTimeout(() => mpesaInput.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
-        });
-    }
+    if (e.key === 'Escape') { closeProfilePage(); closeRatingModal(); closeStoreModal(); closeAuthModal(); }
 });
 
 /* ===================== INIT ===================== */
 window.addEventListener('load', async () => {
-    await loadSettings();
+    updateStarDisplay();
+    await loadUser();
     await loadAdminCelebs();
-    renderCategoryPills('category-pills', 'filterCelebs');
     renderCategoryPills('celebs-category-pills', 'filterCelebs');
     const hash = location.hash.replace('#', '');
-    const page = ['discover','celebs','categories','how','listing'].includes(hash) ? hash : 'discover';
+    const page = ['discover','celebs','store','how','listing'].includes(hash) ? hash : 'discover';
     navigateTo(page);
 });
