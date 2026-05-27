@@ -334,6 +334,17 @@ app.get('/api/me', verifyUser, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// -------------------- USER STAR TRANSACTIONS --------------------
+app.get('/api/me/transactions', verifyUser, async (req, res) => {
+    try {
+        const txs = await StarTransaction.find({ userId: req.user.id })
+            .sort({ createdAt: -1 })
+            .limit(100)
+            .populate('creatorId', 'name handle');
+        res.json({ success: true, transactions: txs });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // -------------------- STARS STORE / PURCHASE --------------------
 app.post('/api/stars/buy', verifyUser, async (req, res) => {
     try {
@@ -590,6 +601,16 @@ app.put('/api/creator/me', verifyCreator, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// -------------------- CREATOR AVATAR UPLOAD --------------------
+app.post('/api/creator/avatar', verifyCreator, upload.single('photo'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ success: false, message: 'Photo required' });
+        const img = `/uploads/${req.file.filename}`;
+        const celeb = await Celeb.findByIdAndUpdate(req.creator.id, { img }, { new: true }).select('-pin');
+        res.json({ success: true, img, creator: celeb });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 app.post('/api/creator/change-pin', verifyCreator, async (req, res) => {
     try {
         const { oldPin, newPin } = req.body;
@@ -826,7 +847,7 @@ app.get('/api/admin/referrals', verifyAdmin, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// -------------------- MEGAPAY STK PUSH (LEGACY MONEY DEPOSIT - KEEP FOR WITHDRAWALS) --------------------
+// -------------------- MEGAPAY STK PUSH (LEGACY MONEY DEPOSIT) --------------------
 app.post('/api/deposit', async (req, res) => {
     try {
         const { userPhone, amount, description, celebId, fanRequestReason } = req.body;

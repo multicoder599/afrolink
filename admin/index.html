@@ -12,18 +12,18 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
 :root {
-    --bg-base:#F8FAFF; --bg-card:#FFFFFF; --bg-elevated:#F0F4FF;
-    --bg-glass:rgba(255,255,255,0.92); --text-primary:#0F172A;
-    --text-secondary:#475569; --text-muted:#94A3B8;
+    --bg-base:#F5F0EB; --bg-card:#FFFBF5; --bg-elevated:#EDE8E0;
+    --bg-glass:rgba(255,251,245,0.92); --text-primary:#1C1917;
+    --text-secondary:#78716C; --text-muted:#A8A29E;
     --accent-blue:#4F46E5; --accent-blue-hover:#4338CA; --accent-blue-soft:rgba(79,70,229,0.1);
     --accent-violet:#8B5CF6; --accent-violet-hover:#7C3AED; --accent-violet-soft:rgba(139,92,246,0.1);
     --accent-magenta:#EC4899; --accent-magenta-hover:#DB2777; --accent-magenta-soft:rgba(236,72,153,0.1);
     --accent-gold:#F59E0B; --accent-gold-hover:#D97706; --accent-gold-soft:rgba(245,158,11,0.12);
     --accent-lime:#10B981; --accent-lime-soft:rgba(16,185,129,0.1);
     --accent-amber:#F59E0B; --accent-amber-soft:rgba(245,158,11,0.12);
-    --border-subtle:#E2E8F0; --border-hover:#CBD5E1;
-    --shadow-sm:0 1px 3px rgba(15,23,42,0.08); --shadow-md:0 4px 24px rgba(15,23,42,0.1);
-    --shadow-lg:0 12px 40px rgba(15,23,42,0.15); --shadow-glow:0 0 40px rgba(79,70,229,0.2);
+    --border-subtle:#E7E5E4; --border-hover:#D6D3D1;
+    --shadow-sm:0 1px 3px rgba(28,25,23,0.06); --shadow-md:0 4px 24px rgba(28,25,23,0.08);
+    --shadow-lg:0 12px 40px rgba(28,25,23,0.12); --shadow-glow:0 0 40px rgba(79,70,229,0.15);
     --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:24px;
     --font-body:'Plus Jakarta Sans',sans-serif;
     --font-mono:'JetBrains Mono',monospace;
@@ -51,6 +51,15 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .btn--outline { background:var(--bg-card); color:var(--text-primary); border:1.5px solid var(--border-subtle); }
 .btn--outline:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
 .btn-sm { padding:8px 14px; font-size:12px; width:auto; }
+
+/* WELCOME MODAL */
+.welcome-overlay { position:fixed; inset:0; background:rgba(28,25,23,.6); backdrop-filter:blur(12px); z-index:5000; display:none; justify-content:center; align-items:center; opacity:0; transition:opacity .3s; }
+.welcome-overlay.active { display:flex; opacity:1; }
+.welcome-box { background:var(--bg-card); border-radius:var(--radius-xl); padding:40px 32px; text-align:center; max-width:380px; width:92%; box-shadow:var(--shadow-lg); border:1.5px solid var(--border-subtle); animation:popIn .4s cubic-bezier(.16,1,.3,1); }
+@keyframes popIn { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+.welcome-box .emoji { font-size:56px; margin-bottom:12px; line-height:1; }
+.welcome-box h2 { font-size:22px; font-weight:800; margin-bottom:8px; }
+.welcome-box p { color:var(--text-secondary); font-size:14px; margin-bottom:24px; }
 
 /* DASHBOARD */
 .dashboard { display:none; min-height:100vh; }
@@ -96,7 +105,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
 /* MODAL */
-.modal-overlay { position:fixed; inset:0; background:rgba(15,23,42,.6); backdrop-filter:blur(12px); display:none; justify-content:center; align-items:center; z-index:2000; }
+.modal-overlay { position:fixed; inset:0; background:rgba(28,25,23,.6); backdrop-filter:blur(12px); display:none; justify-content:center; align-items:center; z-index:2000; }
 .modal-overlay.active { display:flex; }
 .modal-box { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:var(--shadow-lg); }
 .modal-box h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
@@ -134,12 +143,20 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     .table-wrap { overflow-x:auto; }
 }
 </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- WELCOME MODAL -->
+<div id="welcomeModal" class="welcome-overlay" onclick="closeWelcomeModal(event)">
+    <div class="welcome-box" onclick="event.stopPropagation()">
+        <div class="emoji">👋</div>
+        <h2>Welcome back, <span id="welcomeName">Admin</span>!</h2>
+        <p>You have full control of the AfroLink platform. Manage creators, payouts, and settings.</p>
+        <button class="btn btn--primary" onclick="document.getElementById('welcomeModal').classList.remove('active')" style="width:auto;padding:12px 32px;margin:0 auto;display:block;">Go to Dashboard</button>
+    </div>
+</div>
 
 <!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
@@ -354,6 +371,15 @@ function showToast(m, t='info', ti='') {
     setTimeout(() => el.remove(), 4000);
 }
 
+function showWelcome(name) {
+    document.getElementById('welcomeName').innerText = name || 'Admin';
+    document.getElementById('welcomeModal').classList.add('active');
+}
+function closeWelcomeModal(e) {
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('welcomeModal').classList.remove('active');
+}
+
 async function doLogin() {
     const u = document.getElementById('adminUser').value;
     const p = document.getElementById('adminPass').value;
@@ -368,7 +394,7 @@ async function doLogin() {
             localStorage.setItem('afrolink_admin_token', adminToken);
             document.getElementById('loginWrap').style.display='none';
             document.getElementById('dashboard').style.display='block';
-            showToast('Welcome back, Admin', 'success', 'Logged In');
+            showWelcome(u);
             loadDashboard();
         } else {
             showToast(data.message || 'Invalid credentials', 'error', 'Login Failed');
@@ -379,7 +405,7 @@ async function doLogin() {
             localStorage.setItem('afrolink_admin_token', adminToken);
             document.getElementById('loginWrap').style.display='none';
             document.getElementById('dashboard').style.display='block';
-            showToast('Welcome back, Admin', 'success', 'Logged In');
+            showWelcome(u);
             loadDashboard();
         } else {
             showToast('Invalid credentials. Try admin / AfroLink@2026', 'error', 'Login Failed');
@@ -399,7 +425,7 @@ function showSection(id, btn) {
     if (btn) btn.classList.add('active');
 }
 
-function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<<60)return 'Just now'; const m=Math.floor(s/60); if(m<<60)return m+'m ago'; const h=Math.floor(m/60); if(h<<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 async function loadDashboard() {
     await Promise.all([loadCreators(), loadTransactions(), loadApprovals(), loadWithdrawals(), loadReferrals(), loadAdminSettings()]);
@@ -598,8 +624,8 @@ function renderReferrals() {
     if (!total) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No referrals yet</td></tr>'; return; }
     tbody.innerHTML = referrals.map(r => `
         <tr>
-            <td style="color:var(--text-primary);font-weight:600;">${r.referrerId?.name||'Unknown'}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referrerId?.handle||''}</span></td>
-            <td style="color:var(--text-primary);font-weight:600;">${r.referredId?.name||'Unknown'}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referredId?.handle||''}</span></td>
+            <td style="color:var(--text-primary);font-weight:600;">${r.referrerId?.name||'Unknown'}<<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referrerId?.handle||''}</span></td>
+            <td style="color:var(--text-primary);font-weight:600;">${r.referredId?.name||'Unknown'}<<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referredId?.handle||''}</span></td>
             <td style="font-family:var(--font-mono);color:var(--accent-gold);">${r.code}</td>
             <td style="font-family:var(--font-mono);color:var(--accent-violet);">${(r.earnings||0).toLocaleString()}</td>
             <td><span class="badge badge--${r.status}">${r.status}</span></td>

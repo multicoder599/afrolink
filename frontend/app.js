@@ -6,6 +6,7 @@ let globalCelebs = [];
 let currentFilter = 'all';
 let currentUser = null;
 let userToken = localStorage.getItem('afrolink_user_token');
+let balancePollTimer = null;
 
 /* ===================== PARTICLES (3D) ===================== */
 (function() {
@@ -19,17 +20,17 @@ let userToken = localStorage.getItem('afrolink_user_token');
     class Particle {
         reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.size = Math.random()*3+1; this.vx = (Math.random()-.5)*0.5; this.vy = (Math.random()-.5)*0.5; this.color = colors[Math.floor(Math.random()*colors.length)]; this.alpha = Math.random()*0.4+0.1; this.phase = Math.random()*Math.PI*2; this.z = Math.random()*100; }
         constructor() { this.reset(); }
-        update() { this.x += this.vx; this.y += this.vy; this.phase += 0.02; this.z += Math.sin(this.phase)*0.2; if (this.x<0||this.x>w||this.y<0||this.y>h) this.reset(); }
+        update() { this.x += this.vx; this.y += this.vy; this.phase += 0.02; this.z += Math.sin(this.phase)*0.2; if (this.x<<0||this.x>w||this.y<<0||this.y>h) this.reset(); }
         draw() { const a = this.alpha*(0.7+0.3*Math.sin(this.phase)); const s = this.size*(1+this.z/200); ctx.beginPath(); ctx.arc(this.x,this.y,s,0,Math.PI*2); ctx.fillStyle = this.color; ctx.globalAlpha = a; ctx.fill(); ctx.globalAlpha = 1; }
     }
-    for (let i=0; i<70; i++) particles.push(new Particle());
+    for (let i=0; i<<70; i++) particles.push(new Particle());
     function loop() {
         ctx.clearRect(0,0,w,h);
         particles.sort((a,b)=>a.z-b.z);
         particles.forEach(p=>{p.update();p.draw();});
-        for (let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){
+        for (let i=0;i<<particles.length;i++) for(let j=i+1;j<<particles.length;j++){
             const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-            if(d<180){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(139,92,246,${0.06*(1-d/180)})`;ctx.lineWidth=0.5;ctx.stroke();}
+            if(d<<180){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(139,92,246,${0.06*(1-d/180)})`;ctx.lineWidth=0.5;ctx.stroke();}
         }
         requestAnimationFrame(loop);
     }
@@ -50,17 +51,85 @@ function showToast(m, t='info', ti='', d=4000) {
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
 }
 
+/* ===================== WELCOME MODAL ===================== */
+function showWelcome(name) {
+    document.getElementById('welcomeName').innerText = name || 'Fan';
+    document.getElementById('welcomeModal').classList.add('active');
+}
+function closeWelcomeModal(e) {
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('welcomeModal').classList.remove('active');
+}
+
+/* ===================== ACCOUNT MODAL ===================== */
+function openAccountModal() {
+    if (!userToken) { openAuthModal(); return; }
+    document.getElementById('accountModal').classList.add('active');
+    document.getElementById('accountStars').innerText = userStars.toLocaleString();
+    loadUserTransactions();
+}
+function closeAccountModal(e) {
+    if(e && e.target !== e.currentTarget) return;
+    document.getElementById('accountModal').classList.remove('active');
+}
+
+async function loadUserTransactions() {
+    if (!userToken) return;
+    try {
+        const res = await fetch(`${API_BASE}/api/me/transactions`, { headers: { 'Authorization': 'Bearer ' + userToken } });
+        if (res.ok) {
+            const data = await res.json();
+            const list = data.transactions || [];
+            const container = document.getElementById('txHistoryList');
+            if (!list.length) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No transactions yet.</p>';
+                return;
+            }
+            container.innerHTML = list.map(t => `
+                <div class="tx-row">
+                    <div>
+                        <div class="tx-title">${t.description || t.type}</div>
+                        <div class="tx-date">${new Date(t.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div class="tx-amt" style="color:${t.type==='purchase'?'var(--accent-gold)':'var(--accent-blue)'};">
+                        ${t.type==='purchase'?'+':'-'}${t.amount}
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch(e) {
+        document.getElementById('txHistoryList').innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">Failed to load history.</p>';
+    }
+}
+
 /* ===================== USER AUTH ===================== */
 function updateAuthUI() {
     const btn = document.getElementById('authBtn');
     const btnMob = document.getElementById('authBtnMobile');
+    const accBtn = document.getElementById('accountBtn');
+    const accBtnMob = document.getElementById('accountBtnMobile');
     if (currentUser) {
-        if (btn) { btn.innerText = currentUser.name || 'Account'; btn.onclick = ()=>{ localStorage.removeItem('afrolink_user_token'); currentUser=null; userToken=null; updateAuthUI(); showToast('Signed out', 'info'); }; }
-        if (btnMob) { btnMob.innerText = currentUser.name || 'Account'; btnMob.onclick = ()=>{ localStorage.removeItem('afrolink_user_token'); currentUser=null; userToken=null; updateAuthUI(); showToast('Signed out', 'info'); }; }
+        if (btn) btn.style.display = 'none';
+        if (btnMob) btnMob.style.display = 'none';
+        if (accBtn) { accBtn.style.display = 'inline-flex'; accBtn.innerHTML = `<i class="material-symbols-outlined">person</i> ${currentUser.name || 'Account'}`; }
+        if (accBtnMob) { accBtnMob.style.display = 'inline-flex'; }
     } else {
-        if (btn) { btn.innerText = 'Sign In'; btn.onclick = openAuthModal; }
-        if (btnMob) { btnMob.innerText = 'Sign In'; btnMob.onclick = openAuthModal; }
+        if (btn) { btn.style.display = 'inline-flex'; btn.innerText = 'Sign In'; btn.onclick = openAuthModal; }
+        if (btnMob) { btnMob.style.display = 'inline-flex'; btnMob.innerText = 'Sign In'; btnMob.onclick = openAuthModal; }
+        if (accBtn) accBtn.style.display = 'none';
+        if (accBtnMob) accBtnMob.style.display = 'none';
     }
+}
+
+function doLogout() {
+    localStorage.removeItem('afrolink_user_token');
+    userToken = null;
+    currentUser = null;
+    userStars = 0;
+    updateStarDisplay();
+    updateAuthUI();
+    closeAccountModal();
+    showToast('You have been logged out', 'info', 'Signed Out');
 }
 
 async function loadUser() {
@@ -74,7 +143,7 @@ async function loadUser() {
             updateStarDisplay();
             updateAuthUI();
         } else { throw new Error('Invalid token'); }
-    } catch (e) { localStorage.removeItem('afrolink_user_token'); userToken = null; }
+    } catch (e) { localStorage.removeItem('afrolink_user_token'); userToken = null; currentUser = null; }
 }
 
 function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
@@ -104,7 +173,7 @@ async function doAuthLogin() {
             updateStarDisplay();
             updateAuthUI();
             closeAuthModal();
-            showToast('Welcome back!', 'success');
+            showWelcome(currentUser.name);
         } else { showToast(data.message || 'Login failed', 'error'); }
     } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
@@ -128,7 +197,7 @@ async function doAuthRegister() {
             updateStarDisplay();
             updateAuthUI();
             closeAuthModal();
-            showToast('Account created!', 'success');
+            showWelcome(currentUser.name);
         } else { showToast(data.message || 'Registration failed', 'error'); }
     } catch (e) { showToast('Network error. Try again.', 'error'); }
 }
@@ -185,11 +254,26 @@ async function buyStars(pkgId) {
         });
         const data = await res.json();
         if (data.success) {
-            userStars = data.starsBalance || (userStars + pkg.stars + (pkg.popular?10:0));
-            updateStarDisplay();
-            showToast(`You bought ${pkg.stars.toLocaleString()} stars!`, 'success', 'Stars Added');
+            if (data.starsBalance !== undefined) {
+                userStars = data.starsBalance;
+                updateStarDisplay();
+                showToast(`You bought ${pkg.stars.toLocaleString()} stars!`, 'success', 'Stars Added');
+            } else {
+                showToast('STK push sent. Confirm payment on your phone to receive stars.', 'success', 'Payment Pending');
+                startBalancePoll();
+            }
         } else { showToast(data.message || 'Purchase failed', 'error'); }
     } catch (e) { showToast('Network error. Try again.', 'error'); }
+}
+
+function startBalancePoll() {
+    let attempts = 0;
+    if (balancePollTimer) clearInterval(balancePollTimer);
+    balancePollTimer = setInterval(async () => {
+        attempts++;
+        if (attempts > 24 || !userToken) { clearInterval(balancePollTimer); return; }
+        await loadUser();
+    }, 5000);
 }
 
 function openStoreModal() { renderStoreModal(); document.getElementById('storeModal').classList.add('active'); }
@@ -331,7 +415,6 @@ async function openProfilePage(id) {
     if (!c) { showToast('Creator not found', 'error'); return; }
     currentProfileCeleb = c;
 
-    // Log profile view
     try {
         const headers = userToken ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken } : { 'Content-Type': 'application/json' };
         fetch(`${API_BASE}/api/profile-views`, { method: 'POST', headers, body: JSON.stringify({ creatorId: c.id }) }).catch(()=>{});
@@ -354,21 +437,18 @@ async function openProfilePage(id) {
     document.getElementById('prof-unlock-cost').innerText = c.starCost;
     document.getElementById('prof-lock-cost').innerText = c.starCost;
 
-    // Rating
     const fullStars = Math.floor(c.rating);
     const halfStar = c.rating % 1 >= 0.5;
     let starsHtml = '';
-    for(let i=0;i<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
+    for(let i=0;i<<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
     if(halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
     for(let i=0;i<(5-fullStars-(halfStar?1:0));i++) starsHtml += '<i class="far fa-star"></i>';
     document.getElementById('prof-rating-row').innerHTML = starsHtml + `<span>${c.rating} (${c.ratingCount} reviews)</span>`;
 
-    // Tags
     document.getElementById('prof-category-tags').innerHTML = `<span class="profile-tag-pill blue">${c.categoryName}</span>`;
     document.getElementById('prof-hobby-tags').innerHTML = (c.hobbies||[]).map(h=>`<span class="profile-tag-pill">${h}</span>`).join('');
     document.getElementById('prof-opento-tags').innerHTML = (c.openTo||[]).map(o=>`<span class="profile-tag-pill gold">${o}</span>`).join('');
 
-    // Contact locked by default
     const contactBox = document.getElementById('prof-contact-box');
     contactBox.innerHTML = `
         <div style="background:var(--bg-elevated);border:1.5px solid var(--border-subtle);border-radius:var(--radius-md);padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">
@@ -377,7 +457,6 @@ async function openProfilePage(id) {
         </div>
     `;
 
-    // Social
     const socialDiv = document.getElementById('prof-social');
     socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-elevated);border-radius:var(--radius-md);border:1.5px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-magenta);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
 
@@ -477,7 +556,7 @@ async function submitRating() {
                 const fullStars = Math.floor(data.rating);
                 const halfStar = data.rating % 1 >= 0.5;
                 let starsHtml = '';
-                for(let i=0;i<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
+                for(let i=0;i<<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
                 if(halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
                 for(let i=0;i<(5-fullStars-(halfStar?1:0));i++) starsHtml += '<i class="far fa-star"></i>';
                 document.getElementById('prof-rating-row').innerHTML = starsHtml + `<span>${data.rating} (${data.ratingCount} reviews)</span>`;
@@ -547,19 +626,21 @@ triggers.forEach(t => {
 window.addEventListener('popstate', e => { navigateTo(e.state ? e.state.page : 'discover'); });
 
 /* ===================== MODAL CLICK OUTSIDE ===================== */
-document.querySelectorAll('.rating-modal-overlay, .store-modal-overlay, .auth-modal-overlay').forEach(o => {
+document.querySelectorAll('.rating-modal-overlay, .store-modal-overlay, .auth-modal-overlay, .welcome-overlay, .account-overlay').forEach(o => {
     o.addEventListener('click', e => {
         if (e.target === o) {
             if (o.id === 'ratingModal') closeRatingModal();
             if (o.id === 'storeModal') closeStoreModal();
             if (o.id === 'authModal') closeAuthModal();
+            if (o.id === 'welcomeModal') closeWelcomeModal();
+            if (o.id === 'accountModal') closeAccountModal();
         }
     });
 });
 
 /* ===================== KEYBOARD ===================== */
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeProfilePage(); closeRatingModal(); closeStoreModal(); closeAuthModal(); }
+    if (e.key === 'Escape') { closeProfilePage(); closeRatingModal(); closeStoreModal(); closeAuthModal(); closeWelcomeModal(); closeAccountModal(); }
 });
 
 /* ===================== INIT ===================== */
@@ -571,4 +652,12 @@ window.addEventListener('load', async () => {
     const hash = location.hash.replace('#', '');
     const page = ['discover','celebs','store','how','listing'].includes(hash) ? hash : 'discover';
     navigateTo(page);
+
+    // Poll celebs every 30s so admin additions appear "instantly" for active users
+    setInterval(async () => {
+        if (document.getElementById('view-celebs')?.classList.contains('active')) {
+            await loadAdminCelebs();
+            filterCelebs(currentFilter, null);
+        }
+    }, 30000);
 });
