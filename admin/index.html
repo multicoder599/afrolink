@@ -4,50 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AfroLink Admin</title>
-    <meta name="theme-color" content="#4F46E5">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
 :root {
-    --bg-base:#F5F0EB; --bg-card:#FFFBF5; --bg-elevated:#EDE8E0;
-    --bg-glass:rgba(255,251,245,0.92); --text-primary:#1C1917;
-    --text-secondary:#78716C; --text-muted:#A8A29E;
-    --accent-blue:#4F46E5; --accent-blue-hover:#4338CA; --accent-blue-soft:rgba(79,70,229,0.1);
-    --accent-violet:#8B5CF6; --accent-violet-hover:#7C3AED; --accent-violet-soft:rgba(139,92,246,0.1);
-    --accent-magenta:#EC4899; --accent-magenta-hover:#DB2777; --accent-magenta-soft:rgba(236,72,153,0.1);
-    --accent-gold:#F59E0B; --accent-gold-hover:#D97706; --accent-gold-soft:rgba(245,158,11,0.12);
+    --bg-base:#FDF2F4; --bg-card:#FFFFFF; --bg-elevated:#FFF1F2;
+    --text-primary:#1C1917; --text-secondary:#78716C; --text-muted:#A8A29E;
+    --rose-primary:#E11D48; --rose-hover:#BE123C; --rose-soft:rgba(225,29,72,0.08);
+    --pink-accent:#F472B6; --pink-soft:rgba(244,114,182,0.08);
     --accent-lime:#10B981; --accent-lime-soft:rgba(16,185,129,0.1);
-    --accent-amber:#F59E0B; --accent-amber-soft:rgba(245,158,11,0.12);
-    --border-subtle:#E7E5E4; --border-hover:#D6D3D1;
+    --accent-gold:#F59E0B; --accent-gold-soft:rgba(245,158,11,0.12);
+    --border-subtle:#FECDD3; --border-hover:#FDA4AF;
     --shadow-sm:0 1px 3px rgba(28,25,23,0.06); --shadow-md:0 4px 24px rgba(28,25,23,0.08);
-    --shadow-lg:0 12px 40px rgba(28,25,23,0.12); --shadow-glow:0 0 40px rgba(79,70,229,0.15);
+    --shadow-lg:0 12px 40px rgba(28,25,23,0.12); --shadow-rose:0 0 40px rgba(225,29,72,0.1);
     --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-xl:24px;
-    --font-body:'Plus Jakarta Sans',sans-serif;
-    --font-mono:'JetBrains Mono',monospace;
+    --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
+body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; }
 .material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
 
 .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
 .login-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
-.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-blue),var(--accent-violet)); }
+.login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--rose-primary),var(--pink-accent)); }
 .login-card h1 { font-size:24px; font-weight:800; text-align:center; margin-bottom:6px; }
 .login-card p { color:var(--text-secondary); text-align:center; font-size:13px; margin-bottom:28px; }
 .login-logo { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:24px; }
-.login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#FFF; }
+.login-logo .logo-mark { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,var(--rose-primary),var(--pink-accent)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:16px; font-weight:700; color:#FFF; }
 .form-control { width:100%; padding:13px 14px; border:1.5px solid var(--border-subtle); border-radius:var(--radius-md); font-size:14px; font-family:var(--font-body); transition:all .25s; background:var(--bg-base); color:var(--text-primary); margin-bottom:14px; }
-.form-control:focus { outline:none; border-color:var(--accent-blue); box-shadow:0 0 0 4px var(--accent-blue-soft); }
+.form-control:focus { outline:none; border-color:var(--rose-primary); box-shadow:0 0 0 4px var(--rose-soft); }
 .form-label { display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.1em; font-family:var(--font-mono); }
 .btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:13px 20px; border-radius:var(--radius-md); font-weight:700; font-size:13px; cursor:pointer; transition:all .3s; border:none; width:100%; font-family:var(--font-body); }
-.btn--primary { background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); color:#FFF; box-shadow:var(--shadow-md); }
-.btn--primary:hover { transform:translateY(-1px); box-shadow:var(--shadow-glow); }
-.btn--violet { background:linear-gradient(135deg,var(--accent-violet),var(--accent-violet-hover)); color:#FFF; }
-.btn--magenta { background:linear-gradient(135deg,var(--accent-magenta),var(--accent-magenta-hover)); color:#FFF; }
+.btn--primary { background:linear-gradient(135deg,var(--rose-primary),var(--pink-accent)); color:#FFF; box-shadow:var(--shadow-md); }
+.btn--primary:hover { transform:translateY(-1px); box-shadow:var(--shadow-rose); }
 .btn--outline { background:var(--bg-card); color:var(--text-primary); border:1.5px solid var(--border-subtle); }
-.btn--outline:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+.btn--outline:hover { border-color:var(--rose-primary); color:var(--rose-primary); }
 .btn-sm { padding:8px 14px; font-size:12px; width:auto; }
 
 .welcome-overlay { position:fixed; inset:0; background:rgba(28,25,23,.6); backdrop-filter:blur(12px); z-index:5000; display:none; justify-content:center; align-items:center; opacity:0; transition:opacity .3s; }
@@ -61,9 +53,9 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .dashboard { display:none; min-height:100vh; }
 .sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:var(--bg-card); border-right:1.5px solid var(--border-subtle); padding:24px 20px; z-index:100; display:flex; flex-direction:column; }
 .sidebar-logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:32px; padding:0 4px; color:var(--text-primary); }
-.sidebar-logo .logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--accent-blue),var(--accent-violet)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#FFF; }
+.sidebar-logo .logo-mark { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--rose-primary),var(--pink-accent)); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#FFF; }
 .nav-link { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:var(--radius-md); color:var(--text-secondary); text-decoration:none; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; margin-bottom:4px; border:none; background:none; width:100%; font-family:inherit; }
-.nav-link:hover, .nav-link.active { background:var(--accent-blue-soft); color:var(--accent-blue); }
+.nav-link:hover, .nav-link.active { background:var(--rose-soft); color:var(--rose-primary); }
 .nav-link i.material-symbols-outlined { font-size:20px; }
 .sidebar-footer { margin-top:auto; padding-top:16px; border-top:1.5px solid var(--border-subtle); }
 .main-content { margin-left:260px; padding:28px 32px; min-height:100vh; }
@@ -73,9 +65,9 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
 .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
 .stat-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px 18px; transition:all .3s; }
-.stat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--accent-blue); }
+.stat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--rose-primary); }
 .stat-card .stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
-.stat-card .stat-value { font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--accent-blue); }
+.stat-card .stat-value { font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--rose-primary); }
 .stat-card .stat-delta { font-size:11px; color:var(--accent-lime); margin-top:4px; font-family:var(--font-mono); }
 
 .table-wrap { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); overflow:hidden; }
@@ -83,15 +75,13 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .table-wrap th { text-align:left; padding:14px 16px; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); background:var(--bg-elevated); border-bottom:1.5px solid var(--border-subtle); }
 .table-wrap td { padding:14px 16px; border-bottom:1.5px solid var(--border-subtle); color:var(--text-secondary); }
 .table-wrap tr:last-child td { border-bottom:none; }
-.table-wrap tr:hover td { background:rgba(79,70,229,.03); }
+.table-wrap tr:hover td { background:rgba(225,29,72,.03); }
 .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-size:10px; font-weight:700; font-family:var(--font-mono); }
 .badge--verified { background:var(--accent-lime-soft); color:var(--accent-lime); }
-.badge--pending { background:var(--accent-amber-soft); color:var(--accent-amber); }
-.badge--rejected { background:var(--accent-magenta-soft); color:var(--accent-magenta); }
+.badge--pending { background:var(--accent-gold-soft); color:var(--accent-gold); }
+.badge--rejected { background:rgba(225,29,72,.1); color:var(--rose-primary); }
 .badge--success { background:var(--accent-lime-soft); color:var(--accent-lime); }
-.badge--failed { background:var(--accent-magenta-soft); color:var(--accent-magenta); }
-.badge--unlock { background:var(--accent-blue-soft); color:var(--accent-blue); }
-.badge--listing { background:var(--accent-violet-soft); color:var(--accent-violet); }
+.badge--failed { background:rgba(225,29,72,.1); color:var(--rose-primary); }
 
 .section { display:none; }
 .section.active { display:block; animation:fadeIn .3s ease; }
@@ -102,19 +92,13 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .modal-box { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:var(--shadow-lg); }
 .modal-box h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
 .close-modal { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; }
-.close-modal:hover { color:var(--accent-magenta); }
+.close-modal:hover { color:var(--rose-primary); }
 
 .toast-container { position:fixed; top:20px; right:20px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
 .toast { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 16px; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; font-size:12px; font-weight:500; animation:toastIn .3s ease; }
 @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 .toast--success { border-left:3px solid var(--accent-lime); }
-.toast--error { border-left:3px solid var(--accent-magenta); }
-
-.toggle-wrap { display:flex; align-items:center; gap:12px; cursor:pointer; }
-.toggle-wrap input[type="checkbox"] { width:44px; height:24px; -webkit-appearance:none; appearance:none; background:var(--border-subtle); border-radius:12px; position:relative; cursor:pointer; outline:none; transition:background .3s; }
-.toggle-wrap input[type="checkbox"]::after { content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; background:#FFF; border-radius:50%; transition:transform .3s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
-.toggle-wrap input[type="checkbox"]:checked { background:var(--accent-blue); }
-.toggle-wrap input[type="checkbox"]:checked::after { transform:translateX(20px); }
+.toast--error { border-left:3px solid var(--rose-primary); }
 
 .attr-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 @media(max-width:600px){ .attr-grid { grid-template-columns:repeat(2,1fr); } }
@@ -167,15 +151,14 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
         <button class="nav-link active" onclick="showSection('overview',this)"><i class="material-symbols-outlined">dashboard</i> Overview</button>
         <button class="nav-link" onclick="showSection('profiles',this)"><i class="material-symbols-outlined">group</i> Profiles</button>
         <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Payments</button>
-        <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-amber);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-gold);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
         <button class="nav-link" onclick="showSection('settings',this)"><i class="material-symbols-outlined">settings</i> Settings</button>
         <div class="sidebar-footer">
-            <button class="nav-link" onclick="doLogout()" style="color:var(--accent-magenta);"><i class="material-symbols-outlined">logout</i> Logout</button>
+            <button class="nav-link" onclick="doLogout()" style="color:var(--rose-primary);"><i class="material-symbols-outlined">logout</i> Logout</button>
         </div>
     </aside>
 
     <main class="main-content">
-        <!-- OVERVIEW -->
         <div class="section active" id="section-overview">
             <div class="topbar">
                 <h2>Dashboard Overview</h2>
@@ -201,26 +184,22 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             </div>
         </div>
 
-        <!-- PROFILES -->
         <div class="section" id="section-profiles">
             <div class="topbar">
                 <h2>All Profiles</h2>
                 <div class="topbar-actions">
                     <input type="text" id="profileSearch" class="form-control" style="width:220px;margin-bottom:0;" placeholder="Search profiles..." oninput="filterProfiles(this.value)">
-                    <button class="btn btn--violet btn-sm" onclick="openAddProfile()"><i class="material-symbols-outlined">add</i> Add Profile</button>
+                    <button class="btn btn--primary btn-sm" onclick="openAddProfile()"><i class="material-symbols-outlined">add</i> Add Profile</button>
                 </div>
             </div>
             <div class="table-wrap">
                 <table>
-                    <thead>
-                        <tr><th>Profile</th><th>Age</th><th>Location</th><th>Gender</th><th>Price</th><th>Phone</th><th>Unlocks</th><th>Earned</th><th>Status</th><th>Actions</th></tr>
-                    </thead>
+                    <thead><tr><th>Profile</th><th>Age</th><th>Location</th><th>Gender</th><th>Price</th><th>Phone</th><th>Unlocks</th><th>Earned</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="profiles-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- TRANSACTIONS -->
         <div class="section" id="section-transactions">
             <div class="topbar"><h2>All Payments</h2></div>
             <div class="table-wrap">
@@ -231,7 +210,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             </div>
         </div>
 
-        <!-- APPROVALS -->
         <div class="section" id="section-approvals">
             <div class="topbar"><h2>Pending Approvals</h2></div>
             <div class="table-wrap">
@@ -242,48 +220,40 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             </div>
         </div>
 
-        <!-- SETTINGS -->
         <div class="section" id="section-settings">
             <div class="topbar"><h2>Platform Settings</h2></div>
             <div style="max-width:600px;">
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">General</h4>
-                    <label class="form-label">Platform Name</label>
-                    <input type="text" class="form-control" value="AfroLink" style="margin-bottom:16px;">
-                    <label class="form-label">Listing Verification Fee (KES)</label>
-                    <input type="number" class="form-control" value="1499" style="margin-bottom:16px;">
-                    <label class="form-label">Platform Fee (%)</label>
-                    <input type="number" id="platformFeeInput" class="form-control" value="20" style="margin-bottom:16px;">
+                    <label class="form-label">Platform Name</label><input type="text" class="form-control" value="AfroLink" style="margin-bottom:16px;">
+                    <label class="form-label">Listing Verification Fee (KES)</label><input type="number" class="form-control" value="1499" style="margin-bottom:16px;">
+                    <label class="form-label">Platform Fee (%)</label><input type="number" id="platformFeeInput" class="form-control" value="20" style="margin-bottom:16px;">
                     <button class="btn btn--primary btn-sm" style="width:auto;" onclick="saveSettings()"><i class="material-symbols-outlined">save</i> Save Changes</button>
                 </div>
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Demo Mode</h4>
-                    <label class="toggle-wrap">
-                        <input type="checkbox" id="demoModeToggle" onchange="toggleDemoMode()">
+                    <label style="display:flex;align-items:center;gap:12px;cursor:pointer;">
+                        <input type="checkbox" id="demoModeToggle" onchange="toggleDemoMode()" style="width:18px;height:18px;accent-color:var(--rose-primary);">
                         <span style="font-size:13px;">Show demo profiles on main page</span>
                     </label>
                     <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">When disabled, only admin-approved profiles appear on the frontend.</p>
                 </div>
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Change Admin Password</h4>
-                    <label class="form-label">Current Password</label>
-                    <input type="password" id="currentPass" class="form-control" style="margin-bottom:14px;">
-                    <label class="form-label">New Password</label>
-                    <input type="password" id="newPass" class="form-control" style="margin-bottom:14px;">
-                    <label class="form-label">Confirm New Password</label>
-                    <input type="password" id="confirmPass" class="form-control" style="margin-bottom:14px;">
-                    <button class="btn btn--violet btn-sm" style="width:auto;" onclick="changePassword()"><i class="material-symbols-outlined">lock</i> Update Password</button>
+                    <label class="form-label">Current Password</label><input type="password" id="currentPass" class="form-control" style="margin-bottom:14px;">
+                    <label class="form-label">New Password</label><input type="password" id="newPass" class="form-control" style="margin-bottom:14px;">
+                    <label class="form-label">Confirm New Password</label><input type="password" id="confirmPass" class="form-control" style="margin-bottom:14px;">
+                    <button class="btn btn--outline btn-sm" style="width:auto;" onclick="changePassword()"><i class="material-symbols-outlined">lock</i> Update Password</button>
                 </div>
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Danger Zone</h4>
-                    <button class="btn btn--magenta btn-sm" style="width:auto;" onclick="if(confirm('Clear ALL data? This cannot be undone.')) showToast('Feature not implemented in demo', 'warning')"><i class="material-symbols-outlined">delete</i> Reset All Data</button>
+                    <button class="btn btn-sm" style="width:auto;background:var(--rose-soft);color:var(--rose-primary);" onclick="if(confirm('Clear ALL data?')) showToast('Not implemented', 'warning')"><i class="material-symbols-outlined">delete</i> Reset All Data</button>
                 </div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- ADD PROFILE MODAL -->
 <div class="modal-overlay" id="addProfileModal">
     <div class="modal-box">
         <button class="close-modal" onclick="closeAddProfile()">&times;</button>
@@ -314,7 +284,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div><label class="form-label">Piercings</label><input type="text" id="addPiercings" class="form-control" style="margin-bottom:0;" placeholder="Ears, Navel"></div>
         </div>
         <div style="margin-bottom:14px;"><label class="form-label">Tattoos</label><input type="text" id="addTattoos" class="form-control" style="margin-bottom:0;" placeholder="None"></div>
-        <button class="btn btn--violet" onclick="submitAddProfile()"><i class="material-symbols-outlined">save</i> Save Profile</button>
+        <button class="btn btn--primary" onclick="submitAddProfile()"><i class="material-symbols-outlined">save</i> Save Profile</button>
     </div>
 </div>
 
@@ -327,15 +297,12 @@ function showToast(m, t='info', ti='') {
     const C = document.getElementById('toastContainer');
     const el = document.createElement('div');
     el.className = `toast toast--${t}`;
-    el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-lime)':t==='error'?'var(--accent-magenta)':'var(--accent-blue)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
+    el.innerHTML = `<i class="material-symbols-outlined" style="font-size:18px;color:${t==='success'?'var(--accent-lime)':t==='error'?'var(--rose-primary)':'var(--rose-primary)'}">${t==='success'?'check_circle':t==='error'?'error':'info'}</i><div><div style="font-weight:700;font-size:12px;margin-bottom:1px">${ti||t}</div><div style="font-size:11px;color:var(--text-secondary)">${m}</div></div>`;
     C.appendChild(el);
     setTimeout(() => el.remove(), 4000);
 }
 
-function showWelcome(name) {
-    document.getElementById('welcomeName').innerText = name || 'Admin';
-    document.getElementById('welcomeModal').classList.add('active');
-}
+function showWelcome(name) { document.getElementById('welcomeName').innerText = name || 'Admin'; document.getElementById('welcomeModal').classList.add('active'); }
 function closeWelcomeModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('welcomeModal').classList.remove('active'); }
 
 async function doLogin() {
@@ -346,8 +313,7 @@ async function doLogin() {
         const data = await res.json();
         if (data.success && data.token) {
             adminToken = data.token; localStorage.setItem('afrolink_admin_token', adminToken);
-            document.getElementById('loginWrap').style.display='none';
-            document.getElementById('dashboard').style.display='block';
+            document.getElementById('loginWrap').style.display='none'; document.getElementById('dashboard').style.display='block';
             showWelcome(u); loadDashboard();
         } else { showToast(data.message || 'Invalid credentials', 'error', 'Login Failed'); }
     } catch(e) {
@@ -368,7 +334,7 @@ function showSection(id, btn) {
     if (btn) btn.classList.add('active');
 }
 
-function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<<60)return 'Just now'; const m=Math.floor(s/60); if(m<<60)return m+'m ago'; const h=Math.floor(m/60); if(h<<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 async function loadDashboard() {
     await Promise.all([loadProfiles(), loadTransactions(), loadApprovals(), loadAdminSettings()]);
@@ -424,7 +390,7 @@ function renderRecentTx() {
     const recent = transactions.slice(0, 5);
     if (!recent.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
     tbody.innerHTML = recent.map(t => `
-        <tr><td style="color:var(--text-primary);font-weight:600;">${t.description || t.type}</td><td>KES ${t.amount?.toLocaleString()}</td>
+        <tr><td style="color:var(--text-primary);font-weight:600;">${t.description || t.type}</td><td>KES ${(t.amount || 0).toLocaleString()}</td>
         <td><span class="badge badge--${t.type}">${t.type}</span></td>
         <td>${t.userPhone || '-'}</td>
         <td>${t.profileName || t.profileId?.name || '-'}</td>
@@ -438,13 +404,13 @@ function renderProfiles() {
     tbody.innerHTML = profiles.map(p => `
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${p.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${p.gender}</span></td>
-            <td>${p.age}</td><td>${p.location || p.loc || '-'}</td><td>${p.gender}</td>
+            <td>${p.age || '-'}</td><td>${p.location || p.loc || '-'}</td><td>${p.gender || '-'}</td>
             <td style="font-family:var(--font-mono);">KES ${(p.price || 0).toLocaleString()}</td>
             <td>${p.phone || '-'}</td>
             <td style="font-family:var(--font-mono);">${p.unlocks || 0}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-blue);">KES ${(p.totalEarned || 0).toLocaleString()}</td>
+            <td style="font-family:var(--font-mono);color:var(--rose-primary);">KES ${(p.totalEarned || 0).toLocaleString()}</td>
             <td><span class="badge badge--${p.status}">${p.status}</span></td>
-            <td><button class="btn btn--outline btn-sm" onclick="editProfile('${p._id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--magenta btn-sm" onclick="deleteProfile('${p._id}')"><i class="material-symbols-outlined">delete</i></button></td>
+            <td><button class="btn btn--outline btn-sm" onclick="editProfile('${p._id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn-sm" style="background:var(--rose-soft);color:var(--rose-primary);" onclick="deleteProfile('${p._id}')"><i class="material-symbols-outlined">delete</i></button></td>
         </tr>
     `).join('');
 }
@@ -474,7 +440,7 @@ function renderApprovals() {
             <td style="font-family:var(--font-mono);">KES ${(a.price || 0).toLocaleString()}</td>
             <td>${a.phone || '-'}</td>
             <td>${timeAgo(a.createdAt)}</td>
-            <td><button class="btn btn--primary btn-sm" onclick="approveProfile('${a._id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--magenta btn-sm" onclick="rejectProfile('${a._id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
+            <td><button class="btn btn--primary btn-sm" onclick="approveProfile('${a._id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn-sm" style="background:var(--rose-soft);color:var(--rose-primary);" onclick="rejectProfile('${a._id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
         </tr>
     `).join('');
 }
@@ -562,10 +528,7 @@ async function changePassword() {
     catch(e) { showToast('Updated (demo)', 'success'); }
 }
 
-function saveSettings() {
-    showToast('Settings saved', 'success', 'Saved');
-}
-
+function saveSettings() { showToast('Settings saved', 'success', 'Saved'); }
 function refreshData() { loadDashboard(); showToast('Refreshed', 'success'); }
 
 if (adminToken) { document.getElementById('loginWrap').style.display='none'; document.getElementById('dashboard').style.display='block'; loadDashboard(); }

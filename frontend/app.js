@@ -1,38 +1,38 @@
 const API_BASE = 'https://api.afrolink254.com';
 const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+254702098509'];
 
-/* ===================== PARTICLES ===================== */
+/* PARTICLES */
 (function() {
     const c = document.getElementById('particleCanvas');
     if (!c) return;
     const x = c.getContext('2d');
-    let w, h, P = [], COLS = ['#9e4a52','#c5a059','#38BDF8','#EC4899','#8B5CF6'];
+    let w, h, P = [], COLS = ['#E11D48','#FB7185','#F472B6','#FDA4AF','#FBBF24'];
     function R() { w = c.width = innerWidth; h = c.height = innerHeight; }
     R(); addEventListener('resize', R);
     class Q { reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.s = Math.random()*2.5+.5; this.vx = (Math.random()-.5)*.4; this.vy = (Math.random()-.5)*.4; this.c = COLS[Math.floor(Math.random()*5)]; this.o = Math.random()*.5+.2; this.p = Math.random()*Math.PI*2; }
         constructor() { this.reset(); }
-        update() { this.x += this.vx; this.y += this.vy; this.p += .02; if (this.x<0||this.x>w||this.y<0||this.y>h) this.reset(); }
+        update() { this.x += this.vx; this.y += this.vy; this.p += .02; if (this.x<<0||this.x>w||this.y<<0||this.y>h) this.reset(); }
         draw() { const o = this.o*(.7+.3*Math.sin(this.p)); x.beginPath(); x.arc(this.x,this.y,this.s,0,Math.PI*2); x.fillStyle = this.c; x.globalAlpha = o; x.fill(); x.globalAlpha = 1; }
     }
     for (let i = 0; i < 60; i++) P.push(new Q());
-    function L() { x.clearRect(0,0,w,h); P.forEach(p=>{p.update();p.draw();}); for (let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.strokeStyle=`rgba(197,160,89,${.08*(1-d/150)})`;x.lineWidth=.5;x.stroke();}} requestAnimationFrame(L); }
+    function L() { x.clearRect(0,0,w,h); P.forEach(p=>{p.update();p.draw();}); for (let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<<150){x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.strokeStyle=`rgba(225,29,72,${.08*(1-d/150)})`;x.lineWidth=.5;x.stroke();}} requestAnimationFrame(L); }
     L();
 })();
 
-/* ===================== TOAST ===================== */
+/* TOAST */
 function showToast(m, t='info', ti='', d=4000) {
     const C = document.getElementById('toastContainer');
     const el = document.createElement('div');
     const I = {success:'fa-check',error:'fa-exclamation-triangle',info:'fa-info-circle',warning:'fa-exclamation-circle'};
     const T = {success:'Success',error:'Error',info:'Info',warning:'Warning'};
     el.className = `toast toast--${t}`;
-    el.innerHTML = `<div class="toast-icon"><i class="fas ${I[t]}"></i></div><div style="flex:1"><div style="font-weight:700;font-size:14px;margin-bottom:2px">${ti||T[t]}</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.5">${m}</div></div><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
+    el.innerHTML = `<div class="toast-icon"><i class="fas ${I[t]}"></i></div><div style="flex:1"><div style="font-weight:700;font-size:14px;margin-bottom:2px">${ti||T[t]}</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.5">${m}</div></div><button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;" onclick="this.parentElement.remove()">&times;</button>`;
     C.appendChild(el);
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
 }
 
-/* ===================== DATA ===================== */
+/* DATA */
 const NAMES = ["Zariah","Tamara","Ivonne","Faith","Cassie","Hannah","Elsa","Aisha","Shaani","Julie","Amira","Ashley","Jackline","Purity","Nala","Winnie","Stella","Joy","Grace","Mercy","Chelsea","Naomi","Linda","Sophie","Angela","Brenda","Diana","Esther","Fiona","Gloria","Helen","Irene","Janet","Karen","Laura","Mary","Nancy","Olivia","Patricia","Queen","Rachel","Susan","Tina","Vera","Wendy","Yvonne","Alice","Betty"];
 const LOCS = ["Kilimani, Nairobi","Thome, Nairobi","Utawala, Nairobi","Mombasa","Ruaka, Nairobi","Kisumu","Nakuru","Eldoret","Malindi","Thika","Kitengela","Nyali","Buru Buru","Ruiru","Machakos","Kikuyu","Syokimau","Rongai","Karen","Ngong","Kileleshwa","Lavington","Langata","South B","South C","Kasarani","Embakasi","Donholm","Pipeline","Umoja","Eastleigh","Westlands","Parklands","Jogoo Rd","Juja","Waiyaki Way","Mirema","Mlolongo","Athi River","Tassia"];
 const BIOS = ["I'm a fun-loving girl looking for a generous man to spoil me. Let's make unforgettable memories!","Craving a real connection with a mature guy who knows what he wants. Hit unlock and let's skip the small talk.","Sweet, sassy, and ready to be treated like a queen. Are you the one to sweep me off my feet?","Looking for a partner in crime for late-night drives and cozy weekends. Unlock my number and let's vibe!","I love the finer things in life. If you know how to treat a lady, don't keep me waiting... unlock me now.","Naughty but nice. Let's see if you can handle this energy. Drop me a text on WhatsApp!","Your girl next door with a wild side. Unlock to find out what you've been missing.","Classy, sassy, and a little bit bad-assy. Looking for someone who can match my energy.","New in town and ready to explore. Show me around and let's create some magic together.","I believe in living life to the fullest. Looking for someone who isn't afraid to spoil a good woman.","A little bit of sugar, a little bit of spice. Unlock to see which side you get tonight.","Passionate about good conversations and better company. Let's make this worth both our time."];
@@ -41,14 +41,12 @@ const PLocs = ["Kilimani, Nairobi","Westlands, Nairobi","Nyali, Mombasa","Laving
 const PBios = ["VIP exclusive. Only for the elite gentlemen who appreciate true luxury. Your discretion is guaranteed.","Premium companion for exclusive arrangements. I offer an experience, not just a meeting.","High-end experience. Book in advance for unforgettable moments you'll never forget.","Elite tier only. Are you ready for the ultimate treat? I promise you won't regret it.","Luxury redefined. Premium rates for premium experiences. Quality over quantity always.","Top-tier companion. Exclusive access for verified members only. The best is kept private.","An experience crafted for the discerning gentleman. Unlock to enter my world.","Where sophistication meets sensuality. I cater to those who demand the very best."];
 const RI = a => a[Math.floor(Math.random() * a.length)];
 
-/* ===================== GENERATE PROFILES (FALLBACK) ===================== */
-let globalProfiles = [], premiumProfiles = [];
-let adminProfilesLoaded = false;
+let globalProfiles = [], premiumProfiles = [], adminProfilesLoaded = false;
 
 function genProfiles() {
     const arr = [];
     for (let i = 1; i <= 48; i++) {
-        const idx = ((i - 1) % 12) + 1;
+        const idx = ((i - 1) % 20) + 1;
         arr.push({
             id: 'reg_' + i, name: NAMES[i - 1] || RI(NAMES),
             age: Math.floor(Math.random() * (32 - 19 + 1)) + 19,
@@ -68,13 +66,13 @@ function genProfiles() {
 function genPremium() {
     const arr = [];
     for (let i = 1; i <= 20; i++) {
-        const idx = ((i - 1) % 12) + 1;
+        const idx = ((i - 1) % 20) + 1;
         arr.push({
             id: 'prem_' + i, name: PNames[i - 1] || ('VIP ' + i),
             age: Math.floor(Math.random() * (28 - 20 + 1)) + 20,
             loc: PLocs[i - 1],
             desc: PBios[(i - 1) % PBios.length],
-            img: `./premium/premium (${idx}).jpg`,
+            img: `./images/model (${idx}).jpg`,
             isOnline: true, isPremium: true, isVerified: true,
             price: 2999, phone: '', gender: 'Female', isReal: false,
             hair:'Blonde Braids', faceCard:'Model', skinTone:'Light', bodyType:'Slim Thick',
@@ -85,26 +83,23 @@ function genPremium() {
     return arr;
 }
 
-/* ===================== IMAGE URL RESOLVER ===================== */
 function resolveImageUrl(url) {
-    if (!url) return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400';
+    if (!url) return './images/model (1).jpg';
     if (url.startsWith('http')) return url;
     if (url.startsWith('/uploads/')) return API_BASE + url;
     if (url.startsWith('/')) return API_BASE + url;
+    if (url.startsWith('./')) return url;
     return url;
 }
 
-/* ===================== LOAD ADMIN PROFILES ===================== */
 async function loadAdminProfiles() {
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
         const res = await fetch(`${API_BASE}/api/profiles?limit=100`, { signal: controller.signal });
         clearTimeout(timeout);
-
         if (!res.ok) throw new Error('Server error ' + res.status);
         const data = await res.json();
-
         let list = [];
         if (Array.isArray(data)) list = data;
         else if (Array.isArray(data.profiles)) list = data.profiles;
@@ -129,15 +124,12 @@ async function loadAdminProfiles() {
                 bodyType: p.bodyType || '', breast: p.breast || '', waist: p.waist || '',
                 thighs: p.thighs || '', butt: p.butt || '', piercings: p.piercings || '', tattoos: p.tattoos || ''
             }));
-
             const adminRegular = mapped.filter(p => !p.isPremium);
             const adminPremium = mapped.filter(p => p.isPremium);
             globalProfiles = [...adminRegular, ...genProfiles()];
             premiumProfiles = [...adminPremium, ...genPremium()];
             adminProfilesLoaded = true;
-        } else {
-            throw new Error('Empty admin database');
-        }
+        } else { throw new Error('Empty admin database'); }
     } catch (err) {
         console.warn('Admin fetch failed, using demo data:', err.message);
         globalProfiles = genProfiles();
@@ -145,10 +137,9 @@ async function loadAdminProfiles() {
     }
 }
 
-/* ===================== FAVORITES ===================== */
+/* FAVORITES */
 function getFavs() { try { return JSON.parse(localStorage.getItem('afrolink_favs') || '[]'); } catch { return []; } }
 function saveFavs(f) { localStorage.setItem('afrolink_favs', JSON.stringify(f)); }
-
 function toggleFav(id, e) {
     if (e) e.stopPropagation();
     const favs = getFavs();
@@ -164,15 +155,14 @@ function toggleFav(id, e) {
     });
     return idx === -1;
 }
-
 function toggleFavoriteFromDetail() {
     if (!currentDetailProfile) return;
     const isFav = toggleFav(currentDetailProfile.id);
     const btn = document.getElementById('detailFavBtn');
-    if (btn) { btn.classList.toggle('active', isFav); btn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--accent-gold)"></i>' : '<i class="far fa-heart"></i>'; }
+    if (btn) { btn.classList.toggle('active', isFav); btn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--rose-primary)"></i>' : '<i class="far fa-heart"></i>'; }
 }
 
-/* ===================== SHARE ===================== */
+/* SHARE */
 function shareProfile(id, isPrem) {
     const list = isPrem ? premiumProfiles : globalProfiles;
     const p = list.find(x => x.id === id);
@@ -183,11 +173,11 @@ function shareProfile(id, isPrem) {
 }
 function shareCurrentProfile() { if (!currentDetailProfile) return; shareProfile(currentDetailProfile.id, currentDetailProfile.isPremium); }
 
-/* ===================== SQUARE CARD HTML ===================== */
+/* CARDS */
 function squareCard(p, idx, isPrem) {
     const favs = getFavs();
     const isFav = favs.includes(p.id);
-    const onerr = `this.onerror=null;this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400';`;
+    const onerr = `this.onerror=null;this.src='./images/model (1).jpg';`;
     const openFn = `openProfileDetail('${p.id}',${isPrem})`;
     const onlineDot = p.isOnline ? `<div class="online-badge"><div class="dot"></div>Online</div>` : '';
     const hotBadge = `<div class="hot-badge"><i class="fas fa-fire"></i> Hot</div>`;
@@ -217,7 +207,6 @@ function squareCard(p, idx, isPrem) {
     </div>`;
 }
 
-/* ===================== RENDER FUNCTIONS ===================== */
 function renderProfiles(list) {
     const grid = document.getElementById('dynamic-profile-grid');
     if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Profiles Found</h2><p>No profiles match your filters.</p></div>`; return; }
@@ -240,7 +229,7 @@ function renderDiscoverPremium() {
     row.innerHTML = premiumProfiles.slice(0, 6).map((p, i) => squareCard(p, i, true)).join('');
 }
 
-/* ===================== FILTERS ===================== */
+/* FILTERS */
 function setFilter(type, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -257,7 +246,7 @@ function filterByLocation(val) {
     renderProfiles(globalProfiles.filter(p => p.loc.toLowerCase().includes(town)));
 }
 
-/* ===================== VIDEOS ===================== */
+/* VIDEOS */
 function initVideos() {
     const grid = document.getElementById('dynamic-video-grid');
     let h = '';
@@ -268,17 +257,17 @@ function initVideos() {
     observeReveals();
 }
 
-/* ===================== PLANS ===================== */
+/* PLANS */
 const PLANS = [
-    { title: "Basic Unlock", price: 499, icon: "fa-unlock", iconColor: "var(--accent-blue)", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--red", btnText: "Get Basic" },
-    { title: "Starter Pack", price: 499, icon: "fa-rocket", iconColor: "var(--accent-purple)", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--red", btnText: "Start Pack" },
-    { title: "Live Chat", price: 599, icon: "fa-comments", iconColor: "var(--accent-red)", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--red", btnText: "Get Chat" },
-    { title: "Weekend Special", price: 799, icon: "fa-moon", iconColor: "var(--accent-pink)", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--red", btnText: "Get Weekend" },
-    { title: "Video Chat", price: 999, icon: "fa-video", iconColor: "var(--accent-red)", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--red", btnText: "Get Video" },
-    { title: "VIP Monthly", price: 1499, icon: "fa-crown", iconColor: "var(--accent-gold)", desc: "30-day full access", features: ["Unlimited contact unlocks","Free video chats included","VIP badge on your profile","Priority customer support"], badge: "Popular", popular: true, btn: "btn--gold", btnText: "Go VIP" },
-    { title: "Creator Listing", price: 1499, icon: "fa-user-plus", iconColor: "var(--accent-green)", desc: "List your profile", features: ["Verified profile badge","Appear in search results","Receive direct inquiries","Lifetime listing"], badge: null, popular: false, btn: "btn--green", btnText: "Become Member" },
-    { title: "Platinum Pass", price: 2999, icon: "fa-gem", iconColor: "var(--accent-gold)", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--gold", btnText: "Go Platinum" },
-    { title: "All Access", price: 4999, icon: "fa-infinity", iconColor: "var(--accent-gold)", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--gold", btnText: "Go All In" }
+    { title: "Basic Unlock", price: 499, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Basic" },
+    { title: "Starter Pack", price: 499, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Start Pack" },
+    { title: "Live Chat", price: 599, icon: "fa-comments", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Chat" },
+    { title: "Weekend Special", price: 799, icon: "fa-moon", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--rose", btnText: "Get Weekend" },
+    { title: "Video Chat", price: 999, icon: "fa-video", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Video" },
+    { title: "VIP Monthly", price: 1499, icon: "fa-crown", iconColor: "var(--rose-primary)", desc: "30-day full access", features: ["Unlimited contact unlocks","Free video chats included","VIP badge on your profile","Priority customer support"], badge: "Popular", popular: true, btn: "btn--pink", btnText: "Go VIP" },
+    { title: "Member Listing", price: 1499, icon: "fa-user-plus", desc: "List your profile", features: ["Verified profile badge","Appear in search results","Receive direct inquiries","Lifetime listing"], badge: null, popular: false, btn: "btn--gold", btnText: "Become Member" },
+    { title: "Platinum Pass", price: 2999, icon: "fa-gem", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--pink", btnText: "Go Platinum" },
+    { title: "All Access", price: 4999, icon: "fa-infinity", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--pink", btnText: "Go All In" }
 ];
 
 function renderPlans() {
@@ -287,13 +276,13 @@ function renderPlans() {
         const badge = plan.badge ? `<div class="plan-badge">${plan.badge}</div>` : '';
         const popClass = plan.popular ? 'popular' : '';
         const features = plan.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('');
-        const btnGlow = plan.popular ? 'btn-glow-gold' : 'btn-glow';
-        return `<div class="plan-card ${popClass} reveal">${badge}<div class="plan-icon" style="background:${plan.popular ? 'var(--accent-gold-soft)' : 'var(--accent-red-soft)'}"><i class="fas ${plan.icon}" style="color:${plan.iconColor};"></i></div><h3 class="plan-title">${plan.title}</h3><p class="plan-desc">${plan.desc}</p><div class="plan-price">${plan.price.toLocaleString()}<span>KES</span></div><ul class="plan-features">${features}</ul><button class="btn ${plan.btn} ${btnGlow}" onclick="openMpesaModalDirect('${plan.title}',${plan.price})">${plan.btnText}</button></div>`;
+        const btnGlow = plan.popular ? 'btn-glow' : '';
+        return `<div class="plan-card ${popClass} reveal">${badge}<div class="plan-icon"><i class="fas ${plan.icon}"></i></div><h3 class="plan-title">${plan.title}</h3><p class="plan-desc">${plan.desc}</p><div class="plan-price">${plan.price.toLocaleString()}<<span>KES</span></div><ul class="plan-features">${features}</ul><button class="btn ${plan.btn} ${btnGlow}" onclick="openMpesaModalDirect('${plan.title}',${plan.price})">${plan.btnText}</button></div>`;
     }).join('');
     observeReveals();
 }
 
-/* ===================== PROFILE DETAIL MODAL ===================== */
+/* PROFILE DETAIL */
 let currentDetailProfile = null;
 const profileDetailModal = document.getElementById('profileDetailModal');
 
@@ -308,11 +297,12 @@ function showDetailModal(p) {
     currentDetailProfile = p;
     const img = document.getElementById('detail-img');
     img.src = p.img;
-    img.onerror = function() { this.src = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400'; };
-    const checkColor = p.isPremium ? 'var(--accent-gold)' : '#38BDF8';
+    img.onerror = function() { this.src = './images/model (1).jpg'; };
+    const checkColor = p.isPremium ? 'var(--rose-primary)' : '#4ADE80';
     document.getElementById('detail-name').innerHTML = `${p.name}, ${p.age} <i class="fas fa-check-circle" style="color:${checkColor};font-size:18px;"></i>`;
     document.getElementById('detail-loc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${p.loc}`;
     document.getElementById('detail-desc').innerText = p.desc || 'No description available.';
+    document.getElementById('detail-price').innerText = (p.price || 499).toLocaleString();
 
     const attrsContainer = document.getElementById('detail-attrs-container');
     const attrsGrid = document.getElementById('detail-attrs');
@@ -325,16 +315,13 @@ function showDetailModal(p) {
     if (attrs.length > 0) {
         attrsContainer.style.display = 'block';
         attrsGrid.innerHTML = attrs.map(a => `<div class="attr-item"><div class="attr-label">${a.label}</div><div class="attr-value">${a.val}</div></div>`).join('');
-    } else {
-        attrsContainer.style.display = 'none';
-    }
+    } else { attrsContainer.style.display = 'none'; }
 
     const favs = getFavs();
     const isFav = favs.includes(p.id);
     const favBtn = document.getElementById('detailFavBtn');
     favBtn.classList.toggle('active', isFav);
-    favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--accent-gold)"></i>' : '<i class="far fa-heart"></i>';
-    document.getElementById('detail-price').innerText = (p.price || 499).toLocaleString();
+    favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--rose-primary)"></i>' : '<i class="far fa-heart"></i>';
     profileDetailModal.classList.add('active');
 }
 
@@ -346,7 +333,7 @@ function openMpesaFromDetail() {
     setTimeout(() => openMpesaModalDirect(currentDetailProfile.name, currentDetailProfile.price, currentDetailProfile.id, currentDetailProfile.isPremium), 300);
 }
 
-/* ===================== MPESA MODAL ===================== */
+/* MPESA MODAL */
 const mpesaModal = document.getElementById('mpesaModal');
 let currentActiveName = '', currentActivePrice = 499, currentActiveId = '', currentActiveIsPremium = false, paymentInterval = null;
 
@@ -367,7 +354,7 @@ function closeMpesaModal() {
     if (paymentInterval) { clearInterval(paymentInterval); paymentInterval = null; }
 }
 
-/* ===================== PAYMENT PROCESSING ===================== */
+/* PAYMENT */
 async function processPayment() {
     const phone = document.getElementById('mpesaNumber').value.trim().replace(/\s/g, '');
     if (!phone || phone.length < 9) { showToast('Please enter a valid Safaricom phone number.', 'error', 'Invalid Number'); return; }
@@ -385,7 +372,7 @@ async function processPayment() {
     try {
         const res = await fetch(`${API_BASE}/api/deposit`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink` })
+            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink`, profileId: currentActiveId })
         });
         if (!res.ok) { const t = await res.text(); let m = 'Payment gateway error.'; try { m = JSON.parse(t).message || m; } catch {} if (res.status === 404) m = `API endpoint not found.`; throw new Error(m); }
         const data = await res.json();
@@ -411,7 +398,7 @@ async function processPayment() {
                 if (sd.status === 'success') {
                     clearInterval(paymentInterval); paymentInterval = null;
                     updateSteps(3); btnText.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
-                    btn.className = 'btn btn--green';
+                    btn.className = 'btn btn--gold';
                     showToast(`KES ${currentActivePrice.toLocaleString()} paid! ${currentActiveName} unlocked.`, 'success', 'Confirmed', 5000);
                     launchConfetti();
                     closeMpesaModal();
@@ -439,87 +426,62 @@ function updateSteps(idx) {
     });
 }
 
-/* ===================== CONTACT REVEAL ===================== */
+/* CONTACT REVEAL */
 function showContactReveal() {
     const modal = document.getElementById('contactRevealModal');
     const content = document.getElementById('contactRevealContent');
     if (!modal || !content) return;
-
     modal.classList.add('active');
-
-    content.innerHTML = `
-        <div class="spinner-lg" style="width:50px;height:50px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--accent-green);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div>
-        <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Successful!</h3>
-        <p style="color:var(--text-secondary);font-size:14px;">Revealing details shortly...</p>
-    `;
+    content.innerHTML = `<div class="spinner-lg" style="width:50px;height:50px;border:4px solid rgba(255,255,255,.2);border-top-color:#4ADE80;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div><h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Successful!</h3><p style="color:var(--text-secondary);font-size:14px;">Revealing details shortly...</p>`;
 
     setTimeout(() => {
         let displayPhone = '';
         let isPremiumFlow = currentActiveIsPremium;
-
         if (isPremiumFlow) {
             displayPhone = PREMIUM_NUMBERS[Math.floor(Math.random() * PREMIUM_NUMBERS.length)];
         } else {
             const list = globalProfiles;
             const p = list.find(x => x.id === currentActiveId);
-            if (p && p.phone && p.phone.trim() !== '') {
-                displayPhone = p.phone;
-            }
+            if (p && p.phone && p.phone.trim() !== '') displayPhone = p.phone;
         }
 
         if (displayPhone) {
             const waLink = `https://wa.me/${displayPhone.replace(/\D/g,'')}`;
             content.innerHTML = `
-                <div style="width:70px;height:70px;border-radius:50%;background:var(--accent-green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(16,185,129,.3);">
-                    <i class="fas fa-phone-alt" style="font-size:28px;color:var(--accent-green);"></i>
+                <div style="width:70px;height:70px;border-radius:50%;background:rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(74,222,128,.3);">
+                    <i class="fas fa-phone-alt" style="font-size:28px;color:#4ADE80;"></i>
                 </div>
                 <h3 style="font-size:20px;margin-bottom:4px;color:var(--text-primary);font-family:var(--font-serif);">Contact Unlocked!</h3>
                 <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Reach out via WhatsApp</p>
-                <div style="font-size:26px;font-weight:800;color:var(--accent-green);letter-spacing:1px;margin:16px 0;font-family:var(--font-mono);">
+                <div style="font-size:26px;font-weight:800;color:#4ADE80;letter-spacing:1px;margin:16px 0;">
                     <a href="${waLink}" target="_blank" style="color:inherit;text-decoration:none;">${displayPhone}</a>
                 </div>
-                <a href="${waLink}" target="_blank" class="btn btn--green" style="margin-top:8px;text-decoration:none;">
-                    <i class="fab fa-whatsapp"></i> Open WhatsApp
-                </a>
-                <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">
-                    <i class="fas fa-shield-alt"></i> Discretion guaranteed. Do not share this number.
-                </p>
-                <button class="btn btn--outline" style="margin-top:12px;" onclick="closeContactRevealModal()">
-                    <i class="fas fa-times"></i> Close
-                </button>
+                <a href="${waLink}" target="_blank" class="btn btn--gold" style="margin-top:8px;text-decoration:none;"><i class="fab fa-whatsapp"></i> Open WhatsApp</a>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:16px;"><i class="fas fa-shield-alt"></i> Discretion guaranteed. Do not share this number.</p>
+                <button class="btn btn--outline" style="margin-top:12px;" onclick="closeContactRevealModal()"><i class="fas fa-times"></i> Close</button>
             `;
         } else {
             content.innerHTML = `
-                <div style="width:70px;height:70px;border-radius:50%;background:var(--accent-gold-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(197,160,89,.3);">
-                    <i class="fas fa-hourglass-half" style="font-size:28px;color:var(--accent-gold);"></i>
+                <div style="width:70px;height:70px;border-radius:50%;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid var(--border-subtle);">
+                    <i class="fas fa-hourglass-half" style="font-size:28px;color:var(--rose-primary);"></i>
                 </div>
                 <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Received!</h3>
-                <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:20px;">
-                    Your payment is confirmed. The member will reach out to you shortly on your M-Pesa number.
-                </p>
-                <button class="btn btn--gold" onclick="closeContactRevealAndGoHome()">
-                    <i class="fas fa-compass"></i> Back to Discover
-                </button>
+                <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:20px;">Your payment is confirmed. The member will reach out to you shortly on your M-Pesa number.</p>
+                <button class="btn btn--rose" onclick="closeContactRevealAndGoHome()"><i class="fas fa-compass"></i> Back to Discover</button>
             `;
         }
     }, 2500);
 }
 
-function closeContactRevealModal() {
-    document.getElementById('contactRevealModal').classList.remove('active');
-}
-
+function closeContactRevealModal() { document.getElementById('contactRevealModal').classList.remove('active'); }
 function closeContactRevealAndGoHome() {
     closeContactRevealModal();
-    setTimeout(() => {
-        history.pushState({ page: 'discover' }, null, '#discover');
-        navigateTo('discover');
-    }, 300);
+    setTimeout(() => { history.pushState({ page: 'discover' }, null, '#discover'); navigateTo('discover'); }, 300);
 }
 
-/* ===================== CONFETTI ===================== */
+/* CONFETTI */
 function launchConfetti() {
-    const colors = ['#9e4a52', '#c5a059', '#10B981', '#38BDF8', '#EC4899', '#8B5CF6'];
+    const colors = ['#E11D48', '#FB7185', '#F472B6', '#4ADE80', '#FBBF24', '#8B5CF6'];
     for (let i = 0; i < 50; i++) {
         const el = document.createElement('div');
         el.style.cssText = `position:fixed;width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'0'};left:${Math.random()*100}vw;top:-10px;pointer-events:none;z-index:5000;animation:cf ${Math.random()*2+2}s ease-out forwards;`;
@@ -534,7 +496,7 @@ function launchConfetti() {
     }
 }
 
-/* ===================== LISTING FORM ===================== */
+/* LISTING */
 function previewImage(e) {
     const reader = new FileReader();
     const preview = document.getElementById('img-preview');
@@ -543,44 +505,35 @@ function previewImage(e) {
 }
 function submitListing(e) { e.preventDefault(); openMpesaModalDirect('Profile Listing Fee', 1499); }
 
-/* ===================== COUNTER ANIMATION ===================== */
+/* COUNTERS */
 function animateCounters() {
     document.querySelectorAll('[data-count]').forEach(el => {
         const target = parseInt(el.dataset.count), start = performance.now();
-        function update(now) {
-            const p = Math.min((now - start) / 2000, 1);
-            el.textContent = Math.floor(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
-            if (p < 1) requestAnimationFrame(update);
-        }
+        function update(now) { const p = Math.min((now - start) / 2000, 1); el.textContent = Math.floor(target * (1 - Math.pow(1 - p, 3))).toLocaleString(); if (p < 1) requestAnimationFrame(update); }
         requestAnimationFrame(update);
     });
 }
 
-/* ===================== SCROLL REVEAL ===================== */
-const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+/* SCROLL REVEAL */
+const revealObs = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 function observeReveals() { document.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObs.observe(el)); }
 
-/* ===================== SPA ROUTER ===================== */
+/* SPA ROUTER */
 const views = document.querySelectorAll('.spa-view');
 const triggers = document.querySelectorAll('.nav-trigger');
 
 function navigateTo(page) {
     views.forEach(v => { v.classList.remove('active'); v.style.animation = 'none'; v.offsetHeight; });
     triggers.forEach(t => t.classList.remove('active'));
-
     const target = document.getElementById(`view-${page}`);
     if (target) { target.classList.add('active'); target.style.animation = null; }
     document.querySelectorAll(`.nav-trigger[data-page="${page}"]`).forEach(t => t.classList.add('active'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     if (page === 'discover') { renderDiscoverFeatured(); renderDiscoverPremium(); setTimeout(animateCounters, 200); }
     if (page === 'profiles') { renderProfiles(globalProfiles); }
     if (page === 'premium') { renderPremium(premiumProfiles); }
     if (page === 'exclusive') { if (!document.getElementById('dynamic-video-grid').innerHTML.trim()) initVideos(); }
     if (page === 'plans') { if (!document.getElementById('plans-grid').innerHTML.trim()) renderPlans(); }
-
     observeReveals();
 }
 
@@ -594,7 +547,7 @@ triggers.forEach(t => {
 
 window.addEventListener('popstate', e => { navigateTo(e.state ? e.state.page : 'discover'); });
 
-/* ===================== MODAL OVERLAY CLICK ===================== */
+/* MODAL CLICK OUTSIDE */
 document.querySelectorAll('.modal-overlay').forEach(o => {
     o.addEventListener('click', e => {
         if (e.target === o) {
@@ -605,13 +558,9 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
     });
 });
 
-/* ===================== KEYBOARD ===================== */
+/* KEYBOARD */
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-        closeProfileDetailModal();
-        closeMpesaModal();
-        closeContactRevealModal();
-    }
+    if (e.key === 'Escape') { closeProfileDetailModal(); closeMpesaModal(); closeContactRevealModal(); }
     const pages = ['discover', 'profiles', 'premium', 'exclusive', 'plans'];
     if (e.key >= '1' && e.key <= '5' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         const p = pages[parseInt(e.key) - 1];
@@ -619,19 +568,15 @@ document.addEventListener('keydown', e => {
     }
 });
 
-/* ===================== MOBILE KEYBOARD FIX ===================== */
+/* MOBILE KEYBOARD FIX */
 document.addEventListener('DOMContentLoaded', () => {
     const mpesaInput = document.getElementById('mpesaNumber');
     if (mpesaInput) {
-        mpesaInput.addEventListener('focus', () => {
-            setTimeout(() => {
-                mpesaInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 350);
-        });
+        mpesaInput.addEventListener('focus', () => { setTimeout(() => { mpesaInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350); });
     }
 });
 
-/* ===================== INIT ===================== */
+/* INIT */
 window.addEventListener('load', async () => {
     await loadAdminProfiles();
     const hash = location.hash.replace('#', '');

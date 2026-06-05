@@ -24,7 +24,6 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AfroLink@2026';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20');
 
-// ===================== MIDDLEWARE =====================
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
@@ -35,7 +34,6 @@ app.use('/api/', limiter);
 const strictLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, validate: false });
 app.use('/api/admin/login', strictLimiter);
 
-// ===================== FILE UPLOAD & STATIC =====================
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 const storage = multer.diskStorage({
@@ -45,18 +43,13 @@ const storage = multer.diskStorage({
         cb(null, unique + path.extname(file.originalname));
     }
 });
-const upload = multer({
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 },
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('Only image files allowed'), false);
-    }
-});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files allowed'), false);
+}});
 app.use('/uploads', express.static(uploadsDir));
-app.use('/images', express.static(path.join(__dirname, '..', 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// ===================== MONGOOSE SCHEMAS =====================
 const profileSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     age: { type: Number, default: 21 },
@@ -73,18 +66,12 @@ const profileSchema = new mongoose.Schema({
     isVerified: { type: Boolean, default: false },
     price: { type: Number, default: 499, min: 0 },
     status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
-    hair: { type: String, default: '' },
-    faceCard: { type: String, default: '' },
-    skinTone: { type: String, default: '' },
-    bodyType: { type: String, default: '' },
-    breast: { type: String, default: '' },
-    waist: { type: String, default: '' },
-    thighs: { type: String, default: '' },
-    butt: { type: String, default: '' },
-    piercings: { type: String, default: '' },
-    tattoos: { type: String, default: '' },
-    unlocks: { type: Number, default: 0 },
-    totalEarned: { type: Number, default: 0 },
+    hair: { type: String, default: '' }, faceCard: { type: String, default: '' },
+    skinTone: { type: String, default: '' }, bodyType: { type: String, default: '' },
+    breast: { type: String, default: '' }, waist: { type: String, default: '' },
+    thighs: { type: String, default: '' }, butt: { type: String, default: '' },
+    piercings: { type: String, default: '' }, tattoos: { type: String, default: '' },
+    unlocks: { type: Number, default: 0 }, totalEarned: { type: Number, default: 0 },
 }, { timestamps: true });
 
 const transactionSchema = new mongoose.Schema({
@@ -102,38 +89,24 @@ const transactionSchema = new mongoose.Schema({
     callbackData: { type: Object, default: {} },
 }, { timestamps: true });
 
-const adminLogSchema = new mongoose.Schema({
-    action: { type: String, required: true },
-    adminId: { type: String },
-    targetId: { type: String },
-    details: { type: Object, default: {} },
-    ip: { type: String },
-}, { timestamps: true });
-
-const settingsSchema = new mongoose.Schema({
-    key: { type: String, required: true, unique: true },
-    value: { type: mongoose.Schema.Types.Mixed }
-});
+const adminLogSchema = new mongoose.Schema({ action: { type: String, required: true }, adminId: { type: String }, targetId: { type: String }, details: { type: Object, default: {} }, ip: { type: String } }, { timestamps: true });
+const settingsSchema = new mongoose.Schema({ key: { type: String, required: true, unique: true }, value: { type: mongoose.Schema.Types.Mixed } });
 
 const Profile = mongoose.model('Profile', profileSchema);
 const Transaction = mongoose.model('Transaction', transactionSchema);
 const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 const Settings = mongoose.model('Settings', settingsSchema);
 
-// ===================== AUTH MIDDLEWARE =====================
 function verifyAdmin(req, res, next) {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ success: false, message: 'Unauthorized' });
-    const token = auth.split(' ')[1];
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
         if (decoded.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin only' });
-        req.admin = decoded;
-        next();
+        req.admin = decoded; next();
     } catch (e) { return res.status(401).json({ success: false, message: 'Invalid token' }); }
 }
 
-// ===================== HELPERS =====================
 function formatPhoneMegaPay(phone) {
     let fp = phone.replace(/\D/g, '');
     if (fp.startsWith('0')) fp = '254' + fp.slice(1);
@@ -142,105 +115,52 @@ function formatPhoneMegaPay(phone) {
     return fp;
 }
 
-// ===================== ROUTES =====================
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
 
 app.get('/api/settings', async (req, res) => {
-    try {
-        const setting = await Settings.findOne({ key: 'demoMode' });
-        res.json({ success: true, demoMode: setting ? setting.value : true });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const setting = await Settings.findOne({ key: 'demoMode' }); res.json({ success: true, demoMode: setting ? setting.value : true }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.post('/api/admin/settings', verifyAdmin, async (req, res) => {
-    try {
-        const { demoMode } = req.body;
-        await Settings.findOneAndUpdate({ key: 'demoMode' }, { key: 'demoMode', value: demoMode !== false }, { upsert: true });
-        res.json({ success: true, demoMode: demoMode !== false });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const { demoMode } = req.body; await Settings.findOneAndUpdate({ key: 'demoMode' }, { key: 'demoMode', value: demoMode !== false }, { upsert: true }); res.json({ success: true }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// Public Profiles
 app.get('/api/profiles', async (req, res) => {
-    try {
-        const limit = Math.min(parseInt(req.query.limit) || 100, 200);
-        const query = { status: 'verified' };
-        const profiles = await Profile.find(query).sort({ createdAt: -1 }).limit(limit);
-        res.json(profiles);
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const limit = Math.min(parseInt(req.query.limit) || 100, 200); const profiles = await Profile.find({ status: 'verified' }).sort({ createdAt: -1 }).limit(limit); res.json(profiles); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.get('/api/profiles/:id', async (req, res) => {
-    try {
-        const profile = await Profile.findById(req.params.id);
-        if (!profile) return res.status(404).json({ success: false, message: 'Not found' });
-        res.json({ success: true, profile });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const profile = await Profile.findById(req.params.id); if (!profile) return res.status(404).json({ success: false, message: 'Not found' }); res.json({ success: true, profile }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// Deposit / Payment Initiate
 app.post('/api/deposit', async (req, res) => {
     try {
         const { userPhone, amount, description, profileId } = req.body;
         if (!userPhone || !amount || amount < 10) return res.status(400).json({ success: false, message: 'Phone and amount required' });
-        
         const refId = 'AL' + Date.now() + Math.floor(Math.random() * 1000);
-        const tx = new Transaction({
-            userPhone: userPhone.trim(),
-            profileId: profileId || null,
-            amount: parseInt(amount),
-            status: 'pending',
-            refId,
-            description: description || 'AfroLink Payment',
-            type: profileId ? 'unlock' : 'listing'
-        });
+        const tx = new Transaction({ userPhone: userPhone.trim(), profileId: profileId || null, amount: parseInt(amount), status: 'pending', refId, description: description || 'AfroLink Payment', type: profileId ? 'unlock' : 'listing' });
         await tx.save();
-
-        if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) {
-            tx.status = 'success';
-            tx.mpesaRef = 'DEMO' + Date.now();
-            await tx.save();
-            return res.json({ success: true, refId, message: 'Demo mode: Payment auto-resolved' });
-        }
-
+        if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) { tx.status = 'success'; tx.mpesaRef = 'DEMO' + Date.now(); await tx.save(); return res.json({ success: true, refId, message: 'Demo mode: Payment auto-resolved' }); }
         const fp = formatPhoneMegaPay(userPhone);
-        const payload = {
-            api_key: MEGAPAY_API_KEY,
-            email: MEGAPAY_EMAIL,
-            amount: parseInt(amount),
-            msisdn: fp,
-            callback_url: `${BASE_URL}/api/megapay/webhook`,
-            description: tx.description,
-            reference: refId
-        };
-
-        const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 15000
-        });
-        const mpData = mpRes.data;
-        if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) {
-            tx.status = 'failed';
-            await tx.save();
-            return res.status(400).json({ success: false, message: mpData.errorMessage || mpData.message || 'Payment failed' });
-        }
-        res.json({ success: true, refId, message: 'STK push sent to your phone.' });
-    } catch (e) {
-        console.error('Deposit error:', e.message);
-        res.status(500).json({ success: false, message: e.message || 'Payment service error' });
-    }
+        const payload = { api_key: MEGAPAY_API_KEY, email: MEGAPAY_EMAIL, amount: parseInt(amount), msisdn: fp, callback_url: `${BASE_URL}/api/megapay/webhook`, description: tx.description, reference: refId };
+        try {
+            const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
+            const mpData = mpRes.data;
+            if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) { tx.status = 'failed'; await tx.save(); return res.status(400).json({ success: false, message: mpData.errorMessage || mpData.message || 'Payment failed' }); }
+            res.json({ success: true, refId, message: 'STK push sent to your phone.' });
+        } catch (mpErr) { tx.status = 'failed'; await tx.save(); return res.status(502).json({ success: false, message: 'Payment gateway failed' }); }
+    } catch (e) { res.status(500).json({ success: false, message: e.message || 'Payment service error' }); }
 });
 
-// Check Payment Status
 app.get('/api/mpesa/status/:refId', async (req, res) => {
-    try {
-        const tx = await Transaction.findOne({ refId: req.params.refId });
-        if (!tx) return res.status(404).json({ success: false, message: 'Transaction not found' });
-        res.json({ status: tx.status, message: tx.status === 'success' ? 'Payment confirmed' : tx.status === 'failed' ? 'Payment failed' : 'Pending confirmation' });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const tx = await Transaction.findOne({ refId: req.params.refId }); if (!tx) return res.status(404).json({ success: false, message: 'Not found' }); res.json({ status: tx.status }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// MegaPay Webhook
 app.post('/api/megapay/webhook', async (req, res) => {
     res.status(200).send('OK');
     try {
@@ -248,63 +168,33 @@ app.post('/api/megapay/webhook', async (req, res) => {
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
         const ref = data.reference || data.BillRefNumber || '';
         const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID;
-
-        if (responseCode != 0) {
-            if (ref) await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data });
-            return;
-        }
+        if (responseCode != 0) { if (ref) await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data }); return; }
         if (!receipt || !ref) return;
-
         const tx = await Transaction.findOne({ refId: ref, status: 'pending' });
         if (!tx) return;
-
-        tx.status = 'success';
-        tx.mpesaRef = receipt;
-        tx.callbackData = data;
-        await tx.save();
-
+        tx.status = 'success'; tx.mpesaRef = receipt; tx.callbackData = data; await tx.save();
         if (tx.profileId) {
             const platformFee = Math.floor(tx.amount * PLATFORM_FEE_PERCENT / 100);
             const earnings = tx.amount - platformFee;
-            tx.platformFee = platformFee;
-            tx.profileEarnings = earnings;
-            await tx.save();
+            tx.platformFee = platformFee; tx.profileEarnings = earnings; await tx.save();
             await Profile.findByIdAndUpdate(tx.profileId, { $inc: { unlocks: 1, totalEarned: earnings } });
         }
     } catch (err) { console.error('Webhook error:', err.message); }
 });
 
-// Listing Application
 app.post('/api/apply', upload.single('photo'), async (req, res) => {
     try {
         const { name, age, location, gender, phone, bio, price, hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos } = req.body;
         if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
-        
         const existing = await Profile.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
-
         const img = req.file ? `/uploads/${req.file.filename}` : '';
-        const profile = new Profile({
-            name: name.trim(),
-            age: parseInt(age) || 21,
-            location: location || 'Nairobi',
-            loc: location || 'Nairobi',
-            bio: bio || '',
-            desc: bio || '',
-            phone: phone.trim(),
-            gender: gender || 'Female',
-            price: parseInt(price) || 499,
-            image: img,
-            img: img,
-            status: 'pending',
-            hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos
-        });
+        const profile = new Profile({ name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi', bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female', price: parseInt(price) || 499, image: img, img: img, status: 'pending', hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos });
         await profile.save();
         res.json({ success: true, message: 'Application submitted. Await admin approval.', profileId: profile._id });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// Admin Auth
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -331,12 +221,9 @@ app.post('/api/admin/change-password', verifyAdmin, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// Admin Routes
 app.get('/api/admin/profiles', verifyAdmin, async (req, res) => {
-    try {
-        const profiles = await Profile.find().sort({ createdAt: -1 });
-        res.json({ success: true, profiles });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const profiles = await Profile.find().sort({ createdAt: -1 }); res.json({ success: true, profiles }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.post('/api/admin/profiles', verifyAdmin, upload.single('photo'), async (req, res) => {
@@ -345,40 +232,26 @@ app.post('/api/admin/profiles', verifyAdmin, upload.single('photo'), async (req,
         if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
         const existing = await Profile.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
-        
         const img = req.file ? `/uploads/${req.file.filename}` : '';
-        const profile = new Profile({
-            name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi',
-            bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female',
-            price: parseInt(price) || 499, image: img, img: img, status: 'verified', isVerified: true,
-            hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos
-        });
+        const profile = new Profile({ name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi', bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female', price: parseInt(price) || 499, image: img, img: img, status: 'verified', isVerified: true, hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos });
         await profile.save();
         res.json({ success: true, profile });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.get('/api/admin/approvals', verifyAdmin, async (req, res) => {
-    try {
-        const pending = await Profile.find({ status: 'pending' }).sort({ createdAt: -1 });
-        res.json({ success: true, approvals: pending });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const pending = await Profile.find({ status: 'pending' }).sort({ createdAt: -1 }); res.json({ success: true, approvals: pending }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.post('/api/admin/profiles/:id/approve', verifyAdmin, async (req, res) => {
-    try {
-        const profile = await Profile.findByIdAndUpdate(req.params.id, { status: 'verified', isVerified: true }, { new: true });
-        if (!profile) return res.status(404).json({ success: false, message: 'Not found' });
-        res.json({ success: true, profile });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const profile = await Profile.findByIdAndUpdate(req.params.id, { status: 'verified', isVerified: true }, { new: true }); if (!profile) return res.status(404).json({ success: false, message: 'Not found' }); res.json({ success: true, profile }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.post('/api/admin/profiles/:id/reject', verifyAdmin, async (req, res) => {
-    try {
-        const profile = await Profile.findByIdAndUpdate(req.params.id, { status: 'rejected' }, { new: true });
-        if (!profile) return res.status(404).json({ success: false, message: 'Not found' });
-        res.json({ success: true, profile });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const profile = await Profile.findByIdAndUpdate(req.params.id, { status: 'rejected' }, { new: true }); if (!profile) return res.status(404).json({ success: false, message: 'Not found' }); res.json({ success: true, profile }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.delete('/api/admin/profiles/:id', verifyAdmin, async (req, res) => {
@@ -387,10 +260,8 @@ app.delete('/api/admin/profiles/:id', verifyAdmin, async (req, res) => {
 });
 
 app.get('/api/admin/transactions', verifyAdmin, async (req, res) => {
-    try {
-        const txs = await Transaction.find().sort({ createdAt: -1 }).limit(200).populate('profileId', 'name phone');
-        res.json({ success: true, transactions: txs });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+    try { const txs = await Transaction.find().sort({ createdAt: -1 }).limit(200).populate('profileId', 'name phone'); res.json({ success: true, transactions: txs }); }
+    catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
@@ -406,7 +277,6 @@ app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// Error Handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
     if (err instanceof multer.MulterError) return res.status(400).json({ success: false, message: err.message });
@@ -414,17 +284,13 @@ app.use((err, req, res, next) => {
 });
 app.use((req, res) => { res.status(404).json({ success: false, message: 'Endpoint not found' }); });
 
-// Start
 async function start() {
     try {
         await mongoose.connect(MONGO_URI);
         console.log('MongoDB connected');
         const demoSetting = await Settings.findOne({ key: 'demoMode' });
         if (!demoSetting) { await Settings.create({ key: 'demoMode', value: true }); console.log('Demo mode seeded: ON'); }
-        app.listen(PORT, () => {
-            console.log(`AfroLink API running on port ${PORT}`);
-            console.log(`Platform fee: ${PLATFORM_FEE_PERCENT}%`);
-        });
+        app.listen(PORT, () => { console.log(`AfroLink API running on port ${PORT}`); });
     } catch (e) { console.error('Startup error:', e); process.exit(1); }
 }
 start();
