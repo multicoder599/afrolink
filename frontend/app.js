@@ -1,568 +1,537 @@
 const API_BASE = 'https://api.afrolink254.com';
-let userStars = 0;
-let currentProfileCeleb = null;
-let currentRatingCeleb = null;
-let globalCelebs = [];
-let currentFilter = 'all';
-let currentUser = null;
-let userToken = localStorage.getItem('afrolink_user_token');
-let balancePollTimer = null;
+const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+254702098509'];
 
-/* ===================== PARTICLES (3D) ===================== */
+/* ===================== PARTICLES ===================== */
 (function() {
     const c = document.getElementById('particleCanvas');
     if (!c) return;
-    const ctx = c.getContext('2d');
-    let w, h, particles = [];
-    const colors = ['#4F46E5','#8B5CF6','#EC4899','#F59E0B','#06B6D4'];
-    function resize() { w = c.width = innerWidth; h = c.height = innerHeight; }
-    resize(); addEventListener('resize', resize);
-    class Particle {
-        reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.size = Math.random()*3+1; this.vx = (Math.random()-.5)*0.5; this.vy = (Math.random()-.5)*0.5; this.color = colors[Math.floor(Math.random()*colors.length)]; this.alpha = Math.random()*0.4+0.1; this.phase = Math.random()*Math.PI*2; this.z = Math.random()*100; }
+    const x = c.getContext('2d');
+    let w, h, P = [], COLS = ['#9e4a52','#c5a059','#38BDF8','#EC4899','#8B5CF6'];
+    function R() { w = c.width = innerWidth; h = c.height = innerHeight; }
+    R(); addEventListener('resize', R);
+    class Q { reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.s = Math.random()*2.5+.5; this.vx = (Math.random()-.5)*.4; this.vy = (Math.random()-.5)*.4; this.c = COLS[Math.floor(Math.random()*5)]; this.o = Math.random()*.5+.2; this.p = Math.random()*Math.PI*2; }
         constructor() { this.reset(); }
-        update() { this.x += this.vx; this.y += this.vy; this.phase += 0.02; this.z += Math.sin(this.phase)*0.2; if (this.x<<0||this.x>w||this.y<<0||this.y>h) this.reset(); }
-        draw() { const a = this.alpha*(0.7+0.3*Math.sin(this.phase)); const s = this.size*(1+this.z/200); ctx.beginPath(); ctx.arc(this.x,this.y,s,0,Math.PI*2); ctx.fillStyle = this.color; ctx.globalAlpha = a; ctx.fill(); ctx.globalAlpha = 1; }
+        update() { this.x += this.vx; this.y += this.vy; this.p += .02; if (this.x<0||this.x>w||this.y<0||this.y>h) this.reset(); }
+        draw() { const o = this.o*(.7+.3*Math.sin(this.p)); x.beginPath(); x.arc(this.x,this.y,this.s,0,Math.PI*2); x.fillStyle = this.c; x.globalAlpha = o; x.fill(); x.globalAlpha = 1; }
     }
-    for (let i=0; i<<70; i++) particles.push(new Particle());
-    function loop() {
-        ctx.clearRect(0,0,w,h);
-        particles.sort((a,b)=>a.z-b.z);
-        particles.forEach(p=>{p.update();p.draw();});
-        for (let i=0;i<<particles.length;i++) for(let j=i+1;j<<particles.length;j++){
-            const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, d=Math.sqrt(dx*dx+dy*dy);
-            if(d<<180){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(139,92,246,${0.06*(1-d/180)})`;ctx.lineWidth=0.5;ctx.stroke();}
-        }
-        requestAnimationFrame(loop);
-    }
-    loop();
+    for (let i = 0; i < 60; i++) P.push(new Q());
+    function L() { x.clearRect(0,0,w,h); P.forEach(p=>{p.update();p.draw();}); for (let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.strokeStyle=`rgba(197,160,89,${.08*(1-d/150)})`;x.lineWidth=.5;x.stroke();}} requestAnimationFrame(L); }
+    L();
 })();
 
 /* ===================== TOAST ===================== */
 function showToast(m, t='info', ti='', d=4000) {
     const C = document.getElementById('toastContainer');
     const el = document.createElement('div');
-    const I = {success:'check_circle',error:'error',info:'info',warning:'warning'};
+    const I = {success:'fa-check',error:'fa-exclamation-triangle',info:'fa-info-circle',warning:'fa-exclamation-circle'};
     const T = {success:'Success',error:'Error',info:'Info',warning:'Warning'};
-    const colors = {success:'#10B981',error:'#EC4899',info:'#4F46E5',warning:'#F59E0B'};
     el.className = `toast toast--${t}`;
-    el.innerHTML = `<div class="toast-icon" style="background:${colors[t]}15;color:${colors[t]};"><i class="material-symbols-outlined">${I[t]}</i></div><div style="flex:1"><div style="font-weight:700;font-size:13px;margin-bottom:2px">${ti||T[t]}</div><div style="font-size:12px;color:var(--text-secondary);line-height:1.5">${m}</div></div><button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;" onclick="this.parentElement.remove()">&times;</button>`;
+    el.innerHTML = `<div class="toast-icon"><i class="fas ${I[t]}"></i></div><div style="flex:1"><div style="font-weight:700;font-size:14px;margin-bottom:2px">${ti||T[t]}</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.5">${m}</div></div><button class="toast-close" onclick="this.parentElement.remove()">&times;</button>`;
     C.appendChild(el);
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
 }
 
-/* ===================== WELCOME MODAL ===================== */
-function showWelcome(name) {
-    document.getElementById('welcomeName').innerText = name || 'Fan';
-    document.getElementById('welcomeModal').classList.add('active');
-}
-function closeWelcomeModal(e) {
-    if(e && e.target !== e.currentTarget) return;
-    document.getElementById('welcomeModal').classList.remove('active');
-}
+/* ===================== DATA ===================== */
+const NAMES = ["Zariah","Tamara","Ivonne","Faith","Cassie","Hannah","Elsa","Aisha","Shaani","Julie","Amira","Ashley","Jackline","Purity","Nala","Winnie","Stella","Joy","Grace","Mercy","Chelsea","Naomi","Linda","Sophie","Angela","Brenda","Diana","Esther","Fiona","Gloria","Helen","Irene","Janet","Karen","Laura","Mary","Nancy","Olivia","Patricia","Queen","Rachel","Susan","Tina","Vera","Wendy","Yvonne","Alice","Betty"];
+const LOCS = ["Kilimani, Nairobi","Thome, Nairobi","Utawala, Nairobi","Mombasa","Ruaka, Nairobi","Kisumu","Nakuru","Eldoret","Malindi","Thika","Kitengela","Nyali","Buru Buru","Ruiru","Machakos","Kikuyu","Syokimau","Rongai","Karen","Ngong","Kileleshwa","Lavington","Langata","South B","South C","Kasarani","Embakasi","Donholm","Pipeline","Umoja","Eastleigh","Westlands","Parklands","Jogoo Rd","Juja","Waiyaki Way","Mirema","Mlolongo","Athi River","Tassia"];
+const BIOS = ["I'm a fun-loving girl looking for a generous man to spoil me. Let's make unforgettable memories!","Craving a real connection with a mature guy who knows what he wants. Hit unlock and let's skip the small talk.","Sweet, sassy, and ready to be treated like a queen. Are you the one to sweep me off my feet?","Looking for a partner in crime for late-night drives and cozy weekends. Unlock my number and let's vibe!","I love the finer things in life. If you know how to treat a lady, don't keep me waiting... unlock me now.","Naughty but nice. Let's see if you can handle this energy. Drop me a text on WhatsApp!","Your girl next door with a wild side. Unlock to find out what you've been missing.","Classy, sassy, and a little bit bad-assy. Looking for someone who can match my energy.","New in town and ready to explore. Show me around and let's create some magic together.","I believe in living life to the fullest. Looking for someone who isn't afraid to spoil a good woman.","A little bit of sugar, a little bit of spice. Unlock to see which side you get tonight.","Passionate about good conversations and better company. Let's make this worth both our time."];
+const PNames = ["Rozie","Diamond","Pearl","Crystal","Ruby","Sapphire","Amber","Jade","Chloe","Valentina","Scarlett","Bella","Athena","Gia","Luna","Venus","Ivy","Nova","Aria","Mia"];
+const PLocs = ["Kilimani, Nairobi","Westlands, Nairobi","Nyali, Mombasa","Lavington, Nairobi","Kileleshwa, Nairobi","Karen, Nairobi","Spring Valley, Nairobi","Runda, Nairobi","Kitisuru, Nairobi","Muthaiga, Nairobi","Rosslyn, Nairobi","Loresho, Nairobi","Ridgeways, Nairobi","Lower Kabete, Nairobi","Kilimani, Nairobi","Westlands, Nairobi","Nyali, Mombasa","Lavington, Nairobi","Kileleshwa, Nairobi","Karen, Nairobi"];
+const PBios = ["VIP exclusive. Only for the elite gentlemen who appreciate true luxury. Your discretion is guaranteed.","Premium companion for exclusive arrangements. I offer an experience, not just a meeting.","High-end experience. Book in advance for unforgettable moments you'll never forget.","Elite tier only. Are you ready for the ultimate treat? I promise you won't regret it.","Luxury redefined. Premium rates for premium experiences. Quality over quantity always.","Top-tier companion. Exclusive access for verified members only. The best is kept private.","An experience crafted for the discerning gentleman. Unlock to enter my world.","Where sophistication meets sensuality. I cater to those who demand the very best."];
+const RI = a => a[Math.floor(Math.random() * a.length)];
 
-/* ===================== ACCOUNT MODAL ===================== */
-function openAccountModal() {
-    if (!userToken) { openAuthModal(); return; }
-    document.getElementById('accountModal').classList.add('active');
-    document.getElementById('accountStars').innerText = userStars.toLocaleString();
-    loadUserTransactions();
-}
-function closeAccountModal(e) {
-    if(e && e.target !== e.currentTarget) return;
-    document.getElementById('accountModal').classList.remove('active');
-}
+/* ===================== GENERATE PROFILES (FALLBACK) ===================== */
+let globalProfiles = [], premiumProfiles = [];
+let adminProfilesLoaded = false;
 
-async function loadUserTransactions() {
-    if (!userToken) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/me/transactions`, { headers: { 'Authorization': 'Bearer ' + userToken } });
-        if (res.ok) {
-            const data = await res.json();
-            const list = data.transactions || [];
-            const container = document.getElementById('txHistoryList');
-            if (!list.length) {
-                container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No transactions yet.</p>';
-                return;
-            }
-            container.innerHTML = list.map(t => `
-                <div class="tx-row">
-                    <div>
-                        <div class="tx-title">${t.description || t.type}</div>
-                        <div class="tx-date">${new Date(t.createdAt).toLocaleDateString()}</div>
-                    </div>
-                    <div class="tx-amt" style="color:${t.type==='purchase'?'var(--accent-gold)':'var(--accent-blue)'};">
-                        ${t.type==='purchase'?'+':'-'}${t.amount}
-                    </div>
-                </div>
-            `).join('');
-        }
-    } catch(e) {
-        document.getElementById('txHistoryList').innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">Failed to load history.</p>';
-    }
-}
-
-/* ===================== USER AUTH ===================== */
-function updateAuthUI() {
-    const btn = document.getElementById('authBtn');
-    const btnMob = document.getElementById('authBtnMobile');
-    const accBtn = document.getElementById('accountBtn');
-    const accBtnMob = document.getElementById('accountBtnMobile');
-    if (currentUser) {
-        if (btn) btn.style.display = 'none';
-        if (btnMob) btnMob.style.display = 'none';
-        if (accBtn) { accBtn.style.display = 'inline-flex'; accBtn.innerHTML = `<i class="material-symbols-outlined">person</i> ${currentUser.name || 'Account'}`; }
-        if (accBtnMob) { accBtnMob.style.display = 'inline-flex'; }
-    } else {
-        if (btn) { btn.style.display = 'inline-flex'; btn.innerText = 'Sign In'; btn.onclick = openAuthModal; }
-        if (btnMob) { btnMob.style.display = 'inline-flex'; btnMob.innerText = 'Sign In'; btnMob.onclick = openAuthModal; }
-        if (accBtn) accBtn.style.display = 'none';
-        if (accBtnMob) accBtnMob.style.display = 'none';
-    }
-}
-
-function doLogout() {
-    localStorage.removeItem('afrolink_user_token');
-    userToken = null;
-    currentUser = null;
-    userStars = 0;
-    updateStarDisplay();
-    updateAuthUI();
-    closeAccountModal();
-    showToast('You have been logged out', 'info', 'Signed Out');
-}
-
-async function loadUser() {
-    if (!userToken) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/me`, { headers: { 'Authorization': 'Bearer ' + userToken } });
-        if (res.ok) {
-            const data = await res.json();
-            currentUser = data.user;
-            userStars = currentUser.starsBalance || 0;
-            updateStarDisplay();
-            updateAuthUI();
-        } else { throw new Error('Invalid token'); }
-    } catch (e) { localStorage.removeItem('afrolink_user_token'); userToken = null; currentUser = null; }
-}
-
-function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
-function closeAuthModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('authModal').classList.remove('active'); }
-function showAuthTab(tab, btn) {
-    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('auth-login-panel').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('auth-register-panel').style.display = tab === 'register' ? 'block' : 'none';
-}
-
-async function doAuthLogin() {
-    const phone = document.getElementById('authLoginPhone').value.trim();
-    const pin = document.getElementById('authLoginPin').value.trim();
-    if (!phone || !pin) { showToast('Phone and PIN required', 'error'); return; }
-    try {
-        const res = await fetch(`${API_BASE}/api/auth/login`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, pin })
+function genProfiles() {
+    const arr = [];
+    for (let i = 1; i <= 48; i++) {
+        const idx = ((i - 1) % 12) + 1;
+        arr.push({
+            id: 'reg_' + i, name: NAMES[i - 1] || RI(NAMES),
+            age: Math.floor(Math.random() * (32 - 19 + 1)) + 19,
+            loc: LOCS[(i - 1) % LOCS.length],
+            desc: BIOS[(i - 1) % BIOS.length],
+            img: `./images/model (${idx}).jpg`,
+            isOnline: Math.random() > 0.4, isPremium: false, isVerified: true,
+            price: 499, phone: '', gender: 'Female', isReal: false,
+            hair:'Long Black', faceCard:'Pretty', skinTone:'Medium', bodyType:'Curvy',
+            breast:'34C', waist:'28"', thighs:'Thick', butt:'Bubble',
+            piercings:'Ears, Navel', tattoos:'None'
         });
-        const data = await res.json();
-        if (data.success) {
-            userToken = data.token;
-            currentUser = data.user;
-            localStorage.setItem('afrolink_user_token', userToken);
-            userStars = currentUser.starsBalance || 0;
-            updateStarDisplay();
-            updateAuthUI();
-            closeAuthModal();
-            showWelcome(currentUser.name);
-        } else { showToast(data.message || 'Login failed', 'error'); }
-    } catch (e) { showToast('Network error. Try again.', 'error'); }
-}
-
-async function doAuthRegister() {
-    const name = document.getElementById('authRegName').value.trim();
-    const phone = document.getElementById('authRegPhone').value.trim();
-    const pin = document.getElementById('authRegPin').value.trim();
-    if (!phone || !pin) { showToast('Phone and PIN required', 'error'); return; }
-    try {
-        const res = await fetch(`${API_BASE}/api/auth/register`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, phone, pin })
-        });
-        const data = await res.json();
-        if (data.success) {
-            userToken = data.token;
-            currentUser = data.user;
-            localStorage.setItem('afrolink_user_token', userToken);
-            userStars = currentUser.starsBalance || 0;
-            updateStarDisplay();
-            updateAuthUI();
-            closeAuthModal();
-            showWelcome(currentUser.name);
-        } else { showToast(data.message || 'Registration failed', 'error'); }
-    } catch (e) { showToast('Network error. Try again.', 'error'); }
-}
-
-/* ===================== STARS SYSTEM ===================== */
-function updateStarDisplay() {
-    const els = [document.getElementById('userStarBalance'), document.getElementById('userStarBalanceMobile')];
-    els.forEach(el => { if(el) el.innerText = userStars.toLocaleString(); });
-}
-
-const STAR_PACKAGES = [
-    {id:'s1',stars:50,price:99,label:'Starter',popular:false,perks:['Unlock 1-2 creators','Basic support']},
-    {id:'s2',stars:150,price:249,label:'Fan Pack',popular:true,perks:['Unlock 3-5 creators','Priority support','Bonus 10 stars']},
-    {id:'s3',stars:500,price:749,label:'Super Fan',popular:false,perks:['Unlock 10+ creators','VIP badge','Bonus 50 stars','Early access']},
-];
-
-function renderStore() {
-    const grid = document.getElementById('store-grid');
-    if(!grid) return;
-    grid.innerHTML = STAR_PACKAGES.map(p => `
-        <div class="store-card ${p.popular?'popular':''}">
-            <div class="star-icon"><i class="fas fa-star"></i></div>
-            <h4>${p.label}</h4>
-            <div class="price">KES ${p.price}<span> / ${p.stars.toLocaleString()} stars</span></div>
-            <ul>${p.perks.map(k=>`<li><i class="fas fa-check"></i> ${k}</li>`).join('')}</ul>
-            <button class="btn btn--gold" onclick="buyStars('${p.id}')" style="width:100%;"><i class="fas fa-bolt"></i> Buy Now</button>
-        </div>
-    `).join('');
-}
-
-function renderStoreModal() {
-    const grid = document.getElementById('store-modal-grid');
-    if(!grid) return;
-    grid.innerHTML = STAR_PACKAGES.map(p => `
-        <div class="store-card ${p.popular?'popular':''}" style="margin-bottom:16px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <div style="width:48px;height:48px;border-radius:14px;background:var(--accent-gold-soft);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);font-size:20px;"><i class="fas fa-star"></i></div>
-                <div><h4 style="font-size:16px;margin:0;">${p.label}</h4><div style="font-size:12px;color:var(--text-muted);">${p.stars.toLocaleString()} stars</div></div>
-                <div style="margin-left:auto;font-size:20px;font-weight:800;color:var(--text-primary);">KES ${p.price}</div>
-            </div>
-            <button class="btn btn--gold" onclick="buyStars('${p.id}');closeStoreModal();" style="width:100%;"><i class="fas fa-bolt"></i> Buy Now</button>
-        </div>
-    `).join('');
-}
-
-async function buyStars(pkgId) {
-    if (!userToken) { openAuthModal(); return; }
-    const pkg = STAR_PACKAGES.find(p=>p.id===pkgId);
-    if(!pkg) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/stars/buy`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
-            body: JSON.stringify({ packageId: pkg.id, amount: pkg.price, stars: pkg.stars + (pkg.popular?10:0) })
-        });
-        const data = await res.json();
-        if (data.success) {
-            if (data.starsBalance !== undefined) {
-                userStars = data.starsBalance;
-                updateStarDisplay();
-                showToast(`You bought ${pkg.stars.toLocaleString()} stars!`, 'success', 'Stars Added');
-            } else {
-                showToast('STK push sent. Confirm payment on your phone to receive stars.', 'success', 'Payment Pending');
-                startBalancePoll();
-            }
-        } else { showToast(data.message || 'Purchase failed', 'error'); }
-    } catch (e) { showToast('Network error. Try again.', 'error'); }
-}
-
-function startBalancePoll() {
-    let attempts = 0;
-    if (balancePollTimer) clearInterval(balancePollTimer);
-    balancePollTimer = setInterval(async () => {
-        attempts++;
-        if (attempts > 24 || !userToken) { clearInterval(balancePollTimer); return; }
-        await loadUser();
-    }, 5000);
-}
-
-function openStoreModal() { renderStoreModal(); document.getElementById('storeModal').classList.add('active'); }
-function closeStoreModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('storeModal').classList.remove('active'); }
-
-/* ===================== CATEGORIES ===================== */
-const CATEGORIES = [
-    {id:'all', name:'All', icon:'apps'},
-    {id:'music', name:'Music & DJ', icon:'music_note'},
-    {id:'comedy', name:'Comedy', icon:'sentiment_very_satisfied'},
-    {id:'fashion', name:'Fashion', icon:'checkroom'},
-    {id:'fitness', name:'Fitness', icon:'fitness_center'},
-    {id:'tech', name:'Tech', icon:'code'},
-    {id:'food', name:'Food', icon:'restaurant'},
-    {id:'podcast', name:'Podcast', icon:'mic'},
-    {id:'film', name:'Film', icon:'movie'},
-    {id:'dance', name:'Dance', icon:'emoji_people'},
-    {id:'art', name:'Art', icon:'palette'},
-    {id:'influencer', name:'Influencer', icon:'trending_up'},
-];
-
-/* ===================== LOAD ADMIN CELEBS ===================== */
-async function loadAdminCelebs() {
-    try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-        const res = await fetch(`${API_BASE}/api/celebs?limit=200`, { signal: controller.signal });
-        clearTimeout(timeout);
-        if (!res.ok) throw new Error('Server error ' + res.status);
-        const data = await res.json();
-        let list = [];
-        if (Array.isArray(data)) list = data;
-        else if (Array.isArray(data.celebs)) list = data.celebs;
-        else if (Array.isArray(data.data)) list = data.data;
-        if (list.length > 0) {
-            const mapped = list.map((c, i) => ({
-                id: String(c._id || c.id || ('admin_' + i)),
-                name: c.name || 'Unknown',
-                handle: c.handle || c.social || '@creator',
-                age: c.age || 25,
-                city: c.city || c.location || 'Nairobi',
-                category: c.category || 'influencer',
-                categoryName: c.categoryName || 'Influencer',
-                bio: c.bio || c.description || 'No bio.',
-                img: resolveImageUrl(c.image || c.img || c.photo),
-                headerImg: resolveImageUrl(c.headerImg || c.backgroundImg || c.image || c.img || c.photo),
-                isVerified: c.isVerified !== false,
-                isOnline: c.isOnline || false,
-                starCost: c.starCost || c.price || 50,
-                phone: c.phone || c.whatsapp || '',
-                unlocks: c.unlocks || 0,
-                social: c.social || c.handle || '',
-                tiktokUsername: c.tiktokUsername || '',
-                tiktokFollowers: c.tiktokFollowers || 0,
-                verificationBadge: c.verificationBadge || false,
-                isReal: true,
-                hobbies: c.hobbies || [],
-                openTo: c.openTo || [],
-                rating: c.rating || 4.0,
-                ratingCount: c.ratingCount || 0,
-                creatorStars: c.creatorStars || 0
-            }));
-            globalCelebs = mapped;
-        } else { throw new Error('Empty admin database'); }
-    } catch (err) {
-        console.warn('Admin fetch failed:', err.message);
-        globalCelebs = [];
     }
+    return arr;
 }
 
+function genPremium() {
+    const arr = [];
+    for (let i = 1; i <= 20; i++) {
+        const idx = ((i - 1) % 12) + 1;
+        arr.push({
+            id: 'prem_' + i, name: PNames[i - 1] || ('VIP ' + i),
+            age: Math.floor(Math.random() * (28 - 20 + 1)) + 20,
+            loc: PLocs[i - 1],
+            desc: PBios[(i - 1) % PBios.length],
+            img: `./premium/premium (${idx}).jpg`,
+            isOnline: true, isPremium: true, isVerified: true,
+            price: 2999, phone: '', gender: 'Female', isReal: false,
+            hair:'Blonde Braids', faceCard:'Model', skinTone:'Light', bodyType:'Slim Thick',
+            breast:'32D', waist:'24"', thighs:'Toned', butt:'Peachy',
+            piercings:'Nose, Navel', tattoos:'Back piece'
+        });
+    }
+    return arr;
+}
+
+/* ===================== IMAGE URL RESOLVER ===================== */
 function resolveImageUrl(url) {
-    if (!url) return `${API_BASE}/images/model (1).jpg`;
+    if (!url) return 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400';
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/images/')) return API_BASE + url;
     if (url.startsWith('/uploads/')) return API_BASE + url;
     if (url.startsWith('/')) return API_BASE + url;
     return url;
 }
 
-/* ===================== RENDER CARD ===================== */
-function celebCard(c, idx) {
-    const onerr = `this.onerror=null;this.src='${API_BASE}/images/model (1).jpg';`;
-    const onlineBadge = c.isOnline ? `<div class="online-badge"><div style="width:5px;height:5px;background:var(--accent-lime);border-radius:50%;"></div>Online</div>` : '';
-    const tiktokHtml = c.tiktokUsername ? `<div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--accent-violet);font-family:var(--font-mono);margin-top:4px;"><i class="fab fa-tiktok"></i> ${c.tiktokUsername} &bull; ${(c.tiktokFollowers||0).toLocaleString()}</div>` : '';
+/* ===================== LOAD ADMIN PROFILES ===================== */
+async function loadAdminProfiles() {
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        const res = await fetch(`${API_BASE}/api/profiles?limit=100`, { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (!res.ok) throw new Error('Server error ' + res.status);
+        const data = await res.json();
+
+        let list = [];
+        if (Array.isArray(data)) list = data;
+        else if (Array.isArray(data.profiles)) list = data.profiles;
+        else if (Array.isArray(data.data)) list = data.data;
+
+        if (list.length > 0) {
+            const mapped = list.map((p, i) => ({
+                id: p._id || p.id || ('admin_' + i),
+                name: p.name || 'Unknown',
+                age: p.age || 21,
+                loc: p.location || p.loc || 'Nairobi',
+                desc: p.bio || p.desc || 'No description.',
+                img: resolveImageUrl(p.image || p.img),
+                isOnline: p.isOnline || false,
+                isPremium: p.isPremium || false,
+                isVerified: p.isVerified !== false,
+                price: typeof p.price === 'number' ? p.price : 499,
+                phone: p.phone || '',
+                gender: p.gender || 'Female',
+                isReal: true,
+                hair: p.hair || '', faceCard: p.faceCard || '', skinTone: p.skinTone || '',
+                bodyType: p.bodyType || '', breast: p.breast || '', waist: p.waist || '',
+                thighs: p.thighs || '', butt: p.butt || '', piercings: p.piercings || '', tattoos: p.tattoos || ''
+            }));
+
+            const adminRegular = mapped.filter(p => !p.isPremium);
+            const adminPremium = mapped.filter(p => p.isPremium);
+            globalProfiles = [...adminRegular, ...genProfiles()];
+            premiumProfiles = [...adminPremium, ...genPremium()];
+            adminProfilesLoaded = true;
+        } else {
+            throw new Error('Empty admin database');
+        }
+    } catch (err) {
+        console.warn('Admin fetch failed, using demo data:', err.message);
+        globalProfiles = genProfiles();
+        premiumProfiles = genPremium();
+    }
+}
+
+/* ===================== FAVORITES ===================== */
+function getFavs() { try { return JSON.parse(localStorage.getItem('afrolink_favs') || '[]'); } catch { return []; } }
+function saveFavs(f) { localStorage.setItem('afrolink_favs', JSON.stringify(f)); }
+
+function toggleFav(id, e) {
+    if (e) e.stopPropagation();
+    const favs = getFavs();
+    const idx = favs.indexOf(id);
+    if (idx > -1) { favs.splice(idx, 1); showToast('Removed from favorites', 'info', 'Favorites'); }
+    else { favs.push(id); showToast('Added to favorites!', 'success', 'Favorites'); }
+    saveFavs(favs);
+    document.querySelectorAll('.fav-btn-card').forEach(btn => {
+        const pid = btn.dataset.pid;
+        const isF = getFavs().includes(pid);
+        btn.classList.toggle('active', isF);
+        btn.innerHTML = `<i class="${isF ? 'fas' : 'far'} fa-heart"></i>`;
+    });
+    return idx === -1;
+}
+
+function toggleFavoriteFromDetail() {
+    if (!currentDetailProfile) return;
+    const isFav = toggleFav(currentDetailProfile.id);
+    const btn = document.getElementById('detailFavBtn');
+    if (btn) { btn.classList.toggle('active', isFav); btn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--accent-gold)"></i>' : '<i class="far fa-heart"></i>'; }
+}
+
+/* ===================== SHARE ===================== */
+function shareProfile(id, isPrem) {
+    const list = isPrem ? premiumProfiles : globalProfiles;
+    const p = list.find(x => x.id === id);
+    if (!p) return;
+    const text = `Check out ${p.name} on AfroLink!`;
+    if (navigator.share) navigator.share({ title: 'AfroLink', text, url: location.href }).catch(()=>{});
+    else navigator.clipboard.writeText(`${text} ${location.href}`).then(()=>showToast('Link copied!', 'success', 'Shared'));
+}
+function shareCurrentProfile() { if (!currentDetailProfile) return; shareProfile(currentDetailProfile.id, currentDetailProfile.isPremium); }
+
+/* ===================== SQUARE CARD HTML ===================== */
+function squareCard(p, idx, isPrem) {
+    const favs = getFavs();
+    const isFav = favs.includes(p.id);
+    const onerr = `this.onerror=null;this.src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400';`;
+    const openFn = `openProfileDetail('${p.id}',${isPrem})`;
+    const onlineDot = p.isOnline ? `<div class="online-badge"><div class="dot"></div>Online</div>` : '';
+    const hotBadge = `<div class="hot-badge"><i class="fas fa-fire"></i> Hot</div>`;
+    const priceStr = p.price === 0 ? 'Free' : `KES ${p.price.toLocaleString()}`;
+
     return `
-    <div class="celeb-card" data-id="${c.id}" onclick="openProfilePage('${c.id}')">
-        <div class="card-img-wrap">
-            <img src="${c.img}" onerror="${onerr}" alt="${c.name}" loading="lazy">
-            <div class="card-img-overlay"></div>
-            <div class="card-top-badges">
-                <div class="verified-badge"><i class="material-symbols-outlined" style="font-size:14px;">verified</i> Verified</div>
-                ${onlineBadge}
-            </div>
-            <div style="position:absolute;bottom:16px;left:16px;right:16px;z-index:2;">
-                <div class="card-name">${c.name}</div>
-                <div class="card-handle">${c.handle}</div>
-                ${tiktokHtml}
-                <div class="card-meta">
-                    <div class="card-stars"><i class="fas fa-star"></i> ${c.starCost} stars</div>
-                </div>
+    <div class="profile-card" data-id="${p.id}" data-prem="${isPrem}" onclick="${openFn}">
+        <img src="${p.img}" onerror="${onerr}" alt="${p.name}" loading="lazy">
+        <div class="card-top">
+            ${hotBadge}
+            <div style="display:flex;gap:6px;">
+                ${onlineDot}
+                <button class="fav-btn-card ${isFav?'active':''}" data-pid="${p.id}" onclick="event.stopPropagation();toggleFav('${p.id}',event)"><i class="${isFav?'fas':'far'} fa-heart"></i></button>
             </div>
         </div>
-        <div class="card-body">
-            <div class="card-tags">
-                <span class="card-tag">${c.categoryName}</span>
-                <span class="card-tag">${c.city}</span>
+        <div class="card-overlay">
+            <div class="card-name">${p.name}, ${p.age} <i class="fas ${p.isPremium?'fa-gem':'fa-check-circle'}"></i></div>
+            <div class="card-loc"><i class="fas fa-map-marker-alt"></i> ${p.loc}</div>
+            <div class="card-bottom">
+                <div class="card-phone"><i class="fas fa-phone"></i> Hidden</div>
+                <div class="card-lock"><i class="fas fa-lock"></i></div>
             </div>
-            <button class="btn btn--primary view-btn" onclick="event.stopPropagation();openProfilePage('${c.id}')"><i class="material-symbols-outlined" style="font-size:16px;">visibility</i> View Profile</button>
+            <div class="card-unlock-btn">
+                <button class="btn btn--pink" onclick="event.stopPropagation();openMpesaModalDirect('${p.name}',${p.price},'${p.id}',${isPrem})"><i class="fas fa-unlock"></i> UNLOCK — ${priceStr}</button>
+            </div>
         </div>
     </div>`;
 }
 
-function renderCelebs(list, containerId) {
-    const grid = document.getElementById(containerId);
-    if (!list.length) { grid.innerHTML=`<div class="empty-state-box"><i class="material-symbols-outlined">search_off</i><h2>No Creators Found</h2><p>Try a different filter or check back later.</p></div>`; return; }
-    grid.innerHTML = list.map((c, i) => celebCard(c, i)).join('');
+/* ===================== RENDER FUNCTIONS ===================== */
+function renderProfiles(list) {
+    const grid = document.getElementById('dynamic-profile-grid');
+    if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Profiles Found</h2><p>No profiles match your filters.</p></div>`; return; }
+    grid.innerHTML = list.map((p, i) => squareCard(p, i, false)).join('');
 }
 
-function renderCategoryPills(containerId, onClick) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = CATEGORIES.map(cat => `
-        <button class="cat-pill ${cat.id === 'all' ? 'active' : ''}" data-cat="${cat.id}" onclick="${onClick}('${cat.id}',this)">
-            <i class="material-symbols-outlined">${cat.icon}</i> ${cat.name}
-        </button>
-    `).join('');
+function renderPremium(list) {
+    const grid = document.getElementById('dynamic-premium-grid');
+    if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Premium Profiles</h2><p>Check back soon for new VIP members.</p></div>`; return; }
+    grid.innerHTML = list.map((p, i) => squareCard(p, i, true)).join('');
 }
 
-function filterCelebs(catId, btn) {
-    document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    currentFilter = catId;
-    const filtered = catId === 'all' ? globalCelebs : globalCelebs.filter(c => c.category === catId);
-    renderCelebs(filtered.slice(0, 60), 'all-celebs-grid');
+function renderDiscoverFeatured() {
+    const row = document.getElementById('discover-featured-row');
+    row.innerHTML = globalProfiles.slice(0, 6).map((p, i) => squareCard(p, i, false)).join('');
 }
 
-/* ===================== FULL PAGE PROFILE ===================== */
-async function openProfilePage(id) {
-    const c = globalCelebs.find(x => String(x.id) === String(id));
-    if (!c) { showToast('Creator not found', 'error'); return; }
-    currentProfileCeleb = c;
+function renderDiscoverPremium() {
+    const row = document.getElementById('discover-premium-row');
+    row.innerHTML = premiumProfiles.slice(0, 6).map((p, i) => squareCard(p, i, true)).join('');
+}
+
+/* ===================== FILTERS ===================== */
+function setFilter(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (type === 'Men') {
+        const f = globalProfiles.filter(p => p.gender === 'Male');
+        if (!f.length) { document.getElementById('dynamic-profile-grid').innerHTML = `<div class="empty-state-box"><i class="fas fa-male"></i><h2>Nothing Here Yet</h2><p>The men's section is empty. Check back later!</p></div>`; return; }
+        renderProfiles(f);
+    } else if (type === 'Women') { renderProfiles(globalProfiles.filter(p => p.gender === 'Female')); }
+    else { renderProfiles(globalProfiles); }
+}
+function filterByLocation(val) {
+    if (!val || val === 'All Kenya') { renderProfiles(globalProfiles); return; }
+    const town = val.split('(')[0].trim().toLowerCase();
+    renderProfiles(globalProfiles.filter(p => p.loc.toLowerCase().includes(town)));
+}
+
+/* ===================== VIDEOS ===================== */
+function initVideos() {
+    const grid = document.getElementById('dynamic-video-grid');
+    let h = '';
+    for (let i = 1; i <= 6; i++) {
+        h += `<div class="video-card reveal"><video src="./videos/videos (${i}).mp4#t=0.1" class="blurred-video" autoplay loop muted playsinline></video><div class="video-overlay"><i class="fas fa-lock"></i><a href="https://t.me/AfroLinkVIP" target="_blank" class="btn btn--pink" style="width:80%;padding:14px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.5px;"><i class="fab fa-telegram"></i> Watch Full @AfroLinkVIP</a></div></div>`;
+    }
+    grid.innerHTML = h;
+    observeReveals();
+}
+
+/* ===================== PLANS ===================== */
+const PLANS = [
+    { title: "Basic Unlock", price: 499, icon: "fa-unlock", iconColor: "var(--accent-blue)", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--red", btnText: "Get Basic" },
+    { title: "Starter Pack", price: 499, icon: "fa-rocket", iconColor: "var(--accent-purple)", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--red", btnText: "Start Pack" },
+    { title: "Live Chat", price: 599, icon: "fa-comments", iconColor: "var(--accent-red)", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--red", btnText: "Get Chat" },
+    { title: "Weekend Special", price: 799, icon: "fa-moon", iconColor: "var(--accent-pink)", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--red", btnText: "Get Weekend" },
+    { title: "Video Chat", price: 999, icon: "fa-video", iconColor: "var(--accent-red)", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--red", btnText: "Get Video" },
+    { title: "VIP Monthly", price: 1499, icon: "fa-crown", iconColor: "var(--accent-gold)", desc: "30-day full access", features: ["Unlimited contact unlocks","Free video chats included","VIP badge on your profile","Priority customer support"], badge: "Popular", popular: true, btn: "btn--gold", btnText: "Go VIP" },
+    { title: "Creator Listing", price: 1499, icon: "fa-user-plus", iconColor: "var(--accent-green)", desc: "List your profile", features: ["Verified profile badge","Appear in search results","Receive direct inquiries","Lifetime listing"], badge: null, popular: false, btn: "btn--green", btnText: "Become Member" },
+    { title: "Platinum Pass", price: 2999, icon: "fa-gem", iconColor: "var(--accent-gold)", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--gold", btnText: "Go Platinum" },
+    { title: "All Access", price: 4999, icon: "fa-infinity", iconColor: "var(--accent-gold)", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--gold", btnText: "Go All In" }
+];
+
+function renderPlans() {
+    const grid = document.getElementById('plans-grid');
+    grid.innerHTML = PLANS.map(plan => {
+        const badge = plan.badge ? `<div class="plan-badge">${plan.badge}</div>` : '';
+        const popClass = plan.popular ? 'popular' : '';
+        const features = plan.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('');
+        const btnGlow = plan.popular ? 'btn-glow-gold' : 'btn-glow';
+        return `<div class="plan-card ${popClass} reveal">${badge}<div class="plan-icon" style="background:${plan.popular ? 'var(--accent-gold-soft)' : 'var(--accent-red-soft)'}"><i class="fas ${plan.icon}" style="color:${plan.iconColor};"></i></div><h3 class="plan-title">${plan.title}</h3><p class="plan-desc">${plan.desc}</p><div class="plan-price">${plan.price.toLocaleString()}<span>KES</span></div><ul class="plan-features">${features}</ul><button class="btn ${plan.btn} ${btnGlow}" onclick="openMpesaModalDirect('${plan.title}',${plan.price})">${plan.btnText}</button></div>`;
+    }).join('');
+    observeReveals();
+}
+
+/* ===================== PROFILE DETAIL MODAL ===================== */
+let currentDetailProfile = null;
+const profileDetailModal = document.getElementById('profileDetailModal');
+
+function openProfileDetail(id, isPrem) {
+    const list = isPrem ? premiumProfiles : globalProfiles;
+    const p = list.find(x => x.id === id);
+    if (!p) return;
+    showDetailModal(p);
+}
+
+function showDetailModal(p) {
+    currentDetailProfile = p;
+    const img = document.getElementById('detail-img');
+    img.src = p.img;
+    img.onerror = function() { this.src = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400'; };
+    const checkColor = p.isPremium ? 'var(--accent-gold)' : '#38BDF8';
+    document.getElementById('detail-name').innerHTML = `${p.name}, ${p.age} <i class="fas fa-check-circle" style="color:${checkColor};font-size:18px;"></i>`;
+    document.getElementById('detail-loc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${p.loc}`;
+    document.getElementById('detail-desc').innerText = p.desc || 'No description available.';
+
+    const attrsContainer = document.getElementById('detail-attrs-container');
+    const attrsGrid = document.getElementById('detail-attrs');
+    const attrs = [
+        {label:'Hair', val:p.hair}, {label:'Face Card', val:p.faceCard}, {label:'Skin Tone', val:p.skinTone},
+        {label:'Body Type', val:p.bodyType}, {label:'Breast', val:p.breast}, {label:'Waist', val:p.waist},
+        {label:'Thighs', val:p.thighs}, {label:'Butt', val:p.butt}, {label:'Piercings', val:p.piercings}, {label:'Tattoos', val:p.tattoos}
+    ].filter(a => a.val && a.val.trim() !== '');
+
+    if (attrs.length > 0) {
+        attrsContainer.style.display = 'block';
+        attrsGrid.innerHTML = attrs.map(a => `<div class="attr-item"><div class="attr-label">${a.label}</div><div class="attr-value">${a.val}</div></div>`).join('');
+    } else {
+        attrsContainer.style.display = 'none';
+    }
+
+    const favs = getFavs();
+    const isFav = favs.includes(p.id);
+    const favBtn = document.getElementById('detailFavBtn');
+    favBtn.classList.toggle('active', isFav);
+    favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--accent-gold)"></i>' : '<i class="far fa-heart"></i>';
+    document.getElementById('detail-price').innerText = (p.price || 499).toLocaleString();
+    profileDetailModal.classList.add('active');
+}
+
+function closeProfileDetailModal() { profileDetailModal.classList.remove('active'); }
+
+function openMpesaFromDetail() {
+    if (!currentDetailProfile) return;
+    closeProfileDetailModal();
+    setTimeout(() => openMpesaModalDirect(currentDetailProfile.name, currentDetailProfile.price, currentDetailProfile.id, currentDetailProfile.isPremium), 300);
+}
+
+/* ===================== MPESA MODAL ===================== */
+const mpesaModal = document.getElementById('mpesaModal');
+let currentActiveName = '', currentActivePrice = 499, currentActiveId = '', currentActiveIsPremium = false, paymentInterval = null;
+
+function openMpesaModalDirect(name, price, id = '', isPremium = false) {
+    currentActiveName = name; currentActivePrice = price; currentActiveId = id; currentActiveIsPremium = isPremium;
+    document.getElementById('modal-model-name').innerText = name;
+    document.getElementById('modal-price').innerText = price.toLocaleString();
+    document.querySelectorAll('.step-dot').forEach((d, i) => { d.className = 'step-dot' + (i === 0 ? ' active' : ''); });
+    const btn = document.getElementById('mpesaSubmitBtn');
+    btn.disabled = false; btn.className = 'btn btn--pink btn-glow';
+    document.getElementById('btnText').innerHTML = 'Send M-Pesa Prompt';
+    mpesaModal.classList.add('active');
+}
+
+function closeMpesaModal() {
+    mpesaModal.classList.remove('active');
+    document.getElementById('mpesaNumber').value = '';
+    if (paymentInterval) { clearInterval(paymentInterval); paymentInterval = null; }
+}
+
+/* ===================== PAYMENT PROCESSING ===================== */
+async function processPayment() {
+    const phone = document.getElementById('mpesaNumber').value.trim().replace(/\s/g, '');
+    if (!phone || phone.length < 9) { showToast('Please enter a valid Safaricom phone number.', 'error', 'Invalid Number'); return; }
+
+    const prefixes = ['0701','0702','0703','0704','0705','0706','0707','0708','0709','0710','0711','0712','0713','0714','0715','0716','0717','0718','0719','0720','0721','0722','0723','0724','0725','0726','0727','0728','0729','0740','0741','0742','0743','0745','0746','0748','0751','0752','0753','0754','0755','0756','0757','0758','0759','0768','0769','0790','0791','0792','0793','0794','0795','0796','0797','0798','0799','0110','0111','0112','0113','0114','0115'];
+    const valid = prefixes.some(p => phone.startsWith(p) || phone.startsWith('+' + p) || phone.startsWith('254' + p.substring(1)));
+    if (!valid && phone.length < 12) { showToast('Enter a valid Safaricom number starting with 07xx or 01xx.', 'warning', 'Check Number'); return; }
+
+    const btn = document.getElementById('mpesaSubmitBtn');
+    const btnText = document.getElementById('btnText');
+    btn.disabled = true; btn.classList.remove('btn-glow');
+    btnText.innerHTML = '<span class="spinner"></span> Initiating STK Push...';
+    updateSteps(1);
 
     try {
-        const headers = userToken ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken } : { 'Content-Type': 'application/json' };
-        fetch(`${API_BASE}/api/profile-views`, { method: 'POST', headers, body: JSON.stringify({ creatorId: c.id }) }).catch(()=>{});
-    } catch(e) {}
+        const res = await fetch(`${API_BASE}/api/deposit`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink` })
+        });
+        if (!res.ok) { const t = await res.text(); let m = 'Payment gateway error.'; try { m = JSON.parse(t).message || m; } catch {} if (res.status === 404) m = `API endpoint not found.`; throw new Error(m); }
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Failed to initiate payment');
 
-    const coverImg = document.getElementById('prof-cover');
-    coverImg.src = c.headerImg || c.img;
-    coverImg.onerror = function() { this.src = c.img; };
+        updateSteps(2);
+        btnText.innerHTML = '<span class="spinner"></span> Awaiting your confirmation...';
+        showToast('M-Pesa prompt sent! Please check your phone and enter your PIN.', 'info', 'STK Push Sent', 6000);
 
-    const avatarImg = document.getElementById('prof-avatar');
-    avatarImg.src = c.img;
-    avatarImg.onerror = function() { this.src = `${API_BASE}/images/model (1).jpg`; };
+        let attempts = 0;
+        paymentInterval = setInterval(async () => {
+            attempts++;
+            if (attempts >= 30) {
+                clearInterval(paymentInterval); paymentInterval = null;
+                btn.disabled = false; btn.classList.add('btn-glow');
+                btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
+                showToast('Payment timed out. Try again if you completed it.', 'warning', 'Timeout', 6000); return;
+            }
+            try {
+                const s = await fetch(`${API_BASE}/api/mpesa/status/${data.refId}`);
+                if (!s.ok) { if (s.status === 404) return; throw new Error('Status check failed'); }
+                const sd = await s.json();
+                if (sd.status === 'success') {
+                    clearInterval(paymentInterval); paymentInterval = null;
+                    updateSteps(3); btnText.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
+                    btn.className = 'btn btn--green';
+                    showToast(`KES ${currentActivePrice.toLocaleString()} paid! ${currentActiveName} unlocked.`, 'success', 'Confirmed', 5000);
+                    launchConfetti();
+                    closeMpesaModal();
+                    setTimeout(() => showContactReveal(), 400);
+                } else if (sd.status === 'failed') {
+                    clearInterval(paymentInterval); paymentInterval = null;
+                    btn.disabled = false; btn.classList.add('btn-glow');
+                    btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
+                    showToast(sd.message || 'Payment failed. Please try again.', 'error', 'Failed');
+                }
+            } catch (e) { console.error('Status check error:', e); }
+        }, 2000);
+    } catch (err) {
+        btn.disabled = false; btn.classList.add('btn-glow');
+        btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
+        showToast(err.message || 'Unable to connect to payment server.', 'error', 'Payment Error');
+    }
+}
 
-    document.getElementById('prof-name').innerText = c.name;
-    document.getElementById('prof-handle').innerText = c.handle;
-    document.getElementById('prof-bio').innerText = c.bio || 'No bio available.';
-    document.getElementById('prof-unlocks').innerText = (c.unlocks||0).toLocaleString();
-    document.getElementById('prof-stars').innerText = c.starCost;
-    document.getElementById('prof-city').innerText = c.city.substring(0,3).toUpperCase();
-    document.getElementById('prof-unlock-cost').innerText = c.starCost;
-    document.getElementById('prof-lock-cost').innerText = c.starCost;
+function updateSteps(idx) {
+    document.querySelectorAll('.step-dot').forEach((d, i) => {
+        d.className = 'step-dot';
+        if (i < idx) d.classList.add('active');
+        else if (i === idx && idx > 0) d.classList.add('processing');
+    });
+}
 
-    const fullStars = Math.floor(c.rating);
-    const halfStar = c.rating % 1 >= 0.5;
-    let starsHtml = '';
-    for(let i=0;i<<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
-    if(halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-    for(let i=0;i<(5-fullStars-(halfStar?1:0));i++) starsHtml += '<i class="far fa-star"></i>';
-    document.getElementById('prof-rating-row').innerHTML = starsHtml + `<span>${c.rating} (${c.ratingCount} reviews)</span>`;
+/* ===================== CONTACT REVEAL ===================== */
+function showContactReveal() {
+    const modal = document.getElementById('contactRevealModal');
+    const content = document.getElementById('contactRevealContent');
+    if (!modal || !content) return;
 
-    document.getElementById('prof-category-tags').innerHTML = `<span class="profile-tag-pill blue">${c.categoryName}</span>`;
-    document.getElementById('prof-hobby-tags').innerHTML = (c.hobbies||[]).map(h=>`<span class="profile-tag-pill">${h}</span>`).join('');
-    document.getElementById('prof-opento-tags').innerHTML = (c.openTo||[]).map(o=>`<span class="profile-tag-pill gold">${o}</span>`).join('');
+    modal.classList.add('active');
 
-    const contactBox = document.getElementById('prof-contact-box');
-    contactBox.innerHTML = `
-        <div style="background:var(--bg-elevated);border:1.5px solid var(--border-subtle);border-radius:var(--radius-md);padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">
-            <i class="material-symbols-outlined" style="font-size:24px;display:block;margin-bottom:6px;">lock</i>
-            Unlock this creator's contact with <strong>${c.starCost}</strong> stars
-        </div>
+    content.innerHTML = `
+        <div class="spinner-lg" style="width:50px;height:50px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--accent-green);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div>
+        <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Successful!</h3>
+        <p style="color:var(--text-secondary);font-size:14px;">Revealing details shortly...</p>
     `;
 
-    const socialDiv = document.getElementById('prof-social');
-    socialDiv.innerHTML = c.social ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg-elevated);border-radius:var(--radius-md);border:1.5px solid var(--border-subtle);"><i class="material-symbols-outlined" style="color:var(--accent-magenta);">alternate_email</i><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-secondary);">${c.social}</span></div>` : '';
+    setTimeout(() => {
+        let displayPhone = '';
+        let isPremiumFlow = currentActiveIsPremium;
 
-    const page = document.getElementById('profilePage');
-    page.classList.add('active');
-    page.scrollTop = 0;
-}
-
-function closeProfilePage() {
-    document.getElementById('profilePage').classList.remove('active');
-    currentProfileCeleb = null;
-}
-
-function shareProfile() {
-    if (navigator.share) {
-        navigator.share({ title: currentProfileCeleb?.name || 'AfroLink Creator', url: location.href });
-    } else {
-        showToast('Link copied to clipboard', 'success');
-    }
-}
-
-/* ===================== UNLOCK WITH STARS ===================== */
-async function unlockWithStars() {
-    if (!userToken) { openAuthModal(); return; }
-    if (!currentProfileCeleb) return;
-    const cost = currentProfileCeleb.starCost;
-    if (userStars < cost) {
-        showToast(`You need ${cost} stars. Visit the Stars Store.`, 'warning', 'Insufficient Stars');
-        setTimeout(() => openStoreModal(), 1500);
-        return;
-    }
-    try {
-        const res = await fetch(`${API_BASE}/api/stars/unlock`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
-            body: JSON.stringify({ creatorId: currentProfileCeleb.id })
-        });
-        const data = await res.json();
-        if (data.success) {
-            userStars = data.starsBalance;
-            updateStarDisplay();
-            showToast(`${cost} stars transferred. Contact unlocked!`, 'success', 'Unlocked');
-            const waLink = `https://wa.me/${data.phone.replace(/\D/g,'')}`;
-            document.getElementById('prof-contact-box').innerHTML = `
-                <div style="background:linear-gradient(135deg,var(--accent-lime-soft),rgba(16,185,129,.05));border:1.5px solid rgba(16,185,129,.2);border-radius:var(--radius-md);padding:16px;text-align:center;">
-                    <div style="font-size:20px;font-weight:700;color:var(--accent-lime);font-family:var(--font-mono);margin-bottom:8px;">${data.phone}</div>
-                    <a href="${waLink}" target="_blank" class="btn btn--primary" style="width:auto;text-decoration:none;"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
-                </div>
-            `;
-            setTimeout(() => openRatingModal(currentProfileCeleb), 2000);
-        } else { showToast(data.message || 'Unlock failed', 'error'); }
-    } catch (e) { showToast('Network error. Try again.', 'error'); }
-}
-
-/* ===================== RATING SYSTEM ===================== */
-function openRatingModal(celeb) {
-    currentRatingCeleb = celeb;
-    document.getElementById('rate-target-name').innerText = celeb.name;
-    document.querySelectorAll('#rate-stars i').forEach(s => s.classList.remove('active'));
-    document.getElementById('ratingModal').classList.add('active');
-}
-
-function closeRatingModal(e) {
-    if(e && e.target !== e.currentTarget) return;
-    document.getElementById('ratingModal').classList.remove('active');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const stars = document.querySelectorAll('#rate-stars i');
-    stars.forEach((star, idx) => {
-        star.addEventListener('mouseenter', () => {
-            stars.forEach((s, i) => s.classList.toggle('active', i <= idx));
-        });
-        star.addEventListener('click', () => {
-            stars.forEach((s, i) => s.classList.toggle('active', i <= idx));
-            star.dataset.selected = idx + 1;
-        });
-    });
-});
-
-async function submitRating() {
-    if (!userToken) { showToast('Please sign in to rate', 'warning'); return; }
-    const selected = document.querySelector('#rate-stars i[data-selected]');
-    const rating = selected ? parseInt(selected.dataset.selected) : 0;
-    if (!rating) { showToast('Please select a star rating', 'warning'); return; }
-    try {
-        const res = await fetch(`${API_BASE}/api/ratings`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + userToken },
-            body: JSON.stringify({ creatorId: currentRatingCeleb?.id, rating })
-        });
-        const data = await res.json();
-        if (data.success) {
-            closeRatingModal();
-            showToast(`You rated ${currentRatingCeleb?.name} ${rating} stars!`, 'success', 'Rated');
-            if (currentProfileCeleb && currentRatingCeleb.id === currentProfileCeleb.id) {
-                currentProfileCeleb.rating = data.rating;
-                currentProfileCeleb.ratingCount = data.ratingCount;
-                const fullStars = Math.floor(data.rating);
-                const halfStar = data.rating % 1 >= 0.5;
-                let starsHtml = '';
-                for(let i=0;i<<fullStars;i++) starsHtml += '<i class="fas fa-star"></i>';
-                if(halfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-                for(let i=0;i<(5-fullStars-(halfStar?1:0));i++) starsHtml += '<i class="far fa-star"></i>';
-                document.getElementById('prof-rating-row').innerHTML = starsHtml + `<span>${data.rating} (${data.ratingCount} reviews)</span>`;
+        if (isPremiumFlow) {
+            displayPhone = PREMIUM_NUMBERS[Math.floor(Math.random() * PREMIUM_NUMBERS.length)];
+        } else {
+            const list = globalProfiles;
+            const p = list.find(x => x.id === currentActiveId);
+            if (p && p.phone && p.phone.trim() !== '') {
+                displayPhone = p.phone;
             }
-        } else { showToast(data.message || 'Failed', 'error'); }
-    } catch (e) { showToast('Network error', 'error'); }
+        }
+
+        if (displayPhone) {
+            const waLink = `https://wa.me/${displayPhone.replace(/\D/g,'')}`;
+            content.innerHTML = `
+                <div style="width:70px;height:70px;border-radius:50%;background:var(--accent-green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(16,185,129,.3);">
+                    <i class="fas fa-phone-alt" style="font-size:28px;color:var(--accent-green);"></i>
+                </div>
+                <h3 style="font-size:20px;margin-bottom:4px;color:var(--text-primary);font-family:var(--font-serif);">Contact Unlocked!</h3>
+                <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Reach out via WhatsApp</p>
+                <div style="font-size:26px;font-weight:800;color:var(--accent-green);letter-spacing:1px;margin:16px 0;font-family:var(--font-mono);">
+                    <a href="${waLink}" target="_blank" style="color:inherit;text-decoration:none;">${displayPhone}</a>
+                </div>
+                <a href="${waLink}" target="_blank" class="btn btn--green" style="margin-top:8px;text-decoration:none;">
+                    <i class="fab fa-whatsapp"></i> Open WhatsApp
+                </a>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:16px;">
+                    <i class="fas fa-shield-alt"></i> Discretion guaranteed. Do not share this number.
+                </p>
+                <button class="btn btn--outline" style="margin-top:12px;" onclick="closeContactRevealModal()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            `;
+        } else {
+            content.innerHTML = `
+                <div style="width:70px;height:70px;border-radius:50%;background:var(--accent-gold-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(197,160,89,.3);">
+                    <i class="fas fa-hourglass-half" style="font-size:28px;color:var(--accent-gold);"></i>
+                </div>
+                <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Received!</h3>
+                <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:20px;">
+                    Your payment is confirmed. The member will reach out to you shortly on your M-Pesa number.
+                </p>
+                <button class="btn btn--gold" onclick="closeContactRevealAndGoHome()">
+                    <i class="fas fa-compass"></i> Back to Discover
+                </button>
+            `;
+        }
+    }, 2500);
+}
+
+function closeContactRevealModal() {
+    document.getElementById('contactRevealModal').classList.remove('active');
+}
+
+function closeContactRevealAndGoHome() {
+    closeContactRevealModal();
+    setTimeout(() => {
+        history.pushState({ page: 'discover' }, null, '#discover');
+        navigateTo('discover');
+    }, 300);
+}
+
+/* ===================== CONFETTI ===================== */
+function launchConfetti() {
+    const colors = ['#9e4a52', '#c5a059', '#10B981', '#38BDF8', '#EC4899', '#8B5CF6'];
+    for (let i = 0; i < 50; i++) {
+        const el = document.createElement('div');
+        el.style.cssText = `position:fixed;width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'0'};left:${Math.random()*100}vw;top:-10px;pointer-events:none;z-index:5000;animation:cf ${Math.random()*2+2}s ease-out forwards;`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+    }
+    if (!document.getElementById('cf-style')) {
+        const s = document.createElement('style');
+        s.id = 'cf-style';
+        s.textContent = `@keyframes cf{0%{opacity:1;transform:translateY(0)rotate(0)}100%{opacity:0;transform:translateY(100vh)rotate(720deg)}}`;
+        document.head.appendChild(s);
+    }
 }
 
 /* ===================== LISTING FORM ===================== */
@@ -572,10 +541,7 @@ function previewImage(e) {
     reader.onload = () => { preview.src = reader.result; preview.style.display = 'inline-block'; };
     if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 }
-function submitListing(e) {
-    e.preventDefault();
-    showToast('Application submitted! Admin will review shortly.', 'success', 'Applied');
-}
+function submitListing(e) { e.preventDefault(); openMpesaModalDirect('Profile Listing Fee', 1499); }
 
 /* ===================== COUNTER ANIMATION ===================== */
 function animateCounters() {
@@ -603,14 +569,17 @@ const triggers = document.querySelectorAll('.nav-trigger');
 function navigateTo(page) {
     views.forEach(v => { v.classList.remove('active'); v.style.animation = 'none'; v.offsetHeight; });
     triggers.forEach(t => t.classList.remove('active'));
+
     const target = document.getElementById(`view-${page}`);
     if (target) { target.classList.add('active'); target.style.animation = null; }
     document.querySelectorAll(`.nav-trigger[data-page="${page}"]`).forEach(t => t.classList.add('active'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    if (page === 'discover') { setTimeout(animateCounters, 200); }
-    if (page === 'celebs') { renderCelebs(globalCelebs.slice(0, 60), 'all-celebs-grid'); }
-    if (page === 'store') { renderStore(); }
+    if (page === 'discover') { renderDiscoverFeatured(); renderDiscoverPremium(); setTimeout(animateCounters, 200); }
+    if (page === 'profiles') { renderProfiles(globalProfiles); }
+    if (page === 'premium') { renderPremium(premiumProfiles); }
+    if (page === 'exclusive') { if (!document.getElementById('dynamic-video-grid').innerHTML.trim()) initVideos(); }
+    if (page === 'plans') { if (!document.getElementById('plans-grid').innerHTML.trim()) renderPlans(); }
 
     observeReveals();
 }
@@ -625,39 +594,47 @@ triggers.forEach(t => {
 
 window.addEventListener('popstate', e => { navigateTo(e.state ? e.state.page : 'discover'); });
 
-/* ===================== MODAL CLICK OUTSIDE ===================== */
-document.querySelectorAll('.rating-modal-overlay, .store-modal-overlay, .auth-modal-overlay, .welcome-overlay, .account-overlay').forEach(o => {
+/* ===================== MODAL OVERLAY CLICK ===================== */
+document.querySelectorAll('.modal-overlay').forEach(o => {
     o.addEventListener('click', e => {
         if (e.target === o) {
-            if (o.id === 'ratingModal') closeRatingModal();
-            if (o.id === 'storeModal') closeStoreModal();
-            if (o.id === 'authModal') closeAuthModal();
-            if (o.id === 'welcomeModal') closeWelcomeModal();
-            if (o.id === 'accountModal') closeAccountModal();
+            if (o.id === 'profileDetailModal') closeProfileDetailModal();
+            if (o.id === 'mpesaModal') closeMpesaModal();
+            if (o.id === 'contactRevealModal') closeContactRevealModal();
         }
     });
 });
 
 /* ===================== KEYBOARD ===================== */
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeProfilePage(); closeRatingModal(); closeStoreModal(); closeAuthModal(); closeWelcomeModal(); closeAccountModal(); }
+    if (e.key === 'Escape') {
+        closeProfileDetailModal();
+        closeMpesaModal();
+        closeContactRevealModal();
+    }
+    const pages = ['discover', 'profiles', 'premium', 'exclusive', 'plans'];
+    if (e.key >= '1' && e.key <= '5' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const p = pages[parseInt(e.key) - 1];
+        if (p) { history.pushState({ page: p }, null, `#${p}`); navigateTo(p); }
+    }
+});
+
+/* ===================== MOBILE KEYBOARD FIX ===================== */
+document.addEventListener('DOMContentLoaded', () => {
+    const mpesaInput = document.getElementById('mpesaNumber');
+    if (mpesaInput) {
+        mpesaInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                mpesaInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 350);
+        });
+    }
 });
 
 /* ===================== INIT ===================== */
 window.addEventListener('load', async () => {
-    updateStarDisplay();
-    await loadUser();
-    await loadAdminCelebs();
-    renderCategoryPills('celebs-category-pills', 'filterCelebs');
+    await loadAdminProfiles();
     const hash = location.hash.replace('#', '');
-    const page = ['discover','celebs','store','how','listing'].includes(hash) ? hash : 'discover';
+    const page = ['discover','profiles','premium','exclusive','plans','listing'].includes(hash) ? hash : 'discover';
     navigateTo(page);
-
-    // Poll celebs every 30s so admin additions appear "instantly" for active users
-    setInterval(async () => {
-        if (document.getElementById('view-celebs')?.classList.contains('active')) {
-            await loadAdminCelebs();
-            filterCelebs(currentFilter, null);
-        }
-    }, 30000);
 });

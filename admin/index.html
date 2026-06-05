@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AfroLink Admin — admin.afrolink254.com</title>
+    <title>AfroLink Admin</title>
     <meta name="theme-color" content="#4F46E5">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +31,6 @@
 body { font-family:var(--font-body); background:var(--bg-base); color:var(--text-primary); min-height:100vh; line-height:1.55; }
 .material-symbols-outlined { font-family:'Material Symbols Outlined',sans-serif; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; }
 
-/* LOGIN */
 .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
 .login-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:40px 32px; width:100%; max-width:420px; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; }
 .login-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,var(--accent-blue),var(--accent-violet)); }
@@ -52,7 +50,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .btn--outline:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
 .btn-sm { padding:8px 14px; font-size:12px; width:auto; }
 
-/* WELCOME MODAL */
 .welcome-overlay { position:fixed; inset:0; background:rgba(28,25,23,.6); backdrop-filter:blur(12px); z-index:5000; display:none; justify-content:center; align-items:center; opacity:0; transition:opacity .3s; }
 .welcome-overlay.active { display:flex; opacity:1; }
 .welcome-box { background:var(--bg-card); border-radius:var(--radius-xl); padding:40px 32px; text-align:center; max-width:380px; width:92%; box-shadow:var(--shadow-lg); border:1.5px solid var(--border-subtle); animation:popIn .4s cubic-bezier(.16,1,.3,1); }
@@ -61,7 +58,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .welcome-box h2 { font-size:22px; font-weight:800; margin-bottom:8px; }
 .welcome-box p { color:var(--text-secondary); font-size:14px; margin-bottom:24px; }
 
-/* DASHBOARD */
 .dashboard { display:none; min-height:100vh; }
 .sidebar { position:fixed; top:0; left:0; width:260px; height:100vh; background:var(--bg-card); border-right:1.5px solid var(--border-subtle); padding:24px 20px; z-index:100; display:flex; flex-direction:column; }
 .sidebar-logo { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:32px; padding:0 4px; color:var(--text-primary); }
@@ -75,7 +71,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .topbar h2 { font-size:20px; font-weight:800; letter-spacing:-0.5px; }
 .topbar-actions { display:flex; gap:10px; }
 
-/* STATS */
 .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
 .stat-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:20px 18px; transition:all .3s; }
 .stat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--accent-blue); }
@@ -83,7 +78,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .stat-card .stat-value { font-family:var(--font-mono); font-size:24px; font-weight:700; color:var(--accent-blue); }
 .stat-card .stat-delta { font-size:11px; color:var(--accent-lime); margin-top:4px; font-family:var(--font-mono); }
 
-/* TABLES */
 .table-wrap { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); overflow:hidden; }
 .table-wrap table { width:100%; border-collapse:collapse; font-size:13px; }
 .table-wrap th { text-align:left; padding:14px 16px; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); background:var(--bg-elevated); border-bottom:1.5px solid var(--border-subtle); }
@@ -96,42 +90,34 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 .badge--rejected { background:var(--accent-magenta-soft); color:var(--accent-magenta); }
 .badge--success { background:var(--accent-lime-soft); color:var(--accent-lime); }
 .badge--failed { background:var(--accent-magenta-soft); color:var(--accent-magenta); }
-.badge--paid { background:var(--accent-violet-soft); color:var(--accent-violet); }
-.badge--referral { background:var(--accent-gold-soft); color:var(--accent-gold); }
+.badge--unlock { background:var(--accent-blue-soft); color:var(--accent-blue); }
+.badge--listing { background:var(--accent-violet-soft); color:var(--accent-violet); }
 
-/* SECTIONS */
 .section { display:none; }
 .section.active { display:block; animation:fadeIn .3s ease; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-/* MODAL */
 .modal-overlay { position:fixed; inset:0; background:rgba(28,25,23,.6); backdrop-filter:blur(12px); display:none; justify-content:center; align-items:center; z-index:2000; }
 .modal-overlay.active { display:flex; }
-.modal-box { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:var(--shadow-lg); }
+.modal-box { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:var(--shadow-lg); }
 .modal-box h3 { font-size:18px; font-weight:800; margin-bottom:16px; }
 .close-modal { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; }
 .close-modal:hover { color:var(--accent-magenta); }
 
-/* TOAST */
 .toast-container { position:fixed; top:20px; right:20px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
 .toast { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-md); padding:12px 16px; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; font-size:12px; font-weight:500; animation:toastIn .3s ease; }
 @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 .toast--success { border-left:3px solid var(--accent-lime); }
 .toast--error { border-left:3px solid var(--accent-magenta); }
 
-/* REFERRAL GRID */
-.referral-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
-.referral-card { background:var(--bg-card); border:1.5px solid var(--border-subtle); border-radius:var(--radius-lg); padding:18px; text-align:center; transition:all .3s; }
-.referral-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--accent-blue); }
-.referral-card .ref-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); margin-bottom:8px; }
-.referral-card .ref-value { font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent-blue); }
-
-/* TOGGLE SWITCH */
 .toggle-wrap { display:flex; align-items:center; gap:12px; cursor:pointer; }
 .toggle-wrap input[type="checkbox"] { width:44px; height:24px; -webkit-appearance:none; appearance:none; background:var(--border-subtle); border-radius:12px; position:relative; cursor:pointer; outline:none; transition:background .3s; }
 .toggle-wrap input[type="checkbox"]::after { content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; background:#FFF; border-radius:50%; transition:transform .3s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
 .toggle-wrap input[type="checkbox"]:checked { background:var(--accent-blue); }
 .toggle-wrap input[type="checkbox"]:checked::after { transform:translateX(20px); }
+
+.attr-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+@media(max-width:600px){ .attr-grid { grid-template-columns:repeat(2,1fr); } }
 
 @media(max-width:900px){
     .sidebar { width:100%; height:auto; position:relative; padding:16px; flex-direction:row; flex-wrap:wrap; gap:8px; }
@@ -139,7 +125,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     .sidebar-footer { display:none; }
     .main-content { margin-left:0; padding:20px; }
     .stats-grid { grid-template-columns:repeat(2,1fr); }
-    .referral-grid { grid-template-columns:repeat(2,1fr); }
     .table-wrap { overflow-x:auto; }
 }
 </style>
@@ -148,17 +133,15 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
 
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- WELCOME MODAL -->
 <div id="welcomeModal" class="welcome-overlay" onclick="closeWelcomeModal(event)">
     <div class="welcome-box" onclick="event.stopPropagation()">
         <div class="emoji">👋</div>
         <h2>Welcome back, <span id="welcomeName">Admin</span>!</h2>
-        <p>You have full control of the AfroLink platform. Manage creators, payouts, and settings.</p>
+        <p>You have full control of the AfroLink directory.</p>
         <button class="btn btn--primary" onclick="document.getElementById('welcomeModal').classList.remove('active')" style="width:auto;padding:12px 32px;margin:0 auto;display:block;">Go to Dashboard</button>
     </div>
 </div>
 
-<!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
     <div class="login-card">
         <div class="login-logo">
@@ -166,7 +149,7 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <span style="font-size:20px;font-weight:800;">AfroLink Admin</span>
         </div>
         <h1>Admin Portal</h1>
-        <p>admin.afrolink254.com</p>
+        <p>Manage profiles, payments & listings</p>
         <label class="form-label">Username</label>
         <input type="text" id="adminUser" class="form-control" placeholder="admin" value="admin">
         <label class="form-label">Password</label>
@@ -175,7 +158,6 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
     </div>
 </div>
 
-<!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
     <aside class="sidebar">
         <div class="sidebar-logo">
@@ -183,11 +165,9 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <span>AfroLink</span>
         </div>
         <button class="nav-link active" onclick="showSection('overview',this)"><i class="material-symbols-outlined">dashboard</i> Overview</button>
-        <button class="nav-link" onclick="showSection('creators',this)"><i class="material-symbols-outlined">group</i> Creators</button>
-        <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Star Transactions</button>
-        <button class="nav-link" onclick="showSection('withdrawals',this)"><i class="material-symbols-outlined">account_balance</i> Withdrawals <span id="withdrawCount" style="margin-left:auto;background:var(--accent-magenta);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
+        <button class="nav-link" onclick="showSection('profiles',this)"><i class="material-symbols-outlined">group</i> Profiles</button>
+        <button class="nav-link" onclick="showSection('transactions',this)"><i class="material-symbols-outlined">payments</i> Payments</button>
         <button class="nav-link" onclick="showSection('approvals',this)"><i class="material-symbols-outlined">approval</i> Approvals <span id="pendingCount" style="margin-left:auto;background:var(--accent-amber);color:#FFF;font-size:10px;padding:2px 8px;border-radius:100px;">0</span></button>
-        <button class="nav-link" onclick="showSection('referrals',this)"><i class="material-symbols-outlined">group_add</i> Referrals</button>
         <button class="nav-link" onclick="showSection('settings',this)"><i class="material-symbols-outlined">settings</i> Settings</button>
         <div class="sidebar-footer">
             <button class="nav-link" onclick="doLogout()" style="color:var(--accent-magenta);"><i class="material-symbols-outlined">logout</i> Logout</button>
@@ -204,60 +184,49 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 </div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-label">Total Star Revenue</div><div class="stat-value" id="stat-revenue">0</div><div class="stat-delta">Stars purchased</div></div>
-                <div class="stat-card"><div class="stat-label">Creator Star Balance</div><div class="stat-value" id="stat-creator-stars">0</div><div class="stat-delta">Total held by creators</div></div>
-                <div class="stat-card"><div class="stat-label">Referral Payouts (KES)</div><div class="stat-value" id="stat-referral-payouts">KES 0</div><div class="stat-delta">Affiliate commissions</div></div>
+                <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value" id="stat-revenue">KES 0</div><div class="stat-delta">All time MPesa</div></div>
                 <div class="stat-card"><div class="stat-label">Total Unlocks</div><div class="stat-value" id="stat-unlocks">0</div><div class="stat-delta">Contact unlocks</div></div>
-                <div class="stat-card"><div class="stat-label">Active Creators</div><div class="stat-value" id="stat-creators">0</div><div class="stat-delta">Verified</div></div>
+                <div class="stat-card"><div class="stat-label">Listing Fees</div><div class="stat-value" id="stat-listings">0</div><div class="stat-delta">Paid listings</div></div>
+                <div class="stat-card"><div class="stat-label">Active Profiles</div><div class="stat-value" id="stat-profiles">0</div><div class="stat-delta">Verified</div></div>
                 <div class="stat-card"><div class="stat-label">Pending Approvals</div><div class="stat-value" id="stat-pending">0</div><div class="stat-delta">Needs action</div></div>
-                <div class="stat-card"><div class="stat-label">Pending Withdrawals</div><div class="stat-value" id="stat-pending-withdrawals">0</div><div class="stat-delta">Needs payout</div></div>
-                <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">0</div><div class="stat-delta">Registered fans</div></div>
+                <div class="stat-card"><div class="stat-label">Total Profiles</div><div class="stat-value" id="stat-total">0</div><div class="stat-delta">All time</div></div>
+                <div class="stat-card"><div class="stat-label">Today's Revenue</div><div class="stat-value" id="stat-today">KES 0</div><div class="stat-delta">Last 24hrs</div></div>
+                <div class="stat-card"><div class="stat-label">Platform Fee %</div><div class="stat-value" id="stat-fee">20%</div><div class="stat-delta">Per transaction</div></div>
             </div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Recent Star Transaction</th><th>Amount</th><th>Type</th><th>User</th><th>Creator</th><th>Status</th><th>Time</th></tr></thead>
+                    <thead><tr><th>Recent Payment</th><th>Amount</th><th>Type</th><th>Phone</th><th>Profile</th><th>Status</th><th>Time</th></tr></thead>
                     <tbody id="recent-tx-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- CREATORS -->
-        <div class="section" id="section-creators">
+        <!-- PROFILES -->
+        <div class="section" id="section-profiles">
             <div class="topbar">
-                <h2>All Creators</h2>
+                <h2>All Profiles</h2>
                 <div class="topbar-actions">
-                    <input type="text" id="creatorSearch" class="form-control" style="width:220px;margin-bottom:0;" placeholder="Search creators..." oninput="filterCreators(this.value)">
-                    <button class="btn btn--violet btn-sm" onclick="openAddCreator()"><i class="material-symbols-outlined">add</i> Add</button>
+                    <input type="text" id="profileSearch" class="form-control" style="width:220px;margin-bottom:0;" placeholder="Search profiles..." oninput="filterProfiles(this.value)">
+                    <button class="btn btn--violet btn-sm" onclick="openAddProfile()"><i class="material-symbols-outlined">add</i> Add Profile</button>
                 </div>
             </div>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Creator</th><th>TikTok</th><th>Category</th><th>City</th><th>Star Cost</th><th>Stars</th><th>Ref Earnings</th><th>Unlocks</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>Profile</th><th>Age</th><th>Location</th><th>Gender</th><th>Price</th><th>Phone</th><th>Unlocks</th><th>Earned</th><th>Status</th><th>Actions</th></tr>
                     </thead>
-                    <tbody id="creators-body"></tbody>
+                    <tbody id="profiles-body"></tbody>
                 </table>
             </div>
         </div>
 
         <!-- TRANSACTIONS -->
         <div class="section" id="section-transactions">
-            <div class="topbar"><h2>Star Transactions</h2></div>
+            <div class="topbar"><h2>All Payments</h2></div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>ID</th><th>User</th><th>Creator</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+                    <thead><tr><th>Ref ID</th><th>Phone</th><th>Profile</th><th>Amount</th><th>Type</th><th>Status</th><th>MPesa Ref</th><th>Date</th></tr></thead>
                     <tbody id="tx-body"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- WITHDRAWALS -->
-        <div class="section" id="section-withdrawals">
-            <div class="topbar"><h2>Pending Withdrawals</h2></div>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Creator</th><th>Amount (KES)</th><th>Phone</th><th>Requested</th><th>Actions</th></tr></thead>
-                    <tbody id="withdrawals-body"></tbody>
                 </table>
             </div>
         </div>
@@ -267,24 +236,8 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
             <div class="topbar"><h2>Pending Approvals</h2></div>
             <div class="table-wrap">
                 <table>
-                    <thead><tr><th>Applicant</th><th>TikTok</th><th>Category</th><th>City</th><th>Star Cost</th><th>Applied</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Applicant</th><th>Age</th><th>Location</th><th>Gender</th><th>Price</th><th>Phone</th><th>Applied</th><th>Actions</th></tr></thead>
                     <tbody id="approvals-body"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- REFERRALS -->
-        <div class="section" id="section-referrals">
-            <div class="topbar"><h2>Referral Network</h2></div>
-            <div class="referral-grid">
-                <div class="referral-card"><div class="ref-label">Total Referrals</div><div class="ref-value" id="ref-total">0</div></div>
-                <div class="referral-card"><div class="ref-label">Active Affiliates</div><div class="ref-value" id="ref-active">0</div></div>
-                <div class="referral-card"><div class="ref-label">Total Commission Paid</div><div class="ref-value" id="ref-commission">KES 0</div></div>
-            </div>
-            <div class="table-wrap">
-                <table>
-                    <thead><tr><th>Referrer</th><th>Referred</th><th>Code</th><th>Earnings</th><th>Status</th><th>Date</th></tr></thead>
-                    <tbody id="referrals-body"></tbody>
                 </table>
             </div>
         </div>
@@ -297,21 +250,19 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                     <h4 style="font-size:14px;margin-bottom:16px;">General</h4>
                     <label class="form-label">Platform Name</label>
                     <input type="text" class="form-control" value="AfroLink" style="margin-bottom:16px;">
-                    <label class="form-label">Verification Fee (KES)</label>
-                    <input type="number" class="form-control" value="999" style="margin-bottom:16px;">
+                    <label class="form-label">Listing Verification Fee (KES)</label>
+                    <input type="number" class="form-control" value="1499" style="margin-bottom:16px;">
                     <label class="form-label">Platform Fee (%)</label>
-                    <input type="number" class="form-control" value="20" style="margin-bottom:16px;">
-                    <label class="form-label">Referral Commission (% of platform fee)</label>
-                    <input type="number" class="form-control" value="5" style="margin-bottom:16px;">
-                    <button class="btn btn--primary btn-sm" style="width:auto;" onclick="showToast('Settings saved', 'success', 'Saved')"><i class="material-symbols-outlined">save</i> Save Changes</button>
+                    <input type="number" id="platformFeeInput" class="form-control" value="20" style="margin-bottom:16px;">
+                    <button class="btn btn--primary btn-sm" style="width:auto;" onclick="saveSettings()"><i class="material-symbols-outlined">save</i> Save Changes</button>
                 </div>
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Demo Mode</h4>
                     <label class="toggle-wrap">
                         <input type="checkbox" id="demoModeToggle" onchange="toggleDemoMode()">
-                        <span style="font-size:13px;">Show demo creators on main page</span>
+                        <span style="font-size:13px;">Show demo profiles on main page</span>
                     </label>
-                    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">When disabled, only real/admin-added creators will appear on the frontend. Use this when you're ready to go live.</p>
+                    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">When disabled, only admin-approved profiles appear on the frontend.</p>
                 </div>
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Change Admin Password</h4>
@@ -325,42 +276,52 @@ body { font-family:var(--font-body); background:var(--bg-base); color:var(--text
                 </div>
                 <div style="background:var(--bg-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;">
                     <h4 style="font-size:14px;margin-bottom:16px;">Danger Zone</h4>
-                    <button class="btn btn--magenta btn-sm" style="width:auto;" onclick="showToast('This would clear all data. Not implemented.', 'warning', 'Demo')"><i class="material-symbols-outlined">delete</i> Reset Platform Data</button>
+                    <button class="btn btn--magenta btn-sm" style="width:auto;" onclick="if(confirm('Clear ALL data? This cannot be undone.')) showToast('Feature not implemented in demo', 'warning')"><i class="material-symbols-outlined">delete</i> Reset All Data</button>
                 </div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- ADD CREATOR MODAL -->
-<div class="modal-overlay" id="addCreatorModal">
+<!-- ADD PROFILE MODAL -->
+<div class="modal-overlay" id="addProfileModal">
     <div class="modal-box">
-        <button class="close-modal" onclick="closeAddCreator()">&times;</button>
-        <h3>Add Creator Manually</h3>
-        <label class="form-label">Name</label><input type="text" id="addName" class="form-control">
-        <label class="form-label">Handle</label><input type="text" id="addHandle" class="form-control" placeholder="@handle">
-        <label class="form-label">TikTok Username</label><input type="text" id="addTiktok" class="form-control" placeholder="@username">
-        <label class="form-label">TikTok Followers</label><input type="number" id="addTiktokFollowers" class="form-control" value="0">
-        <label class="form-label">Category</label>
-        <select id="addCategory" class="form-control" style="margin-bottom:14px;">
-            <option>Music & DJ</option><option>Comedy</option><option>Fashion</option><option>Fitness</option><option>Tech</option><option>Food</option><option>Podcast</option><option>Film</option><option>Dance</option><option>Art</option><option>Influencer</option><option>Other</option>
-        </select>
-        <label class="form-label">City</label><input type="text" id="addCity" class="form-control" value="Nairobi">
-        <label class="form-label">Star Cost</label><input type="number" id="addStarCost" class="form-control" value="50">
-        <label class="form-label">Phone</label><input type="tel" id="addPhone" class="form-control" placeholder="0712...">
-        <label class="form-label">PIN (4+ digits)</label><input type="text" id="addPin" class="form-control" value="1234">
-        <label class="form-label">Bio</label><textarea id="addBio" class="form-control" style="min-height:80px;"></textarea>
-        <label class="form-label">Hobbies (comma separated)</label><input type="text" id="addHobbies" class="form-control" placeholder="Dancing, Gaming">
-        <label class="form-label">Open To (comma separated)</label><input type="text" id="addOpenTo" class="form-control" placeholder="Engagement, Business">
-        <label class="form-label">Social Handle</label><input type="text" id="addSocial" class="form-control" placeholder="@handle">
-        <button class="btn btn--violet" style="margin-top:10px;" onclick="submitAddCreator()"><i class="material-symbols-outlined">save</i> Save Creator</button>
+        <button class="close-modal" onclick="closeAddProfile()">&times;</button>
+        <h3>Add Profile Manually</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><label class="form-label">Name</label><input type="text" id="addName" class="form-control" style="margin-bottom:10px;"></div>
+            <div><label class="form-label">Age</label><input type="number" id="addAge" class="form-control" value="21" style="margin-bottom:10px;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><label class="form-label">Location</label><input type="text" id="addLocation" class="form-control" value="Nairobi" style="margin-bottom:10px;"></div>
+            <div><label class="form-label">Gender</label><select id="addGender" class="form-control" style="margin-bottom:10px;"><option>Female</option><option>Male</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><label class="form-label">Price (KES)</label><input type="number" id="addPrice" class="form-control" value="499" style="margin-bottom:10px;"></div>
+            <div><label class="form-label">Phone</label><input type="tel" id="addPhone" class="form-control" placeholder="0712..." style="margin-bottom:10px;"></div>
+        </div>
+        <label class="form-label">Bio</label><textarea id="addBio" class="form-control" style="min-height:60px;margin-bottom:10px;"></textarea>
+        <label class="form-label" style="margin-top:8px;">Physical Attributes</label>
+        <div class="attr-grid" style="margin-bottom:14px;">
+            <div><label class="form-label">Hair</label><input type="text" id="addHair" class="form-control" style="margin-bottom:0;" placeholder="Long Black"></div>
+            <div><label class="form-label">Face Card</label><input type="text" id="addFaceCard" class="form-control" style="margin-bottom:0;" placeholder="Pretty"></div>
+            <div><label class="form-label">Skin Tone</label><input type="text" id="addSkinTone" class="form-control" style="margin-bottom:0;" placeholder="Medium"></div>
+            <div><label class="form-label">Body Type</label><input type="text" id="addBodyType" class="form-control" style="margin-bottom:0;" placeholder="Curvy"></div>
+            <div><label class="form-label">Breast</label><input type="text" id="addBreast" class="form-control" style="margin-bottom:0;" placeholder="34C"></div>
+            <div><label class="form-label">Waist</label><input type="text" id="addWaist" class="form-control" style="margin-bottom:0;" placeholder='28"'></div>
+            <div><label class="form-label">Thighs</label><input type="text" id="addThighs" class="form-control" style="margin-bottom:0;" placeholder="Thick"></div>
+            <div><label class="form-label">Butt</label><input type="text" id="addButt" class="form-control" style="margin-bottom:0;" placeholder="Bubble"></div>
+            <div><label class="form-label">Piercings</label><input type="text" id="addPiercings" class="form-control" style="margin-bottom:0;" placeholder="Ears, Navel"></div>
+        </div>
+        <div style="margin-bottom:14px;"><label class="form-label">Tattoos</label><input type="text" id="addTattoos" class="form-control" style="margin-bottom:0;" placeholder="None"></div>
+        <button class="btn btn--violet" onclick="submitAddProfile()"><i class="material-symbols-outlined">save</i> Save Profile</button>
     </div>
 </div>
 
 <script>
 const API_BASE = 'https://api.afrolink254.com';
 let adminToken = localStorage.getItem('afrolink_admin_token');
-let creators = [], transactions = [], approvals = [], withdrawals = [], referrals = [];
+let profiles = [], transactions = [], approvals = [];
 
 function showToast(m, t='info', ti='') {
     const C = document.getElementById('toastContainer');
@@ -375,48 +336,30 @@ function showWelcome(name) {
     document.getElementById('welcomeName').innerText = name || 'Admin';
     document.getElementById('welcomeModal').classList.add('active');
 }
-function closeWelcomeModal(e) {
-    if(e && e.target !== e.currentTarget) return;
-    document.getElementById('welcomeModal').classList.remove('active');
-}
+function closeWelcomeModal(e) { if(e && e.target !== e.currentTarget) return; document.getElementById('welcomeModal').classList.remove('active'); }
 
 async function doLogin() {
     const u = document.getElementById('adminUser').value;
     const p = document.getElementById('adminPass').value;
     try {
-        const res = await fetch(`${API_BASE}/api/admin/login`, {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({username:u, password:p})
-        });
+        const res = await fetch(`${API_BASE}/api/admin/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p}) });
         const data = await res.json();
         if (data.success && data.token) {
-            adminToken = data.token;
-            localStorage.setItem('afrolink_admin_token', adminToken);
+            adminToken = data.token; localStorage.setItem('afrolink_admin_token', adminToken);
             document.getElementById('loginWrap').style.display='none';
             document.getElementById('dashboard').style.display='block';
-            showWelcome(u);
-            loadDashboard();
-        } else {
-            showToast(data.message || 'Invalid credentials', 'error', 'Login Failed');
-        }
+            showWelcome(u); loadDashboard();
+        } else { showToast(data.message || 'Invalid credentials', 'error', 'Login Failed'); }
     } catch(e) {
         if (u === 'admin' && p === 'AfroLink@2026') {
-            adminToken = 'demo_token_' + Date.now();
-            localStorage.setItem('afrolink_admin_token', adminToken);
-            document.getElementById('loginWrap').style.display='none';
-            document.getElementById('dashboard').style.display='block';
-            showWelcome(u);
-            loadDashboard();
-        } else {
-            showToast('Invalid credentials. Try admin / AfroLink@2026', 'error', 'Login Failed');
-        }
+            adminToken = 'demo_token_' + Date.now(); localStorage.setItem('afrolink_admin_token', adminToken);
+            document.getElementById('loginWrap').style.display='none'; document.getElementById('dashboard').style.display='block';
+            showWelcome(u); loadDashboard();
+        } else { showToast('Invalid credentials. Try admin / AfroLink@2026', 'error', 'Login Failed'); }
     }
 }
 
-function doLogout() {
-    localStorage.removeItem('afrolink_admin_token');
-    location.reload();
-}
+function doLogout() { localStorage.removeItem('afrolink_admin_token'); location.reload(); }
 
 function showSection(id, btn) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -425,116 +368,54 @@ function showSection(id, btn) {
     if (btn) btn.classList.add('active');
 }
 
-function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<<60)return 'Just now'; const m=Math.floor(s/60); if(m<<60)return m+'m ago'; const h=Math.floor(m/60); if(h<<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+function timeAgo(d) { const s=Math.floor((Date.now()-new Date(d))/1000); if(s<60)return 'Just now'; const m=Math.floor(s/60); if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; return Math.floor(h/24)+'d ago'; }
 
 async function loadDashboard() {
-    await Promise.all([loadCreators(), loadTransactions(), loadApprovals(), loadWithdrawals(), loadReferrals(), loadAdminSettings()]);
-    updateStats();
-    renderRecentTx();
-    renderCreators();
-    renderTransactions();
-    renderApprovals();
-    renderWithdrawals();
-    renderReferrals();
+    await Promise.all([loadProfiles(), loadTransactions(), loadApprovals(), loadAdminSettings()]);
+    updateStats(); renderRecentTx(); renderProfiles(); renderTransactions(); renderApprovals();
 }
 
 async function loadAdminSettings() {
-    try {
-        const res = await fetch(`${API_BASE}/api/settings`);
-        const data = await res.json();
-        document.getElementById('demoModeToggle').checked = data.demoMode !== false;
-    } catch(e) {
-        document.getElementById('demoModeToggle').checked = true;
-    }
+    try { const res = await fetch(`${API_BASE}/api/settings`); const data = await res.json(); document.getElementById('demoModeToggle').checked = data.demoMode !== false; } catch(e) { document.getElementById('demoModeToggle').checked = true; }
 }
 
 async function toggleDemoMode() {
     const enabled = document.getElementById('demoModeToggle').checked;
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/settings`, {
-            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
-            body: JSON.stringify({ demoMode: enabled })
-        });
-        const data = await res.json();
-        showToast(data.success ? `Demo mode ${enabled?'enabled':'disabled'}` : 'Failed', data.success?'success':'error');
-    } catch(e) {
-        showToast(`Demo mode ${enabled?'enabled':'disabled'} (demo)`, 'success');
-    }
+    try { const res = await fetch(`${API_BASE}/api/admin/settings`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken}, body: JSON.stringify({ demoMode: enabled }) }); const data = await res.json(); showToast(data.success ? `Demo mode ${enabled?'enabled':'disabled'}` : 'Failed', data.success?'success':'error'); } catch(e) { showToast(`Demo mode ${enabled?'enabled':'disabled'} (demo)`, 'success'); }
 }
 
-async function loadCreators() {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/creators`, { headers:{'Authorization':'Bearer '+adminToken} });
-        if (!res.ok) throw new Error('fail');
-        const data = await res.json();
-        creators = Array.isArray(data) ? data : (data.creators || []);
-    } catch(e) { creators = []; }
+async function loadProfiles() {
+    try { const res = await fetch(`${API_BASE}/api/admin/profiles`, { headers:{'Authorization':'Bearer '+adminToken} }); if(!res.ok) throw new Error('fail'); const data = await res.json(); profiles = data.profiles || []; } catch(e) { profiles = []; }
 }
 
 async function loadTransactions() {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/transactions`, { headers:{'Authorization':'Bearer '+adminToken} });
-        if (!res.ok) throw new Error('fail');
-        const data = await res.json();
-        transactions = Array.isArray(data) ? data : (data.transactions || []);
-    } catch(e) { transactions = []; }
+    try { const res = await fetch(`${API_BASE}/api/admin/transactions`, { headers:{'Authorization':'Bearer '+adminToken} }); if(!res.ok) throw new Error('fail'); const data = await res.json(); transactions = data.transactions || []; } catch(e) { transactions = []; }
 }
 
 async function loadApprovals() {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/approvals`, { headers:{'Authorization':'Bearer '+adminToken} });
-        if (!res.ok) throw new Error('fail');
-        const data = await res.json();
-        approvals = Array.isArray(data) ? data : (data.approvals || []);
-    } catch(e) { approvals = []; }
-}
-
-async function loadWithdrawals() {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/withdrawals`, { headers:{'Authorization':'Bearer '+adminToken} });
-        if (!res.ok) throw new Error('fail');
-        const data = await res.json();
-        withdrawals = Array.isArray(data) ? data : (data.withdrawals || []);
-    } catch(e) { withdrawals = []; }
-}
-
-async function loadReferrals() {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/referrals`, { headers:{'Authorization':'Bearer '+adminToken} });
-        if (!res.ok) throw new Error('fail');
-        const data = await res.json();
-        referrals = Array.isArray(data) ? data : (data.referrals || []);
-    } catch(e) { referrals = []; }
+    try { const res = await fetch(`${API_BASE}/api/admin/approvals`, { headers:{'Authorization':'Bearer '+adminToken} }); if(!res.ok) throw new Error('fail'); const data = await res.json(); approvals = data.approvals || []; } catch(e) { approvals = []; }
 }
 
 async function updateStats() {
     try {
         const res = await fetch(`${API_BASE}/api/admin/stats`, { headers:{'Authorization':'Bearer '+adminToken} });
         if (res.ok) {
-            const data = await res.json();
-            const s = data.stats || {};
-            document.getElementById('stat-revenue').innerText = (s.totalStarRevenue || 0).toLocaleString();
-            document.getElementById('stat-creator-stars').innerText = (s.totalCreatorStars || 0).toLocaleString();
-            document.getElementById('stat-referral-payouts').innerText = 'KES ' + (s.totalReferralPayouts || 0).toLocaleString();
+            const data = await res.json(); const s = data.stats || {};
+            document.getElementById('stat-revenue').innerText = 'KES ' + (s.totalRevenue || 0).toLocaleString();
             document.getElementById('stat-unlocks').innerText = (s.totalUnlocks || 0).toLocaleString();
-            document.getElementById('stat-creators').innerText = (s.activeCreators || 0).toLocaleString();
-            document.getElementById('stat-pending').innerText = (s.pendingApprovals || 0).toLocaleString();
-            document.getElementById('stat-pending-withdrawals').innerText = (s.pendingWithdrawals || 0).toLocaleString();
-            document.getElementById('stat-users').innerText = (s.totalUsers || 0).toLocaleString();
-            document.getElementById('pendingCount').innerText = s.pendingApprovals || 0;
-            document.getElementById('withdrawCount').innerText = s.pendingWithdrawals || 0;
+            document.getElementById('stat-listings').innerText = (s.totalListings || 0).toLocaleString();
+            document.getElementById('stat-profiles').innerText = (s.activeProfiles || 0).toLocaleString();
+            document.getElementById('stat-pending').innerText = (s.pendingProfiles || 0).toLocaleString();
+            document.getElementById('stat-total').innerText = (s.totalProfiles || 0).toLocaleString();
+            document.getElementById('stat-today').innerText = 'KES ' + (s.todayRevenue || 0).toLocaleString();
+            document.getElementById('stat-fee').innerText = (s.platformFee || 20) + '%';
+            document.getElementById('pendingCount').innerText = s.pendingProfiles || 0;
         }
     } catch(e) {
-        document.getElementById('stat-revenue').innerText = '0';
-        document.getElementById('stat-creator-stars').innerText = '0';
-        document.getElementById('stat-referral-payouts').innerText = 'KES 0';
-        document.getElementById('stat-unlocks').innerText = '0';
-        document.getElementById('stat-creators').innerText = creators.length.toLocaleString();
-        document.getElementById('stat-pending').innerText = approvals.length.toLocaleString();
-        document.getElementById('stat-pending-withdrawals').innerText = withdrawals.filter(w=>w.status==='pending').length.toLocaleString();
-        document.getElementById('stat-users').innerText = '0';
-        document.getElementById('pendingCount').innerText = approvals.length;
-        document.getElementById('withdrawCount').innerText = withdrawals.filter(w=>w.status==='pending').length;
+        document.getElementById('stat-revenue').innerText = 'KES 0'; document.getElementById('stat-unlocks').innerText = '0';
+        document.getElementById('stat-listings').innerText = '0'; document.getElementById('stat-profiles').innerText = profiles.filter(p=>p.status==='verified').length.toLocaleString();
+        document.getElementById('stat-pending').innerText = approvals.length.toLocaleString(); document.getElementById('stat-total').innerText = profiles.length.toLocaleString();
+        document.getElementById('stat-today').innerText = 'KES 0'; document.getElementById('pendingCount').innerText = approvals.length;
     }
 }
 
@@ -543,222 +424,131 @@ function renderRecentTx() {
     const recent = transactions.slice(0, 5);
     if (!recent.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
     tbody.innerHTML = recent.map(t => `
-        <tr><td style="color:var(--text-primary);font-weight:600;">${t.description || t.type}</td><td>${t.amount}</td>
+        <tr><td style="color:var(--text-primary);font-weight:600;">${t.description || t.type}</td><td>KES ${t.amount?.toLocaleString()}</td>
         <td><span class="badge badge--${t.type}">${t.type}</span></td>
-        <td>${t.userId?.name || t.userId?.phone || '-'}</td>
-        <td>${t.creatorId?.name || '-'}</td>
+        <td>${t.userPhone || '-'}</td>
+        <td>${t.profileName || t.profileId?.name || '-'}</td>
         <td><span class="badge badge--${t.status}">${t.status}</span></td><td>${timeAgo(t.createdAt)}</td></tr>
     `).join('');
 }
 
-function renderCreators() {
-    const tbody = document.getElementById('creators-body');
-    if (!creators.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-muted);">No creators yet</td></tr>'; return; }
-    tbody.innerHTML = creators.map(c => `
+function renderProfiles() {
+    const tbody = document.getElementById('profiles-body');
+    if (!profiles.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-muted);">No profiles yet</td></tr>'; return; }
+    tbody.innerHTML = profiles.map(p => `
         <tr>
-            <td style="color:var(--text-primary);font-weight:600;">${c.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${c.handle}</span></td>
-            <td>${c.tiktokUsername ? `<span style="font-family:var(--font-mono);color:var(--accent-violet);font-size:12px;">${c.tiktokUsername}</span><br><span style="font-size:10px;color:var(--text-muted);">${(c.tiktokFollowers||0).toLocaleString()} fans</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>
-            <td>${c.categoryName || c.category}</td><td>${c.city}</td>
-            <td style="font-family:var(--font-mono);">${c.starCost || c.price || 50}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-blue);">${c.creatorStars || 0}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${c.referralEarnings || 0}</td>
-            <td style="font-family:var(--font-mono);">${c.unlocks||0}</td>
-            <td><span class="badge badge--${c.status}">${c.status}</span></td>
-            <td><button class="btn btn--outline btn-sm" onclick="editCreator('${c._id || c.id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--magenta btn-sm" onclick="deleteCreator('${c._id || c.id}')"><i class="material-symbols-outlined">delete</i></button></td>
+            <td style="color:var(--text-primary);font-weight:600;">${p.name}<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${p.gender}</span></td>
+            <td>${p.age}</td><td>${p.location || p.loc || '-'}</td><td>${p.gender}</td>
+            <td style="font-family:var(--font-mono);">KES ${(p.price || 0).toLocaleString()}</td>
+            <td>${p.phone || '-'}</td>
+            <td style="font-family:var(--font-mono);">${p.unlocks || 0}</td>
+            <td style="font-family:var(--font-mono);color:var(--accent-blue);">KES ${(p.totalEarned || 0).toLocaleString()}</td>
+            <td><span class="badge badge--${p.status}">${p.status}</span></td>
+            <td><button class="btn btn--outline btn-sm" onclick="editProfile('${p._id}')"><i class="material-symbols-outlined">edit</i></button> <button class="btn btn--magenta btn-sm" onclick="deleteProfile('${p._id}')"><i class="material-symbols-outlined">delete</i></button></td>
         </tr>
     `).join('');
 }
 
 function renderTransactions() {
     const tbody = document.getElementById('tx-body');
-    if (!transactions.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
+    if (!transactions.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">No transactions yet</td></tr>'; return; }
     tbody.innerHTML = transactions.map(t => `
-        <tr><td style="font-family:var(--font-mono);font-size:11px;">${t._id || t.id}</td>
-        <td>${t.userId?.name || t.userId?.phone || '-'}</td>
-        <td style="color:var(--text-primary);font-weight:600;">${t.creatorId?.name || '-'}</td>
-        <td style="font-family:var(--font-mono);">${t.amount}</td>
+        <tr><td style="font-family:var(--font-mono);font-size:11px;">${t.refId || t._id}</td>
+        <td>${t.userPhone || '-'}</td>
+        <td style="color:var(--text-primary);font-weight:600;">${t.profileName || t.profileId?.name || '-'}</td>
+        <td style="font-family:var(--font-mono);">KES ${(t.amount || 0).toLocaleString()}</td>
         <td><span class="badge badge--${t.type || 'unlock'}">${t.type || 'unlock'}</span></td>
         <td><span class="badge badge--${t.status}">${t.status}</span></td>
+        <td style="font-family:var(--font-mono);font-size:11px;">${t.mpesaRef || '-'}</td>
         <td>${timeAgo(t.createdAt)}</td></tr>
     `).join('');
 }
 
 function renderApprovals() {
     const tbody = document.getElementById('approvals-body');
-    if (!approvals.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">No pending approvals</td></tr>'; return; }
+    if (!approvals.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-muted);">No pending approvals</td></tr>'; return; }
     tbody.innerHTML = approvals.map(a => `
         <tr>
             <td style="color:var(--text-primary);font-weight:600;">${a.name}</td>
-            <td>${a.tiktokUsername ? `<span style="font-family:var(--font-mono);color:var(--accent-violet);font-size:12px;">${a.tiktokUsername}</span><br><span style="font-size:10px;color:var(--text-muted);">${(a.tiktokFollowers||0).toLocaleString()} fans</span>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}</td>
-            <td>${a.categoryName || a.category}</td><td>${a.city}</td>
-            <td style="font-family:var(--font-mono);">${a.starCost || a.price || 50}</td>
-            <td>${timeAgo(a.appliedAt || a.createdAt)}</td>
-            <td><button class="btn btn--primary btn-sm" onclick="approveCreator('${a._id || a.id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--magenta btn-sm" onclick="rejectCreator('${a._id || a.id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
+            <td>${a.age || '-'}</td><td>${a.location || a.loc || '-'}</td><td>${a.gender || '-'}</td>
+            <td style="font-family:var(--font-mono);">KES ${(a.price || 0).toLocaleString()}</td>
+            <td>${a.phone || '-'}</td>
+            <td>${timeAgo(a.createdAt)}</td>
+            <td><button class="btn btn--primary btn-sm" onclick="approveProfile('${a._id}')"><i class="material-symbols-outlined">check</i> Approve</button> <button class="btn btn--magenta btn-sm" onclick="rejectProfile('${a._id}')"><i class="material-symbols-outlined">close</i> Reject</button></td>
         </tr>
     `).join('');
 }
 
-function renderWithdrawals() {
-    const tbody = document.getElementById('withdrawals-body');
-    const pending = withdrawals.filter(w => w.status === 'pending');
-    if (!pending.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No pending withdrawals</td></tr>'; return; }
-    tbody.innerHTML = pending.map(w => `
-        <tr>
-            <td style="color:var(--text-primary);font-weight:600;">${w.creatorName}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-blue);">KES ${w.amount.toLocaleString()}</td>
-            <td>${w.phone}</td>
-            <td>${timeAgo(w.createdAt)}</td>
-            <td><button class="btn btn--primary btn-sm" onclick="payWithdrawal('${w._id || w.id}')"><i class="material-symbols-outlined">payments</i> Mark Paid</button></td>
-        </tr>
-    `).join('');
-}
-
-function renderReferrals() {
-    const tbody = document.getElementById('referrals-body');
-    const total = referrals.length;
-    const active = referrals.filter(r => r.status === 'active').length;
-    const commission = referrals.reduce((a,r)=>a+(r.earnings||0),0);
-    document.getElementById('ref-total').innerText = total;
-    document.getElementById('ref-active').innerText = active;
-    document.getElementById('ref-commission').innerText = 'KES ' + (commission || 0).toLocaleString();
-    if (!total) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No referrals yet</td></tr>'; return; }
-    tbody.innerHTML = referrals.map(r => `
-        <tr>
-            <td style="color:var(--text-primary);font-weight:600;">${r.referrerId?.name||'Unknown'}<<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referrerId?.handle||''}</span></td>
-            <td style="color:var(--text-primary);font-weight:600;">${r.referredId?.name||'Unknown'}<<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">${r.referredId?.handle||''}</span></td>
-            <td style="font-family:var(--font-mono);color:var(--accent-gold);">${r.code}</td>
-            <td style="font-family:var(--font-mono);color:var(--accent-violet);">${(r.earnings||0).toLocaleString()}</td>
-            <td><span class="badge badge--${r.status}">${r.status}</span></td>
-            <td>${timeAgo(r.createdAt)}</td>
-        </tr>
-    `).join('');
-}
-
-function filterCreators(q) {
+function filterProfiles(q) {
     const term = q.toLowerCase();
-    const rows = document.querySelectorAll('#creators-body tr');
+    const rows = document.querySelectorAll('#profiles-body tr');
     rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none'; });
 }
 
-function openAddCreator() { document.getElementById('addCreatorModal').classList.add('active'); }
-function closeAddCreator() { document.getElementById('addCreatorModal').classList.remove('active'); }
+function openAddProfile() { document.getElementById('addProfileModal').classList.add('active'); }
+function closeAddProfile() { document.getElementById('addProfileModal').classList.remove('active'); }
 
-async function submitAddCreator() {
-    const c = {
+async function submitAddProfile() {
+    const p = {
         name: document.getElementById('addName').value,
-        handle: document.getElementById('addHandle').value,
-        tiktokUsername: document.getElementById('addTiktok').value,
-        tiktokFollowers: parseInt(document.getElementById('addTiktokFollowers').value) || 0,
-        category: document.getElementById('addCategory').value,
-        city: document.getElementById('addCity').value,
-        starCost: parseInt(document.getElementById('addStarCost').value) || 50,
+        age: parseInt(document.getElementById('addAge').value) || 21,
+        location: document.getElementById('addLocation').value,
+        loc: document.getElementById('addLocation').value,
+        gender: document.getElementById('addGender').value,
+        price: parseInt(document.getElementById('addPrice').value) || 499,
         phone: document.getElementById('addPhone').value,
-        pin: document.getElementById('addPin').value,
         bio: document.getElementById('addBio').value,
-        hobbies: document.getElementById('addHobbies').value,
-        openTo: document.getElementById('addOpenTo').value,
-        social: document.getElementById('addSocial').value,
-        status: 'verified', unlocks: 0, creatorStars: 0, referralEarnings: 0
+        desc: document.getElementById('addBio').value,
+        hair: document.getElementById('addHair').value,
+        faceCard: document.getElementById('addFaceCard').value,
+        skinTone: document.getElementById('addSkinTone').value,
+        bodyType: document.getElementById('addBodyType').value,
+        breast: document.getElementById('addBreast').value,
+        waist: document.getElementById('addWaist').value,
+        thighs: document.getElementById('addThighs').value,
+        butt: document.getElementById('addButt').value,
+        piercings: document.getElementById('addPiercings').value,
+        tattoos: document.getElementById('addTattoos').value,
+        status: 'verified', isVerified: true, unlocks: 0, totalEarned: 0
     };
-    if (!c.name) { showToast('Name is required', 'error'); return; }
+    if (!p.name) { showToast('Name is required', 'error'); return; }
     try {
-        const res = await fetch(`${API_BASE}/api/admin/creators`, {
-            method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
-            body: JSON.stringify(c)
-        });
+        const res = await fetch(`${API_BASE}/api/admin/profiles`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken}, body: JSON.stringify(p) });
         const data = await res.json();
-        if (data.success) {
-            creators.unshift(data.celeb || c);
-            renderCreators(); updateStats(); closeAddCreator();
-            showToast(`${c.name} added successfully`, 'success', 'Creator Added');
-        } else { showToast(data.message || 'Failed', 'error'); }
-    } catch(e) {
-        creators.unshift(c);
-        renderCreators(); updateStats(); closeAddCreator();
-        showToast(`${c.name} added (demo)`, 'success', 'Creator Added');
-    }
+        if (data.success) { profiles.unshift(data.profile || p); renderProfiles(); updateStats(); closeAddProfile(); showToast(`${p.name} added`, 'success', 'Profile Added'); }
+        else { showToast(data.message || 'Failed', 'error'); }
+    } catch(e) { profiles.unshift(p); renderProfiles(); updateStats(); closeAddProfile(); showToast(`${p.name} added (demo)`, 'success', 'Profile Added'); }
 }
 
-function editCreator(id) {
-    const c = creators.find(x => (x._id || x.id) === id);
-    if (!c) return;
-    document.getElementById('addName').value = c.name;
-    document.getElementById('addHandle').value = c.handle;
-    document.getElementById('addTiktok').value = c.tiktokUsername || '';
-    document.getElementById('addTiktokFollowers').value = c.tiktokFollowers || 0;
-    document.getElementById('addCategory').value = c.categoryName || c.category;
-    document.getElementById('addCity').value = c.city;
-    document.getElementById('addStarCost').value = c.starCost || c.price || 50;
-    document.getElementById('addPhone').value = c.phone || '';
-    document.getElementById('addBio').value = c.bio || '';
-    document.getElementById('addHobbies').value = (c.hobbies || []).join(', ');
-    document.getElementById('addOpenTo').value = (c.openTo || []).join(', ');
-    document.getElementById('addSocial').value = c.social || '';
-    openAddCreator();
+function editProfile(id) {
+    const p = profiles.find(x => x._id === id);
+    if (!p) return;
+    document.getElementById('addName').value = p.name; document.getElementById('addAge').value = p.age || 21;
+    document.getElementById('addLocation').value = p.location || p.loc || 'Nairobi';
+    document.getElementById('addGender').value = p.gender || 'Female'; document.getElementById('addPrice').value = p.price || 499;
+    document.getElementById('addPhone').value = p.phone || ''; document.getElementById('addBio').value = p.bio || p.desc || '';
+    document.getElementById('addHair').value = p.hair || ''; document.getElementById('addFaceCard').value = p.faceCard || '';
+    document.getElementById('addSkinTone').value = p.skinTone || ''; document.getElementById('addBodyType').value = p.bodyType || '';
+    document.getElementById('addBreast').value = p.breast || ''; document.getElementById('addWaist').value = p.waist || '';
+    document.getElementById('addThighs').value = p.thighs || ''; document.getElementById('addButt').value = p.butt || '';
+    document.getElementById('addPiercings').value = p.piercings || ''; document.getElementById('addTattoos').value = p.tattoos || '';
+    openAddProfile();
 }
 
-async function deleteCreator(id) {
-    if (!confirm('Delete this creator?')) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/creators/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+adminToken} });
-        if (res.ok) { creators = creators.filter(c => (c._id || c.id) !== id); renderCreators(); updateStats(); showToast('Creator deleted', 'info', 'Deleted'); }
-        else throw new Error('fail');
-    } catch(e) {
-        creators = creators.filter(c => (c._id || c.id) !== id); renderCreators(); updateStats();
-        showToast('Creator deleted (demo)', 'info', 'Deleted');
-    }
+async function deleteProfile(id) {
+    if (!confirm('Delete this profile?')) return;
+    try { const res = await fetch(`${API_BASE}/api/admin/profiles/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+adminToken} }); if(res.ok){ profiles = profiles.filter(p=>p._id!==id); renderProfiles(); updateStats(); showToast('Deleted', 'info'); } else throw new Error('fail'); }
+    catch(e) { profiles = profiles.filter(p=>p._id!==id); renderProfiles(); updateStats(); showToast('Deleted (demo)', 'info'); }
 }
 
-async function approveCreator(id) {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/creators/${id}/approve`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
-        if (res.ok) {
-            const a = approvals.find(x => (x._id || x.id) === id);
-            if (a) { creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), creatorStars:0, referralEarnings:0}); }
-            approvals = approvals.filter(x => (x._id || x.id) !== id);
-            renderApprovals(); renderCreators(); updateStats();
-            showToast('Creator approved', 'success', 'Approved');
-        } else throw new Error('fail');
-    } catch(e) {
-        const a = approvals.find(x => (x._id || x.id) === id);
-        if (a) { creators.unshift({...a, status:'verified', unlocks:0, handle:a.handle||('@'+a.name.toLowerCase().replace(/\s/g,'')), creatorStars:0, referralEarnings:0}); }
-        approvals = approvals.filter(x => (x._id || x.id) !== id);
-        renderApprovals(); renderCreators(); updateStats();
-        showToast('Creator approved (demo)', 'success', 'Approved');
-    }
+async function approveProfile(id) {
+    try { const res = await fetch(`${API_BASE}/api/admin/profiles/${id}/approve`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} }); if(res.ok){ const a = approvals.find(x=>x._id===id); if(a){ a.status='verified'; profiles.unshift(a); } approvals = approvals.filter(x=>x._id!==id); renderApprovals(); renderProfiles(); updateStats(); showToast('Approved', 'success'); } else throw new Error('fail'); }
+    catch(e) { const a = approvals.find(x=>x._id===id); if(a){ a.status='verified'; profiles.unshift(a); } approvals = approvals.filter(x=>x._id!==id); renderApprovals(); renderProfiles(); updateStats(); showToast('Approved (demo)', 'success'); }
 }
 
-async function rejectCreator(id) {
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/creators/${id}/reject`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
-        if (res.ok) {
-            approvals = approvals.filter(x => (x._id || x.id) !== id);
-            renderApprovals(); updateStats();
-            showToast('Creator rejected', 'warning', 'Rejected');
-        } else throw new Error('fail');
-    } catch(e) {
-        approvals = approvals.filter(x => (x._id || x.id) !== id);
-        renderApprovals(); updateStats();
-        showToast('Creator rejected (demo)', 'warning', 'Rejected');
-    }
-}
-
-async function payWithdrawal(id) {
-    const w = withdrawals.find(x => (x._id || x.id) === id);
-    if (!w) return;
-    if (!confirm(`Mark KES ${w.amount} as paid to ${w.creatorName}?`)) return;
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/withdrawals/${id}/pay`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} });
-        if (res.ok) {
-            w.status = 'paid';
-            renderWithdrawals(); updateStats();
-            showToast(`KES ${w.amount} marked as paid to ${w.creatorName}`, 'success', 'Paid');
-        } else throw new Error('fail');
-    } catch(e) {
-        w.status = 'paid';
-        renderWithdrawals(); updateStats();
-        showToast(`KES ${w.amount} marked as paid (demo)`, 'success', 'Paid');
-    }
+async function rejectProfile(id) {
+    try { const res = await fetch(`${API_BASE}/api/admin/profiles/${id}/reject`, { method:'POST', headers:{'Authorization':'Bearer '+adminToken} }); if(res.ok){ approvals = approvals.filter(x=>x._id!==id); renderApprovals(); updateStats(); showToast('Rejected', 'warning'); } else throw new Error('fail'); }
+    catch(e) { approvals = approvals.filter(x=>x._id!==id); renderApprovals(); updateStats(); showToast('Rejected (demo)', 'warning'); }
 }
 
 async function changePassword() {
@@ -768,31 +558,17 @@ async function changePassword() {
     if (!current || !newPass) { showToast('Fill all fields', 'error'); return; }
     if (newPass !== confirm) { showToast('Passwords do not match', 'error'); return; }
     if (newPass.length < 6) { showToast('Password must be 6+ chars', 'error'); return; }
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/change-password`, {
-            method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken},
-            body: JSON.stringify({currentPassword:current, newPassword:newPass})
-        });
-        const data = await res.json();
-        if (data.success) {
-            showToast('Password changed!', 'success', 'Updated');
-            document.getElementById('currentPass').value='';
-            document.getElementById('newPass').value='';
-            document.getElementById('confirmPass').value='';
-        } else { showToast(data.message || 'Failed', 'error'); }
-    } catch(e) { showToast('Password changed (demo)', 'success', 'Updated'); }
+    try { const res = await fetch(`${API_BASE}/api/admin/change-password`, { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+adminToken}, body: JSON.stringify({currentPassword:current, newPassword:newPass}) }); const data = await res.json(); if(data.success){ showToast('Updated!', 'success'); document.getElementById('currentPass').value=''; document.getElementById('newPass').value=''; document.getElementById('confirmPass').value=''; } else { showToast(data.message||'Failed','error'); } }
+    catch(e) { showToast('Updated (demo)', 'success'); }
 }
 
-function refreshData() {
-    loadDashboard();
-    showToast('Data refreshed', 'success', 'Updated');
+function saveSettings() {
+    showToast('Settings saved', 'success', 'Saved');
 }
 
-if (adminToken) {
-    document.getElementById('loginWrap').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    loadDashboard();
-}
+function refreshData() { loadDashboard(); showToast('Refreshed', 'success'); }
+
+if (adminToken) { document.getElementById('loginWrap').style.display='none'; document.getElementById('dashboard').style.display='block'; loadDashboard(); }
 </script>
 </body>
 </html>
