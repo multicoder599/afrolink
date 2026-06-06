@@ -26,6 +26,7 @@
 
             --pink-accent: #f472b6;
             --pink-soft: rgba(244, 114, 182, 0.12);
+            --pink-glow: rgba(244, 114, 182, 0.25);
 
             --gold-warm: #fbbf24;
             --gold-soft: rgba(251, 191, 36, 0.12);
@@ -43,6 +44,7 @@
             --shadow-md: 0 8px 24px rgba(0,0,0,0.6);
             --shadow-lg: 0 20px 40px rgba(0,0,0,0.7);
             --shadow-rose: 0 0 30px rgba(225, 29, 72, 0.15);
+            --shadow-pink: 0 0 30px rgba(244, 114, 182, 0.15);
 
             --radius-sm: 10px;
             --radius-md: 16px;
@@ -63,6 +65,7 @@
 
         .gradient-text { background:linear-gradient(135deg,var(--rose-primary),var(--pink-accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .gradient-text-gold { background:linear-gradient(135deg,var(--gold-warm),#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .gradient-text-pink { background:linear-gradient(135deg,var(--pink-accent),#db2777); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 
         .btn { display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:14px 20px; border-radius:var(--radius-md); font-weight:700; font-size:14px; cursor:pointer; transition:all .25s cubic-bezier(.4,0,.2,1); border:none; width:100%; font-family:var(--font-body); position:relative; overflow:hidden; }
         .btn::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent); transform:translateX(-100%); transition:transform .6s; }
@@ -285,7 +288,13 @@
         .footer-logo { display:flex; align-items:center; justify-content:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:12px; letter-spacing:-0.3px; }
         .legal-text { font-size:10px; color:#4a5568; max-width:700px; margin:16px auto 0; line-height:1.7; }
 
-        /* EXCLUSIVE SECTION */
+        /* EXCLUSIVE SECTION - HOOKUP THEME */
+        .exclusive-hero { text-align:center; padding:32px 16px 24px; }
+        .exclusive-hero .crown-wrap { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--rose-soft),var(--pink-soft)); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; border:1px solid var(--border-subtle); box-shadow:0 0 20px var(--rose-glow); }
+        .exclusive-hero .crown-wrap i { font-size:28px; color:var(--rose-primary); }
+        .exclusive-hero h2 { font-size:26px; font-weight:800; letter-spacing:-1px; margin-bottom:6px; }
+        .exclusive-hero p { color:var(--text-secondary); font-size:14px; max-width:400px; margin:0 auto; }
+
         .category-grid { display:grid; grid-template-columns:1fr; gap:12px; padding:0 4px; margin-bottom:24px; }
         @media(min-width:640px){ .category-grid { grid-template-columns:repeat(2,1fr); } }
         @media(min-width:1024px){ .category-grid { grid-template-columns:repeat(3,1fr); } }
@@ -307,7 +316,7 @@
         .live-card img, .live-card .live-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(12px) brightness(.4); transform:scale(1.1); }
         .live-card .live-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.4) 50%, transparent 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:14px; z-index:2; }
         .live-card .live-badge { position:absolute; top:12px; left:12px; background:#e11d48; color:#fff; font-size:9px; font-weight:800; padding:4px 10px; border-radius:6px; text-transform:uppercase; display:flex; align-items:center; gap:4px; z-index:3; box-shadow:0 2px 8px rgba(225,29,72,.4); }
-        .live-card .live-badge.video { background:linear-gradient(135deg,var(--violet),var(--cyan)); }
+        .live-card .live-badge.video { background:linear-gradient(135deg,#8b5cf6,#06b6d4); }
         .live-card .live-badge::before { content:''; width:6px; height:6px; background:#fff; border-radius:50%; animation:pulseOnline 2s infinite; }
         .live-card .live-name { font-size:15px; font-weight:700; color:#fff; margin-bottom:2px; text-shadow:0 1px 4px rgba(0,0,0,.8); }
         .live-card .live-meta { font-size:11px; color:rgba(255,255,255,.7); text-shadow:0 1px 3px rgba(0,0,0,.8); }
@@ -435,12 +444,10 @@
 </section>
 
 <section id="view-exclusive" class="spa-view">
-    <div style="text-align:center;margin-bottom:20px;padding-top:10px;">
-        <div style="width:60px;height:60px;border-radius:20px;display:flex;justify-content:center;align-items:center;margin:0 auto 12px;background:var(--rose-soft);border:1px solid var(--border-subtle);">
-            <i class="fas fa-crown" style="font-size:24px;color:var(--rose-primary);"></i>
-        </div>
-        <h2 class="gradient-text" style="font-weight:800;letter-spacing:-1px;">Premium Content</h2>
-        <p style="color:var(--text-secondary);font-size:14px;max-width:400px;margin:4px auto 0;">Subscribe via M-Pesa and get instant access.</p>
+    <div class="exclusive-hero">
+        <div class="crown-wrap"><i class="fas fa-crown"></i></div>
+        <h2 class="gradient-text">Premium Content</h2>
+        <p>Subscribe via M-Pesa and get instant access to exclusive channels.</p>
     </div>
 
     <div class="section-header-row">

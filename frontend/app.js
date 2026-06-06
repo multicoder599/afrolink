@@ -25,7 +25,7 @@ const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+25
             this.x += this.vx; 
             this.y += this.vy; 
             this.p += .02; 
-            if (this.x<<0||this.x>w||this.y<<0||this.y>h) this.reset(); 
+            if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset(); 
         }
         draw() { 
             const o = this.o*(.7+.3*Math.sin(this.p)); 
@@ -43,7 +43,7 @@ const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+25
         P.forEach(p=>{p.update();p.draw();}); 
         for (let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
             const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);
-            if(d<<150){
+            if(d < 150){
                 x.beginPath();
                 x.moveTo(P[i].x,P[i].y);
                 x.lineTo(P[j].x,P[j].y);
@@ -60,6 +60,7 @@ const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+25
 /* TOAST */
 function showToast(m, t='info', ti='', d=4000) {
     const C = document.getElementById('toastContainer');
+    if (!C) return;
     const el = document.createElement('div');
     const I = {success:'fa-check',error:'fa-exclamation-triangle',info:'fa-info-circle',warning:'fa-exclamation-circle'};
     const T = {success:'Success',error:'Error',info:'Info',warning:'Warning'};
@@ -68,6 +69,14 @@ function showToast(m, t='info', ti='', d=4000) {
     C.appendChild(el);
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
+}
+
+/* FALLBACK IMAGE - no single quotes to break inline handlers */
+const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%25%22 stop-color=%22%2316101a%22/%3E%3Cstop offset=%22100%25%22 stop-color=%22%230f0a12%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill=%22url(%23g)%22 width=%22400%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2245%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23e11d48%22 font-family=%22sans-serif%22 font-size=%2260%22 font-weight=%22800%22 opacity=%220.2%22%3EAL%3C/text%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239f4a5e%22 font-family=%22sans-serif%22 font-size=%2214%22%3EAfroLink%3C/text%3E%3C/svg%3E";
+
+function imgFallback(el) {
+    el.onerror = null;
+    el.src = FALLBACK_IMG;
 }
 
 /* DATA */
@@ -81,6 +90,12 @@ const RI = a => a[Math.floor(Math.random() * a.length)];
 
 let globalProfiles = [], premiumProfiles = [], adminProfilesLoaded = false;
 
+function getImageUrl(i, total, type) {
+    // Spread images across available files to avoid same pic on every profile
+    const idx = ((i - 1) % 20) + 1;
+    return `./images/model (${idx}).jpg`;
+}
+
 function genProfiles() {
     const arr = [];
     for (let i = 1; i <= 48; i++) {
@@ -90,7 +105,7 @@ function genProfiles() {
             age: Math.floor(Math.random() * (32 - 19 + 1)) + 19,
             loc: LOCS[(i - 1) % LOCS.length],
             desc: BIOS[(i - 1) % BIOS.length],
-            img: `./images/model (${idx}).jpg`,
+            img: getImageUrl(i, 48, 'reg'),
             isOnline: Math.random() > 0.4, isPremium: false, isVerified: true,
             price: 499, phone: '', gender: 'Female', isReal: false,
             hair:'Long Black', faceCard:'Pretty', skinTone:'Medium', bodyType:'Curvy',
@@ -110,7 +125,7 @@ function genPremium() {
             age: Math.floor(Math.random() * (28 - 20 + 1)) + 20,
             loc: PLocs[i - 1],
             desc: PBios[(i - 1) % PBios.length],
-            img: `./images/model (${idx}).jpg`,
+            img: getImageUrl(i + 48, 20, 'prem'),
             isOnline: true, isPremium: true, isVerified: true,
             price: 2999, phone: '', gender: 'Female', isReal: false,
             hair:'Blonde Braids', faceCard:'Model', skinTone:'Light', bodyType:'Slim Thick',
@@ -120,8 +135,6 @@ function genPremium() {
     }
     return arr;
 }
-
-const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2316101a'/%3E%3Cstop offset='100%25' stop-color='%230f0a12'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='400' height='500'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23e11d48' font-family='sans-serif' font-size='60' font-weight='800' opacity='0.2'%3EAL%3C/text%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' fill='%239f4a5e' font-family='sans-serif' font-size='14'%3EAfroLink%3C/text%3E%3C/svg%3E";
 
 function resolveImageUrl(url) {
     if (!url) return FALLBACK_IMG;
@@ -220,7 +233,6 @@ function shareCurrentProfile() { if (!currentDetailProfile) return; shareProfile
 function squareCard(p, idx, isPrem) {
     const favs = getFavs();
     const isFav = favs.includes(p.id);
-    const onerr = `this.onerror=null;this.src='${FALLBACK_IMG}';`;
     const openFn = `openProfileDetail('${p.id}',${isPrem})`;
     const onlineDot = p.isOnline ? `<div class="online-badge"><div class="dot"></div>Online</div>` : '';
     const hotBadge = `<div class="hot-badge"><i class="fas fa-fire"></i> Hot</div>`;
@@ -228,7 +240,7 @@ function squareCard(p, idx, isPrem) {
 
     return `
     <div class="profile-card" data-id="${p.id}" data-prem="${isPrem}" onclick="${openFn}">
-        <img src="${p.img}" onerror="${onerr}" alt="${p.name}" loading="lazy">
+        <img src="${p.img}" onerror="imgFallback(this)" alt="${p.name}" loading="lazy">
         <div class="card-top">
             ${hotBadge}
             <div style="display:flex;gap:6px;">
@@ -252,23 +264,27 @@ function squareCard(p, idx, isPrem) {
 
 function renderProfiles(list) {
     const grid = document.getElementById('dynamic-profile-grid');
+    if (!grid) return;
     if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Profiles Found</h2><p>No profiles match your filters.</p></div>`; return; }
     grid.innerHTML = list.map((p, i) => squareCard(p, i, false)).join('');
 }
 
 function renderPremium(list) {
     const grid = document.getElementById('dynamic-premium-grid');
+    if (!grid) return;
     if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Premium Profiles</h2><p>Check back soon for new VIP members.</p></div>`; return; }
     grid.innerHTML = list.map((p, i) => squareCard(p, i, true)).join('');
 }
 
 function renderDiscoverFeatured() {
     const row = document.getElementById('discover-featured-row');
+    if (!row) return;
     row.innerHTML = globalProfiles.slice(0, 6).map((p, i) => squareCard(p, i, false)).join('');
 }
 
 function renderDiscoverPremium() {
     const row = document.getElementById('discover-premium-row');
+    if (!row) return;
     row.innerHTML = premiumProfiles.slice(0, 6).map((p, i) => squareCard(p, i, true)).join('');
 }
 
@@ -278,7 +294,11 @@ function setFilter(type, btn) {
     btn.classList.add('active');
     if (type === 'Men') {
         const f = globalProfiles.filter(p => p.gender === 'Male');
-        if (!f.length) { document.getElementById('dynamic-profile-grid').innerHTML = `<div class="empty-state-box"><i class="fas fa-male"></i><h2>Nothing Here Yet</h2><p>The men's section is empty. Check back later!</p></div>`; return; }
+        if (!f.length) { 
+            const grid = document.getElementById('dynamic-profile-grid');
+            if (grid) grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-male"></i><h2>Nothing Here Yet</h2><p>The men's section is empty. Check back later!</p></div>`; 
+            return; 
+        }
         renderProfiles(f);
     } else if (type === 'Women') { renderProfiles(globalProfiles.filter(p => p.gender === 'Female')); }
     else { renderProfiles(globalProfiles); }
@@ -327,7 +347,7 @@ function renderLivePreviews() {
     ];
     grid.innerHTML = liveData.map(l => `
         <div class="live-card" onclick="openMpesaModalDirect('${l.name}',199)">
-            <img src="${l.img}" onerror="this.src='${FALLBACK_IMG}'" class="live-bg" loading="lazy" alt="${l.name}">
+            <img src="${l.img}" onerror="imgFallback(this)" class="live-bg" loading="lazy" alt="${l.name}">
             <div class="live-badge ${l.type==='video'?'video':''}">${l.type==='live'?'LIVE':'VIDEO'}</div>
             <div class="live-overlay">
                 <div class="live-name">${l.action}</div>
@@ -357,6 +377,7 @@ const PLANS = [
 
 function renderPlans() {
     const grid = document.getElementById('plans-grid');
+    if (!grid) return;
     grid.innerHTML = PLANS.map(plan => {
         const badge = plan.badge ? `<div class="plan-badge ${plan.badge === 'Elite' || plan.badge === 'Best' ? 'gold' : ''}">${plan.badge}</div>` : '';
         const popClass = plan.popular ? 'popular' : '';
@@ -382,13 +403,18 @@ function openProfileDetail(id, isPrem) {
 function showDetailModal(p) {
     currentDetailProfile = p;
     const img = document.getElementById('detail-img');
+    if (!img) return;
     img.src = p.img;
-    img.onerror = function() { this.src = FALLBACK_IMG; };
+    img.onerror = function() { this.onerror = null; this.src = FALLBACK_IMG; };
     const checkColor = p.isPremium ? 'var(--gold-warm)' : '#4ADE80';
-    document.getElementById('detail-name').innerHTML = `${p.name}, ${p.age} <i class="fas fa-check-circle" style="color:${checkColor};font-size:18px;"></i>`;
-    document.getElementById('detail-loc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${p.loc}`;
-    document.getElementById('detail-desc').innerText = p.desc || 'No description available.';
-    document.getElementById('detail-price').innerText = (p.price || 499).toLocaleString();
+    const nameEl = document.getElementById('detail-name');
+    if (nameEl) nameEl.innerHTML = `${p.name}, ${p.age} <i class="fas fa-check-circle" style="color:${checkColor};font-size:18px;"></i>`;
+    const locEl = document.getElementById('detail-loc');
+    if (locEl) locEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${p.loc}`;
+    const descEl = document.getElementById('detail-desc');
+    if (descEl) descEl.innerText = p.desc || 'No description available.';
+    const priceEl = document.getElementById('detail-price');
+    if (priceEl) priceEl.innerText = (p.price || 499).toLocaleString();
 
     const attrsContainer = document.getElementById('detail-attrs-container');
     const attrsGrid = document.getElementById('detail-attrs');
@@ -398,20 +424,26 @@ function showDetailModal(p) {
         {label:'Thighs', val:p.thighs}, {label:'Butt', val:p.butt}, {label:'Piercings', val:p.piercings}, {label:'Tattoos', val:p.tattoos}
     ].filter(a => a.val && a.val.trim() !== '');
 
-    if (attrs.length > 0) {
-        attrsContainer.style.display = 'block';
-        attrsGrid.innerHTML = attrs.map(a => `<div class="attr-item"><div class="attr-label">${a.label}</div><div class="attr-value">${a.val}</div></div>`).join('');
-    } else { attrsContainer.style.display = 'none'; }
+    if (attrsContainer && attrsGrid) {
+        if (attrs.length > 0) {
+            attrsContainer.style.display = 'block';
+            attrsGrid.innerHTML = attrs.map(a => `<div class="attr-item"><div class="attr-label">${a.label}</div><div class="attr-value">${a.val}</div></div>`).join('');
+        } else { attrsContainer.style.display = 'none'; }
+    }
 
     const favs = getFavs();
     const isFav = favs.includes(p.id);
     const favBtn = document.getElementById('detailFavBtn');
-    favBtn.classList.toggle('active', isFav);
-    favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--rose-primary)"></i>' : '<i class="far fa-heart"></i>';
-    profileDetailModal.classList.add('active');
+    if (favBtn) {
+        favBtn.classList.toggle('active', isFav);
+        favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--rose-primary)"></i>' : '<i class="far fa-heart"></i>';
+    }
+    if (profileDetailModal) profileDetailModal.classList.add('active');
 }
 
-function closeProfileDetailModal() { profileDetailModal.classList.remove('active'); }
+function closeProfileDetailModal() { 
+    if (profileDetailModal) profileDetailModal.classList.remove('active'); 
+}
 
 function openMpesaFromDetail() {
     if (!currentDetailProfile) return;
@@ -425,18 +457,22 @@ let currentActiveName = '', currentActivePrice = 499, currentActiveId = '', curr
 
 function openMpesaModalDirect(name, price, id = '', isPremium = false) {
     currentActiveName = name; currentActivePrice = price; currentActiveId = id; currentActiveIsPremium = isPremium;
-    document.getElementById('modal-model-name').innerText = name;
-    document.getElementById('modal-price').innerText = price.toLocaleString();
+    const nameSpan = document.getElementById('modal-model-name');
+    const priceSpan = document.getElementById('modal-price');
+    if (nameSpan) nameSpan.innerText = name;
+    if (priceSpan) priceSpan.innerText = price.toLocaleString();
     document.querySelectorAll('.step-dot').forEach((d, i) => { d.className = 'step-dot' + (i === 0 ? ' active' : ''); });
     const btn = document.getElementById('mpesaSubmitBtn');
-    btn.disabled = false; btn.className = 'btn btn--rose btn-glow';
-    document.getElementById('btnText').innerHTML = 'Send M-Pesa Prompt';
-    mpesaModal.classList.add('active');
+    const btnText = document.getElementById('btnText');
+    if (btn) { btn.disabled = false; btn.className = 'btn btn--rose btn-glow'; }
+    if (btnText) btnText.innerHTML = 'Send M-Pesa Prompt';
+    if (mpesaModal) mpesaModal.classList.add('active');
 }
 
 function closeMpesaModal() {
-    mpesaModal.classList.remove('active');
-    document.getElementById('mpesaNumber').value = '';
+    if (mpesaModal) mpesaModal.classList.remove('active');
+    const mpesaInput = document.getElementById('mpesaNumber');
+    if (mpesaInput) mpesaInput.value = '';
     if (paymentInterval) { clearInterval(paymentInterval); paymentInterval = null; }
 }
 
@@ -451,8 +487,8 @@ async function processPayment() {
 
     const btn = document.getElementById('mpesaSubmitBtn');
     const btnText = document.getElementById('btnText');
-    btn.disabled = true; btn.classList.remove('btn-glow');
-    btnText.innerHTML = '<span class="spinner"></span> Initiating STK Push...';
+    if (btn) { btn.disabled = true; btn.classList.remove('btn-glow'); }
+    if (btnText) btnText.innerHTML = '<span class="spinner"></span> Initiating STK Push...';
     updateSteps(1);
 
     try {
@@ -465,7 +501,7 @@ async function processPayment() {
         if (!data.success) throw new Error(data.message || 'Failed to initiate payment');
 
         updateSteps(2);
-        btnText.innerHTML = '<span class="spinner"></span> Awaiting your confirmation...';
+        if (btnText) btnText.innerHTML = '<span class="spinner"></span> Awaiting your confirmation...';
         showToast('M-Pesa prompt sent! Please check your phone and enter your PIN.', 'info', 'STK Push Sent', 6000);
 
         let attempts = 0;
@@ -473,8 +509,8 @@ async function processPayment() {
             attempts++;
             if (attempts >= 30) {
                 clearInterval(paymentInterval); paymentInterval = null;
-                btn.disabled = false; btn.classList.add('btn-glow');
-                btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
+                if (btn) { btn.disabled = false; btn.classList.add('btn-glow'); }
+                if (btnText) btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
                 showToast('Payment timed out. Try again if you completed it.', 'warning', 'Timeout', 6000); return;
             }
             try {
@@ -483,23 +519,24 @@ async function processPayment() {
                 const sd = await s.json();
                 if (sd.status === 'success') {
                     clearInterval(paymentInterval); paymentInterval = null;
-                    updateSteps(3); btnText.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
-                    btn.className = 'btn btn--gold';
+                    updateSteps(3); 
+                    if (btnText) btnText.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
+                    if (btn) btn.className = 'btn btn--gold';
                     showToast(`KES ${currentActivePrice.toLocaleString()} paid! ${currentActiveName} unlocked.`, 'success', 'Confirmed', 5000);
                     launchConfetti();
                     closeMpesaModal();
                     setTimeout(() => showContactReveal(), 400);
                 } else if (sd.status === 'failed') {
                     clearInterval(paymentInterval); paymentInterval = null;
-                    btn.disabled = false; btn.classList.add('btn-glow');
-                    btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
+                    if (btn) { btn.disabled = false; btn.classList.add('btn-glow'); }
+                    if (btnText) btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
                     showToast(sd.message || 'Payment failed. Please try again.', 'error', 'Failed');
                 }
             } catch (e) { console.error('Status check error:', e); }
         }, 2000);
     } catch (err) {
-        btn.disabled = false; btn.classList.add('btn-glow');
-        btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
+        if (btn) { btn.disabled = false; btn.classList.add('btn-glow'); }
+        if (btnText) btnText.innerHTML = 'Send M-Pesa Prompt'; updateSteps(0);
         showToast(err.message || 'Unable to connect to payment server.', 'error', 'Payment Error');
     }
 }
@@ -559,7 +596,10 @@ function showContactReveal() {
     }, 2500);
 }
 
-function closeContactRevealModal() { document.getElementById('contactRevealModal').classList.remove('active'); }
+function closeContactRevealModal() { 
+    const modal = document.getElementById('contactRevealModal');
+    if (modal) modal.classList.remove('active'); 
+}
 function closeContactRevealAndGoHome() {
     closeContactRevealModal();
     setTimeout(() => { history.pushState({ page: 'discover' }, null, '#discover'); navigateTo('discover'); }, 300);
@@ -586,6 +626,7 @@ function launchConfetti() {
 function previewImage(e) {
     const reader = new FileReader();
     const preview = document.getElementById('img-preview');
+    if (!preview) return;
     reader.onload = () => { preview.src = reader.result; preview.style.display = 'inline-block'; };
     if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 }
@@ -609,6 +650,7 @@ const views = document.querySelectorAll('.spa-view');
 const triggers = document.querySelectorAll('.nav-trigger');
 
 function navigateTo(page) {
+    if (!page) page = 'discover';
     views.forEach(v => { v.classList.remove('active'); v.style.animation = 'none'; v.offsetHeight; });
     triggers.forEach(t => t.classList.remove('active'));
     const target = document.getElementById(`view-${page}`);
