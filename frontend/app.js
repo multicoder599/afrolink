@@ -127,7 +127,7 @@ function genPremium() {
             desc: PBios[(i - 1) % PBios.length],
             img: getImageUrl(i + 48, 20, 'prem'),
             isOnline: true, isPremium: true, isVerified: true,
-            price: 2999, phone: '', gender: 'Female', isReal: false,
+            price: 299, phone: '', gender: 'Female', isReal: false,
             hair:'Blonde Braids', faceCard:'Model', skinTone:'Light', bodyType:'Slim Thick',
             breast:'32D', waist:'24"', thighs:'Toned', butt:'Peachy',
             piercings:'Nose, Navel', tattoos:'Back piece'
