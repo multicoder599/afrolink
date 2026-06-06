@@ -14,17 +14,17 @@
             --bg-elevated: #0c0c14;
             --card: rgba(18, 18, 28, 0.75);
             --card-border: rgba(255, 255, 255, 0.05);
-            --card-border-hover: rgba(139, 92, 246, 0.25);
+            --card-border-hover: rgba(225, 29, 72, 0.25);
             --text: #f8fafc;
             --text-secondary: #94a3b8;
             --muted: #64748b;
             --dim: #475569;
 
-            --accent: #8b5cf6;
-            --accent-glow: rgba(139, 92, 246, 0.25);
-            --accent-hover: #7c3aed;
-            --cyan: #06b6d4;
-            --cyan-glow: rgba(6, 182, 212, 0.2);
+            --accent: #e11d48;
+            --accent-glow: rgba(225, 29, 72, 0.25);
+            --accent-hover: #be123c;
+            --secondary: #f472b6;
+            --secondary-glow: rgba(244, 114, 182, 0.2);
             --gold: #fbbf24;
             --gold-glow: rgba(251, 191, 36, 0.2);
             --green: #34d399;
@@ -52,8 +52,8 @@
             min-height: 100vh;
             line-height: 1.5;
             background-image: 
-                radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.07) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 0%, rgba(225, 29, 72, 0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(244, 114, 182, 0.05) 0%, transparent 50%),
                 linear-gradient(0deg, transparent 24%, rgba(255,255,255,0.006) 25%, rgba(255,255,255,0.006) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.006) 75%, rgba(255,255,255,0.006) 76%, transparent 77%, transparent),
                 linear-gradient(90deg, transparent 24%, rgba(255,255,255,0.006) 25%, rgba(255,255,255,0.006) 26%, transparent 27%, transparent 74%, rgba(255,255,255,0.006) 75%, rgba(255,255,255,0.006) 76%, transparent 77%, transparent);
             background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
@@ -88,7 +88,6 @@
 
         .hidden { display: none !important; }
 
-        /* LOGIN */
         .login-screen { 
             display: flex; 
             justify-content: center; 
@@ -114,7 +113,7 @@
         }
         .login-box .logo-area .logo-icon {
             width: 56px; height: 56px;
-            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
             border-radius: var(--radius-md);
             display: inline-flex;
             align-items: center;
@@ -224,7 +223,7 @@
         .btn-outline:hover:not(:disabled) { 
             border-color: var(--accent); 
             color: var(--accent); 
-            background: rgba(139,92,246,0.08);
+            background: rgba(225,29,72,0.08);
         }
         .btn-gold { 
             background: var(--gold); 
@@ -248,10 +247,8 @@
             gap: 6px;
         }
 
-        /* ADMIN LAYOUT */
         .admin-layout { display: none; }
 
-        /* Sidebar */
         .sidebar { 
             position: fixed; 
             left: 0; top: 0; 
@@ -276,7 +273,7 @@
         }
         .sidebar-logo .logo-mark {
             width: 32px; height: 32px;
-            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -301,14 +298,14 @@
             border: 1px solid transparent;
         }
         .nav-link:hover { 
-            background: rgba(139, 92, 246, 0.08); 
+            background: rgba(225, 29, 72, 0.08); 
             color: var(--text-secondary); 
-            border-color: rgba(139, 92, 246, 0.15);
+            border-color: rgba(225, 29, 72, 0.15);
         }
         .nav-link.active { 
-            background: rgba(139, 92, 246, 0.12); 
+            background: rgba(225, 29, 72, 0.12); 
             color: var(--accent); 
-            border-color: rgba(139, 92, 246, 0.25);
+            border-color: rgba(225, 29, 72, 0.25);
             font-weight: 700;
         }
         .nav-link .material-symbols-outlined { font-size: 20px; }
@@ -346,7 +343,6 @@
             .main-content { margin-left: 0 !important; padding-top: 60px !important; }
         }
 
-        /* Main Content */
         .main-content { 
             margin-left: 260px; 
             padding: 28px; 
@@ -390,7 +386,6 @@
             box-shadow: 0 0 15px rgba(248,113,113,0.1);
         }
 
-        /* Stats Grid */
         .stats-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -412,7 +407,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, var(--accent), var(--cyan));
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -446,11 +441,9 @@
             .stat-card .value { font-size: 24px; }
         }
 
-        /* Sections */
         .section { display: none; }
         .section.active { display: block; animation: fadeInUp 0.4s ease-out; }
 
-        /* Cards */
         .content-card {
             background: var(--card);
             backdrop-filter: blur(12px);
@@ -483,7 +476,6 @@
             gap: 12px;
         }
 
-        /* Tables */
         .table-wrap {
             overflow-x: auto;
             border-radius: var(--radius-md);
@@ -541,7 +533,7 @@
         .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
         .badge-gold { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.2); }
         .badge-red { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
-        .badge-violet { background: rgba(139,92,246,0.12); color: var(--accent); border: 1px solid rgba(139,92,246,0.2); }
+        .badge-rose { background: rgba(225,29,72,0.12); color: var(--accent); border: 1px solid rgba(225,29,72,0.2); }
 
         .actions-cell {
             display: flex;
@@ -565,7 +557,6 @@
         .delete-btn { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.2) !important; }
         .delete-btn:hover { background: rgba(248, 113, 113, 0.2); box-shadow: 0 0 10px rgba(248,113,113,0.15); }
 
-        /* Modal */
         .modal-overlay { 
             position: fixed; 
             inset: 0; 
@@ -602,7 +593,6 @@
             .modal-box { padding: 20px; max-height: 95vh; border-radius: var(--radius-lg); }
         }
 
-        /* Form */
         .form-group { margin-bottom: 16px; }
         .form-group label { 
             display: block; 
@@ -651,7 +641,6 @@
         }
         .attr-section-title .material-symbols-outlined { font-size: 18px; }
 
-        /* Toast */
         .toast { 
             position: fixed; 
             bottom: 24px; 
@@ -704,7 +693,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="logo-area">
@@ -735,7 +723,6 @@
         </div>
     </div>
 
-    <!-- ADMIN DASHBOARD -->
     <div class="admin-layout" id="adminLayout">
         <button class="sidebar-toggle" onclick="toggleSidebar()">
             <span class="material-symbols-outlined">menu</span>
@@ -778,7 +765,6 @@
                 </button>
             </div>
 
-            <!-- DASHBOARD -->
             <div class="section active" id="dashboard">
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -800,7 +786,6 @@
                 </div>
             </div>
 
-            <!-- PROFILES LIST -->
             <div class="section" id="profiles">
                 <div class="content-card">
                     <div class="section-header">
@@ -832,7 +817,6 @@
                 </div>
             </div>
 
-            <!-- ADD / EDIT PROFILE -->
             <div class="section" id="add">
                 <div class="content-card">
                     <h3 id="formTitle">
@@ -842,7 +826,6 @@
                     <form id="profileForm" onsubmit="saveProfile(event)">
                         <input type="hidden" id="editId" />
 
-                        <!-- BASIC INFO -->
                         <div class="form-grid-2">
                             <div class="form-group">
                                 <label>Name / Alias</label>
@@ -884,7 +867,6 @@
                             <textarea id="pBio" required placeholder="Write an alluring description..."></textarea>
                         </div>
 
-                        <!-- PHYSICAL ATTRIBUTES -->
                         <div class="attr-section-title">
                             <span class="material-symbols-outlined">straighten</span>
                             Physical Attributes
@@ -976,7 +958,6 @@
                 </div>
             </div>
 
-            <!-- TRANSACTIONS -->
             <div class="section" id="transactions">
                 <div class="content-card">
                     <h3>
@@ -1005,7 +986,6 @@
         </div>
     </div>
 
-    <!-- DELETE CONFIRM MODAL -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-box" style="max-width: 420px; text-align: center;">
             <span class="material-symbols-outlined" style="font-size: 48px; color: var(--red); margin-bottom: 12px;">warning</span>
@@ -1193,7 +1173,7 @@
                 <tr>
                     <td><code>${t.refId || t.reference || '-'}</code></td>
                     <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${t.userPhone || t.phone || '-'}</td>
-                    <td><span class="badge badge-violet">${t.type || 'Payment'}</span></td>
+                    <td><span class="badge badge-rose">${t.type || 'Payment'}</span></td>
                     <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;">KES ${t.amount?.toLocaleString() || 0}</td>
                     <td>
                         ${t.status === 'Success' || t.status === 'success' ? '<span class="badge badge-green">Success</span>' : 
