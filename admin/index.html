@@ -1085,19 +1085,19 @@
         }
 
         async function loadDashboard() {
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/stats`, {
-                    headers: { 'Authorization': `Bearer ${authToken}` }
-                });
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('statProfiles').innerText = data.stats.totalProfiles;
-                    document.getElementById('statUsers').innerText = data.stats.totalUsers;
-                    document.getElementById('statTransactions').innerText = data.stats.totalTransactions;
-                    document.getElementById('statRevenue').innerText = 'KES ' + (data.stats.totalRevenue || 0).toLocaleString();
-                }
-            } catch (err) { console.error('Stats error:', err); }
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/stats`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('statProfiles').innerText = data.stats.totalProfiles || 0;
+            document.getElementById('statUsers').innerText = data.stats.totalUsers || 0;
+            document.getElementById('statTransactions').innerText = data.stats.totalTransactions || 0;
+            document.getElementById('statRevenue').innerText = 'KES ' + (data.stats.totalRevenue || 0).toLocaleString();
         }
+    } catch (err) { console.error('Stats error:', err); }
+}
 
         async function loadProfiles() {
             try {

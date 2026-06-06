@@ -291,11 +291,11 @@ function filterByLocation(val) {
 
 /* EXCLUSIVE SECTION */
 const CATEGORIES = [
-    { id:'kenyan', icon:'fa-exclamation-triangle', title:'Kenyan Porn', desc:'Premium Kenyan adult content', price:'From KES 99/wk', color:'rose' },
-    { id:'trending', icon:'fa-fire', title:'Trending Leaks', desc:'Latest viral & trending leaked content', price:'From KES 99/wk', color:'rose' },
-    { id:'somali', icon:'fa-heart', title:'Somali Porn', desc:'Exclusive Somali adult content', price:'From KES 99/wk', color:'rose' },
-    { id:'celebrity', icon:'fa-gem', title:'Celebrity Leaks', desc:'Exclusive celebrity & influencer content', price:'From KES 99/wk', color:'rose' },
-    { id:'all', icon:'fa-infinity', title:'All of the Above', desc:'Access to all 4 channels in one subscription', price:'From KES 199/wk', color:'gold', badge:'BEST VALUE' }
+    { id:'kenyan', icon:'fa-exclamation-triangle', title:'Kenyan Porn', desc:'Premium Kenyan adult content', price:'From KES 99/wk' },
+    { id:'trending', icon:'fa-fire', title:'Trending Leaks', desc:'Latest viral & trending leaked content', price:'From KES 99/wk' },
+    { id:'somali', icon:'fa-heart', title:'Somali Porn', desc:'Exclusive Somali adult content', price:'From KES 99/wk' },
+    { id:'celebrity', icon:'fa-gem', title:'Celebrity Leaks', desc:'Exclusive celebrity & influencer content', price:'From KES 99/wk' },
+    { id:'all', icon:'fa-infinity', title:'All of the Above', desc:'Access to all 4 channels in one subscription', price:'From KES 199/wk', badge:'BEST VALUE' }
 ];
 
 function renderCategories() {

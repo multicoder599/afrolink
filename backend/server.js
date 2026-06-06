@@ -43,8 +43,9 @@ const storage = multer.diskStorage({
         cb(null, unique + path.extname(file.originalname));
     }
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB max
-// Serve static uploads
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+
+// Serve static uploads and images
 app.use('/uploads', express.static(uploadDir));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
@@ -62,8 +63,10 @@ const profileSchema = new mongoose.Schema({
     isPremium: { type: Boolean, default: false },
     isOnline: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+    active: { type: Boolean, default: true },
     price: { type: Number, default: 499, min: 0 },
     status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
+    county: { type: String, default: 'Nairobi' },
     hair: { type: String, default: '' }, faceCard: { type: String, default: '' },
     skinTone: { type: String, default: '' }, bodyType: { type: String, default: '' },
     breast: { type: String, default: '' }, waist: { type: String, default: '' },
@@ -224,25 +227,32 @@ app.get('/api/admin/profiles', verifyAdmin, async (req, res) => {
     catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.post('/api/admin/profiles', upload.single('image'), async (req, res) => {
+app.post('/api/admin/profiles', verifyAdmin, upload.single('image'), async (req, res) => {
     try {
         const data = req.body;
         if (req.file) data.image = '/uploads/' + req.file.filename;
-        // ... save to MongoDB
-        res.json({ success: true, profile: data });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
+        data.img = data.image || '';
+        data.loc = data.location || data.loc || 'Nairobi';
+        data.desc = data.bio || data.desc || '';
+        data.status = 'verified';
+        data.isVerified = true;
+        const profile = new Profile(data);
+        await profile.save();
+        res.json({ success: true, profile });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
-app.put('/api/admin/profiles/:id', upload.single('image'), async (req, res) => {
+
+app.put('/api/admin/profiles/:id', verifyAdmin, upload.single('image'), async (req, res) => {
     try {
         const updates = req.body;
         if (req.file) updates.image = '/uploads/' + req.file.filename;
-        // ... findByIdAndUpdate
-        res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
+        if (updates.image) updates.img = updates.image;
+        updates.loc = updates.location || updates.loc || 'Nairobi';
+        updates.desc = updates.bio || updates.desc || '';
+        const profile = await Profile.findByIdAndUpdate(req.params.id, updates, { new: true });
+        if (!profile) return res.status(404).json({ success: false, message: 'Profile not found' });
+        res.json({ success: true, profile });
+    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.get('/api/admin/approvals', verifyAdmin, async (req, res) => {
@@ -279,7 +289,24 @@ app.get('/api/admin/stats', verifyAdmin, async (req, res) => {
         const activeProfiles = await Profile.countDocuments({ status: 'verified' });
         const pendingProfiles = await Profile.countDocuments({ status: 'pending' });
         const totalProfiles = await Profile.countDocuments();
-        res.json({ success: true, stats: { totalRevenue: totalRevenue[0]?.total || 0, todayRevenue: todayRevenue[0]?.total || 0, totalUnlocks, totalListings, activeProfiles, pendingProfiles, totalProfiles, platformFee: PLATFORM_FEE_PERCENT } });
+        const totalTransactions = await Transaction.countDocuments();
+        const totalUsers = await Transaction.distinct('userPhone').then(arr => arr.length);
+        
+        res.json({ 
+            success: true, 
+            stats: { 
+                totalRevenue: totalRevenue[0]?.total || 0, 
+                todayRevenue: todayRevenue[0]?.total || 0, 
+                totalUnlocks, 
+                totalListings, 
+                activeProfiles, 
+                pendingProfiles, 
+                totalProfiles,
+                totalTransactions,
+                totalUsers,
+                platformFee: PLATFORM_FEE_PERCENT 
+            } 
+        });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
