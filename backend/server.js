@@ -64,7 +64,7 @@ const profileSchema = new mongoose.Schema({
     isOnline: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
-    price: { type: Number, default: 499, min: 0 },
+    price: { type: Number, default: 99, min: 0 },
     status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
     county: { type: String, default: 'Nairobi' },
     hair: { type: String, default: '' }, faceCard: { type: String, default: '' },
@@ -190,7 +190,7 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
         const existing = await Profile.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
         const img = req.file ? `/uploads/${req.file.filename}` : '';
-        const profile = new Profile({ name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi', bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female', price: parseInt(price) || 499, image: img, img: img, status: 'pending', hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos });
+        const profile = new Profile({ name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi', bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female', price: parseInt(price) || 99, image: img, img: img, status: 'pending', hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos });
         await profile.save();
         res.json({ success: true, message: 'Application submitted. Await admin approval.', profileId: profile._id });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }

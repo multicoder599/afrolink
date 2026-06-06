@@ -107,7 +107,7 @@ function genProfiles() {
             desc: BIOS[(i - 1) % BIOS.length],
             img: getImageUrl(i, 48, 'reg'),
             isOnline: Math.random() > 0.4, isPremium: false, isVerified: true,
-            price: 499, phone: '', gender: 'Female', isReal: false,
+            price: 99, phone: '', gender: 'Female', isReal: false,
             hair:'Long Black', faceCard:'Pretty', skinTone:'Medium', bodyType:'Curvy',
             breast:'34C', waist:'28"', thighs:'Thick', butt:'Bubble',
             piercings:'Ears, Navel', tattoos:'None'
@@ -169,7 +169,7 @@ async function loadAdminProfiles() {
                 isOnline: p.isOnline || false,
                 isPremium: p.isPremium || false,
                 isVerified: p.isVerified !== false,
-                price: typeof p.price === 'number' ? p.price : 499,
+                price: typeof p.price === 'number' ? p.price : 99,
                 phone: p.phone || '',
                 gender: p.gender || 'Female',
                 isReal: true,
@@ -364,15 +364,15 @@ function renderLivePreviews() {
 
 /* PLANS */
 const PLANS = [
-    { title: "Basic Unlock", price: 499, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Basic" },
-    { title: "Starter Pack", price: 499, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Start Pack" },
-    { title: "Live Chat", price: 599, icon: "fa-comments", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Chat" },
-    { title: "Weekend Special", price: 799, icon: "fa-moon", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--rose", btnText: "Get Weekend" },
-    { title: "Video Chat", price: 999, icon: "fa-video", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Video" },
+    { title: "Basic Unlock", price: 299, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Basic" },
+    { title: "Starter Pack", price: 399, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Start Pack" },
+    { title: "Live Chat", price: 299, icon: "fa-comments", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Chat" },
+    { title: "Weekend Special", price: 499, icon: "fa-moon", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--rose", btnText: "Get Weekend" },
+    { title: "Video Chat", price: 399, icon: "fa-video", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Video" },
     { title: "VIP Monthly", price: 1499, icon: "fa-crown", iconColor: "var(--rose-primary)", desc: "30-day full access", features: ["Unlimited contact unlocks","Free video chats included","VIP badge on your profile","Priority customer support"], badge: "Popular", popular: true, btn: "btn--rose", btnText: "Go VIP" },
-    { title: "Member Listing", price: 1499, icon: "fa-user-plus", desc: "List your profile", features: ["Verified profile badge","Appear in search results","Receive direct inquiries","Lifetime listing"], badge: null, popular: false, btn: "btn--gold", btnText: "Become Member" },
-    { title: "Platinum Pass", price: 2999, icon: "fa-gem", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--rose", btnText: "Go Platinum" },
-    { title: "All Access", price: 4999, icon: "fa-infinity", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--rose", btnText: "Go All In" }
+    { title: "Member Listing", price: 999, icon: "fa-user-plus", desc: "List your profile", features: ["Verified profile badge","Appear in search results","Receive direct inquiries","Lifetime listing"], badge: null, popular: false, btn: "btn--gold", btnText: "Become Member" },
+    { title: "Platinum Pass", price: 1499, icon: "fa-gem", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--rose", btnText: "Go Platinum" },
+    { title: "All Access", price: 1999, icon: "fa-infinity", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--rose", btnText: "Go All In" }
 ];
 
 function renderPlans() {
@@ -414,7 +414,7 @@ function showDetailModal(p) {
     const descEl = document.getElementById('detail-desc');
     if (descEl) descEl.innerText = p.desc || 'No description available.';
     const priceEl = document.getElementById('detail-price');
-    if (priceEl) priceEl.innerText = (p.price || 499).toLocaleString();
+    if (priceEl) priceEl.innerText = (p.price || 99).toLocaleString();
 
     const attrsContainer = document.getElementById('detail-attrs-container');
     const attrsGrid = document.getElementById('detail-attrs');
@@ -453,7 +453,7 @@ function openMpesaFromDetail() {
 
 /* MPESA MODAL */
 const mpesaModal = document.getElementById('mpesaModal');
-let currentActiveName = '', currentActivePrice = 499, currentActiveId = '', currentActiveIsPremium = false, paymentInterval = null;
+let currentActiveName = '', currentActivePrice = 99, currentActiveId = '', currentActiveIsPremium = false, paymentInterval = null;
 
 function openMpesaModalDirect(name, price, id = '', isPremium = false) {
     currentActiveName = name; currentActivePrice = price; currentActiveId = id; currentActiveIsPremium = isPremium;
@@ -630,7 +630,7 @@ function previewImage(e) {
     reader.onload = () => { preview.src = reader.result; preview.style.display = 'inline-block'; };
     if (e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
 }
-function submitListing(e) { e.preventDefault(); openMpesaModalDirect('Profile Listing Fee', 1499); }
+function submitListing(e) { e.preventDefault(); openMpesaModalDirect('Profile Listing Fee', 999); }
 
 /* COUNTERS */
 function animateCounters() {
