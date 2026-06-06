@@ -24,14 +24,6 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AfroLink@2026';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20');
 
-// ====== GLOBAL REQUEST LOGGER (DEBUG) ======
-const allReqLog = path.join(__dirname, 'all-requests.log');
-function logAllReq(req, msg) {
-    const line = `[${new Date().toISOString()}] ${req.method} ${req.path} | IP:${req.ip} | ${msg}\n`;
-    fs.appendFileSync(allReqLog, line);
-    console.log(`[REQ] ${req.method} ${req.path} from ${req.ip} - ${msg}`);
-}
-
 // Webhook logging
 const webhookLogPath = path.join(__dirname, 'webhook.log');
 function logWebhook(msg, data) {
@@ -43,27 +35,24 @@ function logWebhook(msg, data) {
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*', credentials: true }));
 
-// ====== RAW BODY CAPTURE FOR WEBHOOKS (before JSON parser) ======
+// RAW BODY for webhook BEFORE JSON parser
 app.use('/api/webhook/megapay', express.raw({ type: '*/*', limit: '1mb' }));
 app.use('/api/webhook/megapay', (req, res, next) => {
-    logAllReq(req, 'WEBHOOK_RAW_BODY');
-    logWebhook('RAW_BODY_RECEIVED', { method: req.method, headers: req.headers, body: req.body ? req.body.toString().substring(0, 2000) : 'empty' });
+    logWebhook('RAW_HIT', { method: req.method, ip: req.ip, headers: req.headers });
+    try { req.body = JSON.parse(req.body); } catch (e) { req.body = req.body ? req.body.toString() : {}; }
+    next();
+});
+
+// Also raw body for old fallback path
+app.use('/api/megapay/webhook', express.raw({ type: '*/*', limit: '1mb' }));
+app.use('/api/megapay/webhook', (req, res, next) => {
+    logWebhook('RAW_HIT_ALT', { method: req.method, ip: req.ip });
     try { req.body = JSON.parse(req.body); } catch (e) { req.body = req.body ? req.body.toString() : {}; }
     next();
 });
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// ====== GLOBAL LOGGER FOR EVERY REQUEST ======
-app.use((req, res, next) => {
-    logAllReq(req, `START`);
-    const start = Date.now();
-    res.on('finish', () => {
-        logAllReq(req, `DONE ${res.statusCode} ${Date.now() - start}ms`);
-    });
-    next();
-});
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false, validate: false });
 app.use('/api/', limiter);
@@ -223,7 +212,6 @@ app.post('/api/deposit', async (req, res) => {
             const mpData = mpRes.data;
             console.log('[DEPOSIT] Megapay response:', mpData);
             
-            // Save Megapay IDs for potential manual status check later
             if (mpData.CheckoutRequestID) {
                 tx.checkoutRequestId = mpData.CheckoutRequestID;
                 await tx.save();
@@ -256,26 +244,30 @@ app.get('/api/mpesa/status/:refId', async (req, res) => {
     catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// ====== WEBHOOK ENDPOINTS (MULTIPLE PATHS FOR DEBUG) ======
+// ====== WEBHOOK ENDPOINTS ======
 
-// 1. The configured URL: /api/webhook/megapay
-app.all('/api/webhook/megapay', async (req, res) => {
+// Primary: /api/webhook/megapay (matches your configured URL)
+app.post('/api/webhook/megapay', async (req, res) => {
     res.status(200).send('OK');
-    logWebhook('ALL_METHOD_HIT', { method: req.method, body: req.body, query: req.query, ip: req.ip });
-    if (req.method === 'POST') await processWebhook(req.body);
+    logWebhook('PRIMARY_POST', { body: req.body, ip: req.ip });
+    await processWebhook(req.body);
 });
 
-// 2. Alternative path in case Megapay sends here (from your old projects)
-app.all('/api/megapay/webhook', async (req, res) => {
-    res.status(200).send('OK');
-    logWebhook('ALT_PATH_HIT', { method: req.method, body: req.body, query: req.query, ip: req.ip });
-    if (req.method === 'POST') await processWebhook(req.body);
+app.get('/api/webhook/megapay', (req, res) => {
+    logWebhook('PRIMARY_GET', { query: req.query, ip: req.ip });
+    res.status(200).send('Webhook endpoint is live. Use POST for callbacks.');
 });
 
-// 3. Generic catch-all for any webhook path
-app.post('/api/webhook/*', async (req, res) => {
+// Fallback: /api/megapay/webhook (in case Megapay sends here)
+app.post('/api/megapay/webhook', async (req, res) => {
     res.status(200).send('OK');
-    logWebhook('WILDCARD_HIT', { path: req.path, body: req.body, ip: req.ip });
+    logWebhook('FALLBACK_POST', { body: req.body, ip: req.ip });
+    await processWebhook(req.body);
+});
+
+app.get('/api/megapay/webhook', (req, res) => {
+    logWebhook('FALLBACK_GET', { query: req.query, ip: req.ip });
+    res.status(200).send('Webhook fallback is live.');
 });
 
 async function processWebhook(data) {
@@ -283,9 +275,10 @@ async function processWebhook(data) {
         data = data || {};
         logWebhook('PROCESSING', data);
         
+        // FIX: Megapay uses TransactionReference, not reference
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
-        const ref = data.reference || data.BillRefNumber || data.refId || data.Reference || '';
-        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID || data.ReceiptNo || '';
+        const ref = data.reference || data.BillRefNumber || data.refId || data.Reference || data.TransactionReference || '';
+        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID || data.ReceiptNo || data.TransactionID || '';
         
         logWebhook('PARSED', { responseCode, ref, receipt });
         
@@ -329,7 +322,7 @@ async function processWebhook(data) {
     }
 }
 
-// ====== MANUAL STATUS CHECK (FALLBACK) ======
+// Manual status check fallback
 app.post('/api/deposit/check-status', async (req, res) => {
     try {
         const { refId } = req.body;
@@ -342,7 +335,7 @@ app.post('/api/deposit/check-status', async (req, res) => {
     }
 });
 
-// ====== SIMULATE WEBHOOK (FOR TESTING) ======
+// Simulate webhook (for testing)
 app.post('/api/simulate-webhook', async (req, res) => {
     try {
         const { refId, resultCode = '0', receipt = 'SIM' + Date.now() } = req.body;
@@ -514,9 +507,9 @@ async function start() {
         if (!demoSetting) { await Settings.create({ key: 'demoMode', value: true }); console.log('Demo mode seeded: ON'); }
         app.listen(PORT, () => { 
             console.log(`AfroLink API running on port ${PORT}`);
-            console.log(`Webhook URLs registered:`);
-            console.log(`  - ${BASE_URL}/api/webhook/megapay  (configured)`);
-            console.log(`  - ${BASE_URL}/api/megapay/webhook  (fallback)`);
+            console.log(`Webhook URLs:`);
+            console.log(`  POST ${BASE_URL}/api/webhook/megapay`);
+            console.log(`  POST ${BASE_URL}/api/megapay/webhook`);
         });
     } catch (e) { console.error('Startup error:', e); process.exit(1); }
 }
