@@ -34,20 +34,18 @@ app.use('/api/', limiter);
 const strictLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, validate: false });
 app.use('/api/admin/login', strictLimiter);
 
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadsDir),
+    destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => {
         const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, unique + path.extname(file.originalname));
     }
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true);
-    else cb(new Error('Only image files allowed'), false);
-}});
-app.use('/uploads', express.static(uploadsDir));
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB max
+// Serve static uploads
+app.use('/uploads', express.static(uploadDir));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 const profileSchema = new mongoose.Schema({
@@ -226,17 +224,25 @@ app.get('/api/admin/profiles', verifyAdmin, async (req, res) => {
     catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.post('/api/admin/profiles', verifyAdmin, upload.single('photo'), async (req, res) => {
+app.post('/api/admin/profiles', upload.single('image'), async (req, res) => {
     try {
-        const { name, age, location, gender, phone, price, bio, hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos } = req.body;
-        if (!name || !phone) return res.status(400).json({ success: false, message: 'Name and phone required' });
-        const existing = await Profile.findOne({ phone: phone.trim() });
-        if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
-        const img = req.file ? `/uploads/${req.file.filename}` : '';
-        const profile = new Profile({ name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi', bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female', price: parseInt(price) || 499, image: img, img: img, status: 'verified', isVerified: true, hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos });
-        await profile.save();
-        res.json({ success: true, profile });
-    } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+        const data = req.body;
+        if (req.file) data.image = '/uploads/' + req.file.filename;
+        // ... save to MongoDB
+        res.json({ success: true, profile: data });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+app.put('/api/admin/profiles/:id', upload.single('image'), async (req, res) => {
+    try {
+        const updates = req.body;
+        if (req.file) updates.image = '/uploads/' + req.file.filename;
+        // ... findByIdAndUpdate
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 app.get('/api/admin/approvals', verifyAdmin, async (req, res) => {

@@ -289,15 +289,57 @@ function filterByLocation(val) {
     renderProfiles(globalProfiles.filter(p => p.loc.toLowerCase().includes(town)));
 }
 
-/* VIDEOS */
-function initVideos() {
-    const grid = document.getElementById('dynamic-video-grid');
-    let h = '';
-    for (let i = 1; i <= 6; i++) {
-        h += `<div class="video-card reveal"><video src="./videos/videos (${i}).mp4#t=0.1" class="blurred-video" autoplay loop muted playsinline></video><div class="video-overlay"><i class="fas fa-lock"></i><a href="https://t.me/AfroLinkVIP" target="_blank" class="btn btn--rose" style="width:80%;padding:14px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.5px;"><i class="fab fa-telegram"></i> Watch Full @AfroLinkVIP</a></div></div>`;
-    }
-    grid.innerHTML = h;
-    observeReveals();
+/* EXCLUSIVE SECTION */
+const CATEGORIES = [
+    { id:'kenyan', icon:'fa-exclamation-triangle', title:'Kenyan Porn', desc:'Premium Kenyan adult content', price:'From KES 99/wk', color:'rose' },
+    { id:'trending', icon:'fa-fire', title:'Trending Leaks', desc:'Latest viral & trending leaked content', price:'From KES 99/wk', color:'rose' },
+    { id:'somali', icon:'fa-heart', title:'Somali Porn', desc:'Exclusive Somali adult content', price:'From KES 99/wk', color:'rose' },
+    { id:'celebrity', icon:'fa-gem', title:'Celebrity Leaks', desc:'Exclusive celebrity & influencer content', price:'From KES 99/wk', color:'rose' },
+    { id:'all', icon:'fa-infinity', title:'All of the Above', desc:'Access to all 4 channels in one subscription', price:'From KES 199/wk', color:'gold', badge:'BEST VALUE' }
+];
+
+function renderCategories() {
+    const grid = document.getElementById('category-grid');
+    if (!grid) return;
+    grid.innerHTML = CATEGORIES.map(cat => `
+        <div class="category-card" onclick="openMpesaModalDirect('${cat.title}',99)">
+            <div class="cat-icon"><i class="fas ${cat.icon}"></i></div>
+            <div class="cat-body">
+                <div class="cat-title">${cat.title}</div>
+                <div class="cat-desc">${cat.desc}</div>
+                <div class="cat-price">${cat.price}</div>
+            </div>
+            <i class="fas fa-chevron-right cat-arrow"></i>
+        </div>
+    `).join('');
+}
+
+function renderLivePreviews() {
+    const grid = document.getElementById('live-grid');
+    if (!grid) return;
+    const liveData = [
+        { name:'Monica', age:23, loc:'South C, Nairobi', type:'live', action:'Chat with Monica', img:'./images/model (1).jpg' },
+        { name:'Hannah', age:26, loc:'Thome, Nairobi', type:'video', action:"Watch Hannah's videos", img:'./images/model (2).jpg' },
+        { name:'Makena', age:26, loc:'Thika', type:'live', action:'Chat with Makena', img:'./images/model (3).jpg' },
+        { name:'Mariam', age:28, loc:'Mombasa', type:'video', action:"Watch Mariam's videos", img:'./images/model (4).jpg' },
+        { name:'Zawadi', age:24, loc:'Kilimani, Nairobi', type:'live', action:'Chat with Zawadi', img:'./images/model (5).jpg' },
+        { name:'Amina', age:27, loc:'Nyali, Mombasa', type:'video', action:"Watch Amina's videos", img:'./images/model (6).jpg' }
+    ];
+    grid.innerHTML = liveData.map(l => `
+        <div class="live-card" onclick="openMpesaModalDirect('${l.name}',199)">
+            <img src="${l.img}" onerror="this.src='${FALLBACK_IMG}'" class="live-bg" loading="lazy" alt="${l.name}">
+            <div class="live-badge ${l.type==='video'?'video':''}">${l.type==='live'?'LIVE':'VIDEO'}</div>
+            <div class="live-overlay">
+                <div class="live-name">${l.action}</div>
+                <div class="live-meta">${l.name} is online — ${l.loc}</div>
+            </div>
+            <div class="live-action">
+                <button class="btn btn--rose" style="width:100%;" onclick="event.stopPropagation();openMpesaModalDirect('${l.name}',199)">
+                    <i class="fas fa-${l.type==='live'?'comment':'play'}"></i> ${l.type==='live'?'Chat Now':'Watch'}
+                </button>
+            </div>
+        </div>
+    `).join('');
 }
 
 /* PLANS */
@@ -576,7 +618,7 @@ function navigateTo(page) {
     if (page === 'discover') { renderDiscoverFeatured(); renderDiscoverPremium(); setTimeout(animateCounters, 200); }
     if (page === 'profiles') { renderProfiles(globalProfiles); }
     if (page === 'premium') { renderPremium(premiumProfiles); }
-    if (page === 'exclusive') { if (!document.getElementById('dynamic-video-grid').innerHTML.trim()) initVideos(); }
+    if (page === 'exclusive') { renderCategories(); renderLivePreviews(); }
     if (page === 'plans') { if (!document.getElementById('plans-grid').innerHTML.trim()) renderPlans(); }
     observeReveals();
 }
