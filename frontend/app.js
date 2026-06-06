@@ -6,16 +6,54 @@ const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+25
     const c = document.getElementById('particleCanvas');
     if (!c) return;
     const x = c.getContext('2d');
-    let w, h, P = [], COLS = ['#E11D48','#FB7185','#F472B6','#FDA4AF','#FBBF24'];
+    let w, h, P = [], COLS = ['#8b5cf6','#a78bfa','#06b6d4','#22d3ee','#fbbf24'];
     function R() { w = c.width = innerWidth; h = c.height = innerHeight; }
     R(); addEventListener('resize', R);
-    class Q { reset() { this.x = Math.random()*w; this.y = Math.random()*h; this.s = Math.random()*2.5+.5; this.vx = (Math.random()-.5)*.4; this.vy = (Math.random()-.5)*.4; this.c = COLS[Math.floor(Math.random()*5)]; this.o = Math.random()*.5+.2; this.p = Math.random()*Math.PI*2; }
+    class Q { 
+        reset() { 
+            this.x = Math.random()*w; 
+            this.y = Math.random()*h; 
+            this.s = Math.random()*2.5+.5; 
+            this.vx = (Math.random()-.5)*.4; 
+            this.vy = (Math.random()-.5)*.4; 
+            this.c = COLS[Math.floor(Math.random()*5)]; 
+            this.o = Math.random()*.5+.2; 
+            this.p = Math.random()*Math.PI*2; 
+        }
         constructor() { this.reset(); }
-        update() { this.x += this.vx; this.y += this.vy; this.p += .02; if (this.x<<0||this.x>w||this.y<<0||this.y>h) this.reset(); }
-        draw() { const o = this.o*(.7+.3*Math.sin(this.p)); x.beginPath(); x.arc(this.x,this.y,this.s,0,Math.PI*2); x.fillStyle = this.c; x.globalAlpha = o; x.fill(); x.globalAlpha = 1; }
+        update() { 
+            this.x += this.vx; 
+            this.y += this.vy; 
+            this.p += .02; 
+            if (this.x<<0||this.x>w||this.y<<0||this.y>h) this.reset(); 
+        }
+        draw() { 
+            const o = this.o*(.7+.3*Math.sin(this.p)); 
+            x.beginPath(); 
+            x.arc(this.x,this.y,this.s,0,Math.PI*2); 
+            x.fillStyle = this.c; 
+            x.globalAlpha = o; 
+            x.fill(); 
+            x.globalAlpha = 1; 
+        }
     }
-    for (let i = 0; i < 60; i++) P.push(new Q());
-    function L() { x.clearRect(0,0,w,h); P.forEach(p=>{p.update();p.draw();}); for (let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<<150){x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.strokeStyle=`rgba(225,29,72,${.08*(1-d/150)})`;x.lineWidth=.5;x.stroke();}} requestAnimationFrame(L); }
+    for (let i = 0; i < 70; i++) P.push(new Q());
+    function L() { 
+        x.clearRect(0,0,w,h); 
+        P.forEach(p=>{p.update();p.draw();}); 
+        for (let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
+            const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.sqrt(dx*dx+dy*dy);
+            if(d<<150){
+                x.beginPath();
+                x.moveTo(P[i].x,P[i].y);
+                x.lineTo(P[j].x,P[j].y);
+                x.strokeStyle=`rgba(139,92,246,${.08*(1-d/150)})`;
+                x.lineWidth=.5;
+                x.stroke();
+            }
+        } 
+        requestAnimationFrame(L); 
+    }
     L();
 })();
 
@@ -83,8 +121,10 @@ function genPremium() {
     return arr;
 }
 
+const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2312121c'/%3E%3Cstop offset='100%25' stop-color='%230c0c14'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2364748b' font-family='sans-serif' font-size='18'%3EAfroLink%3C/text%3E%3C/svg%3E";
+
 function resolveImageUrl(url) {
-    if (!url) return './images/model (1).jpg';
+    if (!url) return FALLBACK_IMG;
     if (url.startsWith('http')) return url;
     if (url.startsWith('/uploads/')) return API_BASE + url;
     if (url.startsWith('/')) return API_BASE + url;
@@ -159,7 +199,10 @@ function toggleFavoriteFromDetail() {
     if (!currentDetailProfile) return;
     const isFav = toggleFav(currentDetailProfile.id);
     const btn = document.getElementById('detailFavBtn');
-    if (btn) { btn.classList.toggle('active', isFav); btn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--rose-primary)"></i>' : '<i class="far fa-heart"></i>'; }
+    if (btn) { 
+        btn.classList.toggle('active', isFav); 
+        btn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--violet)"></i>' : '<i class="far fa-heart"></i>'; 
+    }
 }
 
 /* SHARE */
@@ -177,7 +220,7 @@ function shareCurrentProfile() { if (!currentDetailProfile) return; shareProfile
 function squareCard(p, idx, isPrem) {
     const favs = getFavs();
     const isFav = favs.includes(p.id);
-    const onerr = `this.onerror=null;this.src='./images/model (1).jpg';`;
+    const onerr = `this.onerror=null;this.src='${FALLBACK_IMG}';`;
     const openFn = `openProfileDetail('${p.id}',${isPrem})`;
     const onlineDot = p.isOnline ? `<div class="online-badge"><div class="dot"></div>Online</div>` : '';
     const hotBadge = `<div class="hot-badge"><i class="fas fa-fire"></i> Hot</div>`;
@@ -201,7 +244,7 @@ function squareCard(p, idx, isPrem) {
                 <div class="card-lock"><i class="fas fa-lock"></i></div>
             </div>
             <div class="card-unlock-btn">
-                <button class="btn btn--pink" onclick="event.stopPropagation();openMpesaModalDirect('${p.name}',${p.price},'${p.id}',${isPrem})"><i class="fas fa-unlock"></i> UNLOCK — ${priceStr}</button>
+                <button class="btn btn--violet" onclick="event.stopPropagation();openMpesaModalDirect('${p.name}',${p.price},'${p.id}',${isPrem})"><i class="fas fa-unlock"></i> UNLOCK — ${priceStr}</button>
             </div>
         </div>
     </div>`;
@@ -251,7 +294,7 @@ function initVideos() {
     const grid = document.getElementById('dynamic-video-grid');
     let h = '';
     for (let i = 1; i <= 6; i++) {
-        h += `<div class="video-card reveal"><video src="./videos/videos (${i}).mp4#t=0.1" class="blurred-video" autoplay loop muted playsinline></video><div class="video-overlay"><i class="fas fa-lock"></i><a href="https://t.me/AfroLinkVIP" target="_blank" class="btn btn--pink" style="width:80%;padding:14px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.5px;"><i class="fab fa-telegram"></i> Watch Full @AfroLinkVIP</a></div></div>`;
+        h += `<div class="video-card reveal"><video src="./videos/videos (${i}).mp4#t=0.1" class="blurred-video" autoplay loop muted playsinline></video><div class="video-overlay"><i class="fas fa-lock"></i><a href="https://t.me/AfroLinkVIP" target="_blank" class="btn btn--violet" style="width:80%;padding:14px 10px;font-size:14px;text-transform:uppercase;letter-spacing:.5px;"><i class="fab fa-telegram"></i> Watch Full @AfroLinkVIP</a></div></div>`;
     }
     grid.innerHTML = h;
     observeReveals();
@@ -259,25 +302,26 @@ function initVideos() {
 
 /* PLANS */
 const PLANS = [
-    { title: "Basic Unlock", price: 499, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Basic" },
-    { title: "Starter Pack", price: 499, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Start Pack" },
-    { title: "Live Chat", price: 599, icon: "fa-comments", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Chat" },
-    { title: "Weekend Special", price: 799, icon: "fa-moon", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--rose", btnText: "Get Weekend" },
-    { title: "Video Chat", price: 999, icon: "fa-video", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Video" },
-    { title: "VIP Monthly", price: 1499, icon: "fa-crown", iconColor: "var(--rose-primary)", desc: "30-day full access", features: ["Unlimited contact unlocks","Free video chats included","VIP badge on your profile","Priority customer support"], badge: "Popular", popular: true, btn: "btn--pink", btnText: "Go VIP" },
+    { title: "Basic Unlock", price: 499, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--violet", btnText: "Get Basic" },
+    { title: "Starter Pack", price: 499, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--violet", btnText: "Start Pack" },
+    { title: "Live Chat", price: 599, icon: "fa-comments", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--violet", btnText: "Get Chat" },
+    { title: "Weekend Special", price: 799, icon: "fa-moon", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--violet", btnText: "Get Weekend" },
+    { title: "Video Chat", price: 999, icon: "fa-video", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--violet", btnText: "Get Video" },
+    { title: "VIP Monthly", price: 1499, icon: "fa-crown", iconColor: "var(--violet)", desc: "30-day full access", features: ["Unlimited contact unlocks","Free video chats included","VIP badge on your profile","Priority customer support"], badge: "Popular", popular: true, btn: "btn--violet", btnText: "Go VIP" },
     { title: "Member Listing", price: 1499, icon: "fa-user-plus", desc: "List your profile", features: ["Verified profile badge","Appear in search results","Receive direct inquiries","Lifetime listing"], badge: null, popular: false, btn: "btn--gold", btnText: "Become Member" },
-    { title: "Platinum Pass", price: 2999, icon: "fa-gem", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--pink", btnText: "Go Platinum" },
-    { title: "All Access", price: 4999, icon: "fa-infinity", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--pink", btnText: "Go All In" }
+    { title: "Platinum Pass", price: 2999, icon: "fa-gem", desc: "30 days everything", features: ["All VIP features unlocked","Unlimited video chats","Early access to new members","Personal account manager"], badge: "Best", popular: true, btn: "btn--violet", btnText: "Go Platinum" },
+    { title: "All Access", price: 4999, icon: "fa-infinity", desc: "Lifetime unlimited", features: ["Lifetime unlimited access","Every feature unlocked forever","First access to beta features","VIP-only events & meetups"], badge: "Elite", popular: true, btn: "btn--violet", btnText: "Go All In" }
 ];
 
 function renderPlans() {
     const grid = document.getElementById('plans-grid');
     grid.innerHTML = PLANS.map(plan => {
-        const badge = plan.badge ? `<div class="plan-badge">${plan.badge}</div>` : '';
+        const badge = plan.badge ? `<div class="plan-badge ${plan.badge === 'Elite' || plan.badge === 'Best' ? 'gold' : ''}">${plan.badge}</div>` : '';
         const popClass = plan.popular ? 'popular' : '';
+        const goldClass = plan.btn === 'btn--gold' ? 'gold-tier' : '';
         const features = plan.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('');
         const btnGlow = plan.popular ? 'btn-glow' : '';
-        return `<div class="plan-card ${popClass} reveal">${badge}<div class="plan-icon"><i class="fas ${plan.icon}"></i></div><h3 class="plan-title">${plan.title}</h3><p class="plan-desc">${plan.desc}</p><div class="plan-price">${plan.price.toLocaleString()}<<span>KES</span></div><ul class="plan-features">${features}</ul><button class="btn ${plan.btn} ${btnGlow}" onclick="openMpesaModalDirect('${plan.title}',${plan.price})">${plan.btnText}</button></div>`;
+        return `<div class="plan-card ${popClass} ${goldClass} reveal">${badge}<div class="plan-icon ${plan.btn === 'btn--gold' ? 'gold' : ''}"><i class="fas ${plan.icon}"></i></div><h3 class="plan-title">${plan.title}</h3><p class="plan-desc">${plan.desc}</p><div class="plan-price">${plan.price.toLocaleString()}<<span>KES</span></div><ul class="plan-features">${features}</ul><button class="btn ${plan.btn} ${btnGlow}" onclick="openMpesaModalDirect('${plan.title}',${plan.price})">${plan.btnText}</button></div>`;
     }).join('');
     observeReveals();
 }
@@ -297,8 +341,8 @@ function showDetailModal(p) {
     currentDetailProfile = p;
     const img = document.getElementById('detail-img');
     img.src = p.img;
-    img.onerror = function() { this.src = './images/model (1).jpg'; };
-    const checkColor = p.isPremium ? 'var(--rose-primary)' : '#4ADE80';
+    img.onerror = function() { this.src = FALLBACK_IMG; };
+    const checkColor = p.isPremium ? 'var(--gold)' : '#4ADE80';
     document.getElementById('detail-name').innerHTML = `${p.name}, ${p.age} <i class="fas fa-check-circle" style="color:${checkColor};font-size:18px;"></i>`;
     document.getElementById('detail-loc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${p.loc}`;
     document.getElementById('detail-desc').innerText = p.desc || 'No description available.';
@@ -321,7 +365,7 @@ function showDetailModal(p) {
     const isFav = favs.includes(p.id);
     const favBtn = document.getElementById('detailFavBtn');
     favBtn.classList.toggle('active', isFav);
-    favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--rose-primary)"></i>' : '<i class="far fa-heart"></i>';
+    favBtn.innerHTML = isFav ? '<i class="fas fa-heart" style="color:var(--violet)"></i>' : '<i class="far fa-heart"></i>';
     profileDetailModal.classList.add('active');
 }
 
@@ -343,7 +387,7 @@ function openMpesaModalDirect(name, price, id = '', isPremium = false) {
     document.getElementById('modal-price').innerText = price.toLocaleString();
     document.querySelectorAll('.step-dot').forEach((d, i) => { d.className = 'step-dot' + (i === 0 ? ' active' : ''); });
     const btn = document.getElementById('mpesaSubmitBtn');
-    btn.disabled = false; btn.className = 'btn btn--pink btn-glow';
+    btn.disabled = false; btn.className = 'btn btn--violet btn-glow';
     document.getElementById('btnText').innerHTML = 'Send M-Pesa Prompt';
     mpesaModal.classList.add('active');
 }
@@ -432,7 +476,7 @@ function showContactReveal() {
     const content = document.getElementById('contactRevealContent');
     if (!modal || !content) return;
     modal.classList.add('active');
-    content.innerHTML = `<div class="spinner-lg" style="width:50px;height:50px;border:4px solid rgba(255,255,255,.2);border-top-color:#4ADE80;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div><h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Successful!</h3><p style="color:var(--text-secondary);font-size:14px;">Revealing details shortly...</p>`;
+    content.innerHTML = `<div class="spinner-lg" style="width:50px;height:50px;border:4px solid rgba(255,255,255,.2);border-top-color:#4ADE80;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div><h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Payment Successful!</h3><p style="color:var(--text-secondary);font-size:14px;">Revealing details shortly...</p>`;
 
     setTimeout(() => {
         let displayPhone = '';
@@ -451,7 +495,7 @@ function showContactReveal() {
                 <div style="width:70px;height:70px;border-radius:50%;background:rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(74,222,128,.3);">
                     <i class="fas fa-phone-alt" style="font-size:28px;color:#4ADE80;"></i>
                 </div>
-                <h3 style="font-size:20px;margin-bottom:4px;color:var(--text-primary);font-family:var(--font-serif);">Contact Unlocked!</h3>
+                <h3 style="font-size:20px;margin-bottom:4px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Contact Unlocked!</h3>
                 <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Reach out via WhatsApp</p>
                 <div style="font-size:26px;font-weight:800;color:#4ADE80;letter-spacing:1px;margin:16px 0;">
                     <a href="${waLink}" target="_blank" style="color:inherit;text-decoration:none;">${displayPhone}</a>
@@ -462,12 +506,12 @@ function showContactReveal() {
             `;
         } else {
             content.innerHTML = `
-                <div style="width:70px;height:70px;border-radius:50%;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid var(--border-subtle);">
-                    <i class="fas fa-hourglass-half" style="font-size:28px;color:var(--rose-primary);"></i>
+                <div style="width:70px;height:70px;border-radius:50%;background:var(--violet-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid var(--border-subtle);">
+                    <i class="fas fa-hourglass-half" style="font-size:28px;color:var(--violet);"></i>
                 </div>
-                <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-family:var(--font-serif);">Payment Received!</h3>
+                <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Payment Received!</h3>
                 <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:20px;">Your payment is confirmed. The member will reach out to you shortly on your M-Pesa number.</p>
-                <button class="btn btn--rose" onclick="closeContactRevealAndGoHome()"><i class="fas fa-compass"></i> Back to Discover</button>
+                <button class="btn btn--violet" onclick="closeContactRevealAndGoHome()"><i class="fas fa-compass"></i> Back to Discover</button>
             `;
         }
     }, 2500);
@@ -481,7 +525,7 @@ function closeContactRevealAndGoHome() {
 
 /* CONFETTI */
 function launchConfetti() {
-    const colors = ['#E11D48', '#FB7185', '#F472B6', '#4ADE80', '#FBBF24', '#8B5CF6'];
+    const colors = ['#8b5cf6', '#a78bfa', '#06b6d4', '#22d3ee', '#fbbf24', '#4ADE80'];
     for (let i = 0; i < 50; i++) {
         const el = document.createElement('div');
         el.style.cssText = `position:fixed;width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'0'};left:${Math.random()*100}vw;top:-10px;pointer-events:none;z-index:5000;animation:cf ${Math.random()*2+2}s ease-out forwards;`;
