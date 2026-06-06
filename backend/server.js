@@ -24,14 +24,6 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AfroLink@2026';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20');
 
-// ====== GLOBAL REQUEST LOGGER (DEBUG) ======
-const allReqLog = path.join(__dirname, 'all-requests.log');
-function logAllReq(req, msg) {
-    const line = `[${new Date().toISOString()}] ${req.method} ${req.path} | IP:${req.ip} | ${msg}\n`;
-    fs.appendFileSync(allReqLog, line);
-    console.log(`[REQ] ${req.method} ${req.path} from ${req.ip} - ${msg}`);
-}
-
 // Webhook logging
 const webhookLogPath = path.join(__dirname, 'webhook.log');
 function logWebhook(msg, data) {
@@ -43,27 +35,16 @@ function logWebhook(msg, data) {
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*', credentials: true }));
 
-// ====== RAW BODY CAPTURE FOR WEBHOOKS (before JSON parser) ======
+// IMPORTANT: Raw body for webhooks before JSON parser
 app.use('/api/webhook/megapay', express.raw({ type: '*/*', limit: '1mb' }));
 app.use('/api/webhook/megapay', (req, res, next) => {
-    logAllReq(req, 'WEBHOOK_RAW_BODY');
-    logWebhook('RAW_BODY_RECEIVED', { method: req.method, headers: req.headers, body: req.body ? req.body.toString().substring(0, 2000) : 'empty' });
+    logWebhook('RAW_BODY_RECEIVED', { method: req.method, headers: req.headers, body: req.body ? req.body.toString() : 'empty' });
     try { req.body = JSON.parse(req.body); } catch (e) { req.body = req.body ? req.body.toString() : {}; }
     next();
 });
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// ====== GLOBAL LOGGER FOR EVERY REQUEST ======
-app.use((req, res, next) => {
-    logAllReq(req, `START`);
-    const start = Date.now();
-    res.on('finish', () => {
-        logAllReq(req, `DONE ${res.statusCode} ${Date.now() - start}ms`);
-    });
-    next();
-});
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false, validate: false });
 app.use('/api/', limiter);
@@ -120,8 +101,6 @@ const transactionSchema = new mongoose.Schema({
     status: { type: String, enum: ['pending', 'success', 'failed', 'cancelled'], default: 'pending' },
     mpesaRef: { type: String, default: '' },
     refId: { type: String, required: true, unique: true },
-    checkoutRequestId: { type: String, default: '' },
-    merchantRequestId: { type: String, default: '' },
     description: { type: String, default: '' },
     type: { type: String, enum: ['unlock', 'listing'], default: 'unlock' },
     callbackData: { type: Object, default: {} },
@@ -222,17 +201,6 @@ app.post('/api/deposit', async (req, res) => {
             const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
             const mpData = mpRes.data;
             console.log('[DEPOSIT] Megapay response:', mpData);
-            
-            // Save Megapay IDs for potential manual status check later
-            if (mpData.CheckoutRequestID) {
-                tx.checkoutRequestId = mpData.CheckoutRequestID;
-                await tx.save();
-            }
-            if (mpData.MerchantRequestID) {
-                tx.merchantRequestId = mpData.MerchantRequestID;
-                await tx.save();
-            }
-            
             if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) { 
                 tx.status = 'failed'; 
                 await tx.save(); 
@@ -252,44 +220,31 @@ app.post('/api/deposit', async (req, res) => {
 });
 
 app.get('/api/mpesa/status/:refId', async (req, res) => {
-    try { const tx = await Transaction.findOne({ refId: req.params.refId }); if (!tx) return res.status(404).json({ success: false, message: 'Not found' }); res.json({ status: tx.status, tx }); }
+    try { const tx = await Transaction.findOne({ refId: req.params.refId }); if (!tx) return res.status(404).json({ success: false, message: 'Not found' }); res.json({ status: tx.status }); }
     catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// ====== WEBHOOK ENDPOINTS (MULTIPLE PATHS FOR DEBUG) ======
-
-// 1. The configured URL: /api/webhook/megapay
-app.all('/api/webhook/megapay', async (req, res) => {
-    res.status(200).send('OK');
-    logWebhook('ALL_METHOD_HIT', { method: req.method, body: req.body, query: req.query, ip: req.ip });
-    if (req.method === 'POST') await processWebhook(req.body);
+// FIXED: Route matches your configured webhook URL https://api.afrolink254.com/api/webhook/megapay
+app.get('/api/webhook/megapay', (req, res) => {
+    logWebhook('GET_TEST', { query: req.query, ip: req.ip });
+    res.status(200).send('Webhook endpoint is live. Use POST for callbacks.');
 });
 
-// 2. Alternative path in case Megapay sends here (from your old projects)
-app.all('/api/megapay/webhook', async (req, res) => {
+app.post('/api/webhook/megapay', async (req, res) => {
+    // Always respond 200 immediately so Megapay doesn't retry
     res.status(200).send('OK');
-    logWebhook('ALT_PATH_HIT', { method: req.method, body: req.body, query: req.query, ip: req.ip });
-    if (req.method === 'POST') await processWebhook(req.body);
-});
-
-// 3. Generic catch-all for any webhook path
-app.post('/api/webhook/*', async (req, res) => {
-    res.status(200).send('OK');
-    logWebhook('WILDCARD_HIT', { path: req.path, body: req.body, ip: req.ip });
-});
-
-async function processWebhook(data) {
+    
     try {
-        data = data || {};
-        logWebhook('PROCESSING', data);
+        const data = req.body || {};
+        logWebhook('POST_RECEIVED', data);
         
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
-        const ref = data.reference || data.BillRefNumber || data.refId || data.Reference || '';
-        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID || data.ReceiptNo || '';
+        const ref = data.reference || data.BillRefNumber || data.refId || '';
+        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID || '';
         
         logWebhook('PARSED', { responseCode, ref, receipt });
         
-        if (responseCode != 0 && responseCode !== '0') { 
+        if (responseCode != 0) { 
             if (ref) {
                 await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data });
                 logWebhook('MARKED_FAILED', { ref, responseCode });
@@ -298,7 +253,7 @@ async function processWebhook(data) {
         }
         
         if (!receipt || !ref) {
-            logWebhook('MISSING_DATA', { receipt, ref, fullData: data });
+            logWebhook('MISSING_DATA', { receipt, ref });
             return;
         }
         
@@ -326,35 +281,6 @@ async function processWebhook(data) {
     } catch (err) { 
         logWebhook('WEBHOOK_ERROR', { error: err.message, stack: err.stack });
         console.error('Webhook error:', err.message); 
-    }
-}
-
-// ====== MANUAL STATUS CHECK (FALLBACK) ======
-app.post('/api/deposit/check-status', async (req, res) => {
-    try {
-        const { refId } = req.body;
-        if (!refId) return res.status(400).json({ success: false, message: 'refId required' });
-        const tx = await Transaction.findOne({ refId });
-        if (!tx) return res.status(404).json({ success: false, message: 'Transaction not found' });
-        res.json({ success: true, status: tx.status, tx });
-    } catch (e) {
-        res.status(500).json({ success: false, message: e.message });
-    }
-});
-
-// ====== SIMULATE WEBHOOK (FOR TESTING) ======
-app.post('/api/simulate-webhook', async (req, res) => {
-    try {
-        const { refId, resultCode = '0', receipt = 'SIM' + Date.now() } = req.body;
-        if (!refId) return res.status(400).json({ success: false, message: 'refId required' });
-        await processWebhook({
-            reference: refId,
-            ResponseCode: resultCode,
-            TransactionReceipt: receipt
-        });
-        res.json({ success: true, message: 'Webhook simulated' });
-    } catch (e) {
-        res.status(500).json({ success: false, message: e.message });
     }
 });
 
@@ -514,9 +440,7 @@ async function start() {
         if (!demoSetting) { await Settings.create({ key: 'demoMode', value: true }); console.log('Demo mode seeded: ON'); }
         app.listen(PORT, () => { 
             console.log(`AfroLink API running on port ${PORT}`);
-            console.log(`Webhook URLs registered:`);
-            console.log(`  - ${BASE_URL}/api/webhook/megapay  (configured)`);
-            console.log(`  - ${BASE_URL}/api/megapay/webhook  (fallback)`);
+            console.log(`Webhook URL: ${BASE_URL}/api/webhook/megapay`);
         });
     } catch (e) { console.error('Startup error:', e); process.exit(1); }
 }
