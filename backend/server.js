@@ -140,21 +140,66 @@ app.get('/api/profiles/:id', async (req, res) => {
 
 app.post('/api/deposit', async (req, res) => {
     try {
-        const { userPhone, amount, description, profileId } = req.body;
+        const { userPhone, amount, description, profileId, profileName } = req.body;
         if (!userPhone || !amount || amount < 10) return res.status(400).json({ success: false, message: 'Phone and amount required' });
+        
         const refId = 'AL' + Date.now() + Math.floor(Math.random() * 1000);
-        const tx = new Transaction({ userPhone: userPhone.trim(), profileId: profileId || null, amount: parseInt(amount), status: 'pending', refId, description: description || 'AfroLink Payment', type: profileId ? 'unlock' : 'listing' });
+        
+        // FIX: Only store valid MongoDB ObjectIds. Demo IDs like 'reg_1' are rejected from the ObjectId field
+        // but we keep the payment as an 'unlock' type and store the name for admin reference.
+        const hasProfileId = !!profileId;
+        let validProfileId = null;
+        if (profileId && mongoose.Types.ObjectId.isValid(profileId)) {
+            validProfileId = profileId;
+        }
+        
+        const tx = new Transaction({ 
+            userPhone: userPhone.trim(), 
+            profileId: validProfileId, 
+            profileName: profileName || '',
+            amount: parseInt(amount), 
+            status: 'pending', 
+            refId, 
+            description: description || 'AfroLink Payment', 
+            type: hasProfileId ? 'unlock' : 'listing' 
+        });
         await tx.save();
-        if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) { tx.status = 'success'; tx.mpesaRef = 'DEMO' + Date.now(); await tx.save(); return res.json({ success: true, refId, message: 'Demo mode: Payment auto-resolved' }); }
+        
+        if (!MEGAPAY_API_KEY || !MEGAPAY_EMAIL) { 
+            tx.status = 'success'; 
+            tx.mpesaRef = 'DEMO' + Date.now(); 
+            await tx.save(); 
+            return res.json({ success: true, refId, message: 'Demo mode: Payment auto-resolved' }); 
+        }
+        
         const fp = formatPhoneMegaPay(userPhone);
-        const payload = { api_key: MEGAPAY_API_KEY, email: MEGAPAY_EMAIL, amount: parseInt(amount), msisdn: fp, callback_url: `${BASE_URL}/api/megapay/webhook`, description: tx.description, reference: refId };
+        const payload = { 
+            api_key: MEGAPAY_API_KEY, 
+            email: MEGAPAY_EMAIL, 
+            amount: parseInt(amount), 
+            msisdn: fp, 
+            callback_url: `${BASE_URL}/api/megapay/webhook`, 
+            description: tx.description, 
+            reference: refId 
+        };
+        
         try {
             const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
             const mpData = mpRes.data;
-            if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) { tx.status = 'failed'; await tx.save(); return res.status(400).json({ success: false, message: mpData.errorMessage || mpData.message || 'Payment failed' }); }
+            if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) { 
+                tx.status = 'failed'; 
+                await tx.save(); 
+                return res.status(400).json({ success: false, message: mpData.errorMessage || mpData.message || 'Payment failed' }); 
+            }
             res.json({ success: true, refId, message: 'STK push sent to your phone.' });
-        } catch (mpErr) { tx.status = 'failed'; await tx.save(); return res.status(502).json({ success: false, message: 'Payment gateway failed' }); }
-    } catch (e) { res.status(500).json({ success: false, message: e.message || 'Payment service error' }); }
+        } catch (mpErr) { 
+            tx.status = 'failed'; 
+            await tx.save(); 
+            return res.status(502).json({ success: false, message: 'Payment gateway failed' }); 
+        }
+    } catch (e) { 
+        res.status(500).json({ success: false, message: e.message || 'Payment service error' }); 
+    }
 });
 
 app.get('/api/mpesa/status/:refId', async (req, res) => {
@@ -169,15 +214,23 @@ app.post('/api/megapay/webhook', async (req, res) => {
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
         const ref = data.reference || data.BillRefNumber || '';
         const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID;
-        if (responseCode != 0) { if (ref) await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data }); return; }
+        if (responseCode != 0) { 
+            if (ref) await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data }); 
+            return; 
+        }
         if (!receipt || !ref) return;
         const tx = await Transaction.findOne({ refId: ref, status: 'pending' });
         if (!tx) return;
-        tx.status = 'success'; tx.mpesaRef = receipt; tx.callbackData = data; await tx.save();
+        tx.status = 'success'; 
+        tx.mpesaRef = receipt; 
+        tx.callbackData = data; 
+        await tx.save();
         if (tx.profileId) {
             const platformFee = Math.floor(tx.amount * PLATFORM_FEE_PERCENT / 100);
             const earnings = tx.amount - platformFee;
-            tx.platformFee = platformFee; tx.profileEarnings = earnings; await tx.save();
+            tx.platformFee = platformFee; 
+            tx.profileEarnings = earnings; 
+            await tx.save();
             await Profile.findByIdAndUpdate(tx.profileId, { $inc: { unlocks: 1, totalEarned: earnings } });
         }
     } catch (err) { console.error('Webhook error:', err.message); }
@@ -190,7 +243,21 @@ app.post('/api/apply', upload.single('photo'), async (req, res) => {
         const existing = await Profile.findOne({ phone: phone.trim() });
         if (existing) return res.status(409).json({ success: false, message: 'Phone already registered' });
         const img = req.file ? `/uploads/${req.file.filename}` : '';
-        const profile = new Profile({ name: name.trim(), age: parseInt(age) || 21, location: location || 'Nairobi', loc: location || 'Nairobi', bio: bio || '', desc: bio || '', phone: phone.trim(), gender: gender || 'Female', price: parseInt(price) || 99, image: img, img: img, status: 'pending', hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos });
+        const profile = new Profile({ 
+            name: name.trim(), 
+            age: parseInt(age) || 21, 
+            location: location || 'Nairobi', 
+            loc: location || 'Nairobi', 
+            bio: bio || '', 
+            desc: bio || '', 
+            phone: phone.trim(), 
+            gender: gender || 'Female', 
+            price: parseInt(price) || 99, 
+            image: img, 
+            img: img, 
+            status: 'pending', 
+            hair, faceCard, skinTone, bodyType, breast, waist, thighs, butt, piercings, tattoos 
+        });
         await profile.save();
         res.json({ success: true, message: 'Application submitted. Await admin approval.', profileId: profile._id });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }

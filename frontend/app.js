@@ -493,8 +493,15 @@ async function processPayment() {
 
     try {
         const res = await fetch(`${API_BASE}/api/deposit`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userPhone: phone, amount: currentActivePrice, description: `Unlock ${currentActiveName} via AfroLink`, profileId: currentActiveId })
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                userPhone: phone, 
+                amount: currentActivePrice, 
+                description: `Unlock ${currentActiveName} via AfroLink`, 
+                profileId: currentActiveId,
+                profileName: currentActiveName  // <-- ADD THIS
+            })
         });
         if (!res.ok) { const t = await res.text(); let m = 'Payment gateway error.'; try { m = JSON.parse(t).message || m; } catch {} if (res.status === 404) m = `API endpoint not found.`; throw new Error(m); }
         const data = await res.json();
