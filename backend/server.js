@@ -24,8 +24,25 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AfroLink@2026';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20');
 
+// Webhook logging
+const webhookLogPath = path.join(__dirname, 'webhook.log');
+function logWebhook(msg, data) {
+    const line = `[${new Date().toISOString()}] ${msg} | ${JSON.stringify(data)}\n`;
+    fs.appendFileSync(webhookLogPath, line);
+    console.log(`[WEBHOOK] ${msg}`, data);
+}
+
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false, crossOriginResourcePolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*', credentials: true }));
+
+// IMPORTANT: Raw body for webhooks before JSON parser
+app.use('/api/webhook/megapay', express.raw({ type: '*/*', limit: '1mb' }));
+app.use('/api/webhook/megapay', (req, res, next) => {
+    logWebhook('RAW_BODY_RECEIVED', { method: req.method, headers: req.headers, body: req.body ? req.body.toString() : 'empty' });
+    try { req.body = JSON.parse(req.body); } catch (e) { req.body = req.body ? req.body.toString() : {}; }
+    next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -45,7 +62,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// Serve static uploads and images
 app.use('/uploads', express.static(uploadDir));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
@@ -90,12 +106,10 @@ const transactionSchema = new mongoose.Schema({
     callbackData: { type: Object, default: {} },
 }, { timestamps: true });
 
-const adminLogSchema = new mongoose.Schema({ action: { type: String, required: true }, adminId: { type: String }, targetId: { type: String }, details: { type: Object, default: {} }, ip: { type: String } }, { timestamps: true });
 const settingsSchema = new mongoose.Schema({ key: { type: String, required: true, unique: true }, value: { type: mongoose.Schema.Types.Mixed } });
 
 const Profile = mongoose.model('Profile', profileSchema);
 const Transaction = mongoose.model('Transaction', transactionSchema);
-const AdminLog = mongoose.model('AdminLog', adminLogSchema);
 const Settings = mongoose.model('Settings', settingsSchema);
 
 function verifyAdmin(req, res, next) {
@@ -144,9 +158,6 @@ app.post('/api/deposit', async (req, res) => {
         if (!userPhone || !amount || amount < 10) return res.status(400).json({ success: false, message: 'Phone and amount required' });
         
         const refId = 'AL' + Date.now() + Math.floor(Math.random() * 1000);
-        
-        // FIX: Only store valid MongoDB ObjectIds. Demo IDs like 'reg_1' are rejected from the ObjectId field
-        // but we keep the payment as an 'unlock' type and store the name for admin reference.
         const hasProfileId = !!profileId;
         let validProfileId = null;
         if (profileId && mongoose.Types.ObjectId.isValid(profileId)) {
@@ -173,19 +184,23 @@ app.post('/api/deposit', async (req, res) => {
         }
         
         const fp = formatPhoneMegaPay(userPhone);
+        const callbackUrl = `${BASE_URL}/api/webhook/megapay`;
         const payload = { 
             api_key: MEGAPAY_API_KEY, 
             email: MEGAPAY_EMAIL, 
             amount: parseInt(amount), 
             msisdn: fp, 
-            callback_url: `${BASE_URL}/api/megapay/webhook`, 
+            callback_url: callbackUrl, 
             description: tx.description, 
             reference: refId 
         };
         
+        console.log('[DEPOSIT] Sending to Megapay:', { refId, callbackUrl, amount, msisdn: fp });
+        
         try {
             const mpRes = await axios.post('https://megapay.co.ke/backend/v1/initiatestk', payload, { headers: { 'Content-Type': 'application/json' }, timeout: 15000 });
             const mpData = mpRes.data;
+            console.log('[DEPOSIT] Megapay response:', mpData);
             if (mpData && (mpData.status === false || mpData.success === false || mpData.ResponseCode === '1')) { 
                 tx.status = 'failed'; 
                 await tx.save(); 
@@ -193,11 +208,13 @@ app.post('/api/deposit', async (req, res) => {
             }
             res.json({ success: true, refId, message: 'STK push sent to your phone.' });
         } catch (mpErr) { 
+            console.error('[DEPOSIT] Megapay error:', mpErr.message, mpErr.response?.data);
             tx.status = 'failed'; 
             await tx.save(); 
             return res.status(502).json({ success: false, message: 'Payment gateway failed' }); 
         }
     } catch (e) { 
+        console.error('[DEPOSIT] Server error:', e);
         res.status(500).json({ success: false, message: e.message || 'Payment service error' }); 
     }
 });
@@ -207,24 +224,51 @@ app.get('/api/mpesa/status/:refId', async (req, res) => {
     catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-app.post('/api/megapay/webhook', async (req, res) => {
+// FIXED: Route matches your configured webhook URL https://api.afrolink254.com/api/webhook/megapay
+app.get('/api/webhook/megapay', (req, res) => {
+    logWebhook('GET_TEST', { query: req.query, ip: req.ip });
+    res.status(200).send('Webhook endpoint is live. Use POST for callbacks.');
+});
+
+app.post('/api/webhook/megapay', async (req, res) => {
+    // Always respond 200 immediately so Megapay doesn't retry
     res.status(200).send('OK');
+    
     try {
         const data = req.body || {};
+        logWebhook('POST_RECEIVED', data);
+        
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
-        const ref = data.reference || data.BillRefNumber || '';
-        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID;
+        const ref = data.reference || data.BillRefNumber || data.refId || '';
+        const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID || '';
+        
+        logWebhook('PARSED', { responseCode, ref, receipt });
+        
         if (responseCode != 0) { 
-            if (ref) await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data }); 
+            if (ref) {
+                await Transaction.findOneAndUpdate({ refId: ref }, { status: 'failed', callbackData: data });
+                logWebhook('MARKED_FAILED', { ref, responseCode });
+            }
             return; 
         }
-        if (!receipt || !ref) return;
+        
+        if (!receipt || !ref) {
+            logWebhook('MISSING_DATA', { receipt, ref });
+            return;
+        }
+        
         const tx = await Transaction.findOne({ refId: ref, status: 'pending' });
-        if (!tx) return;
+        if (!tx) {
+            logWebhook('TX_NOT_FOUND', { ref });
+            return;
+        }
+        
         tx.status = 'success'; 
         tx.mpesaRef = receipt; 
         tx.callbackData = data; 
         await tx.save();
+        logWebhook('TX_SUCCESS', { ref, receipt, amount: tx.amount });
+        
         if (tx.profileId) {
             const platformFee = Math.floor(tx.amount * PLATFORM_FEE_PERCENT / 100);
             const earnings = tx.amount - platformFee;
@@ -232,8 +276,12 @@ app.post('/api/megapay/webhook', async (req, res) => {
             tx.profileEarnings = earnings; 
             await tx.save();
             await Profile.findByIdAndUpdate(tx.profileId, { $inc: { unlocks: 1, totalEarned: earnings } });
+            logWebhook('PROFILE_CREDITED', { profileId: tx.profileId, earnings });
         }
-    } catch (err) { console.error('Webhook error:', err.message); }
+    } catch (err) { 
+        logWebhook('WEBHOOK_ERROR', { error: err.message, stack: err.stack });
+        console.error('Webhook error:', err.message); 
+    }
 });
 
 app.post('/api/apply', upload.single('photo'), async (req, res) => {
@@ -390,7 +438,10 @@ async function start() {
         console.log('MongoDB connected');
         const demoSetting = await Settings.findOne({ key: 'demoMode' });
         if (!demoSetting) { await Settings.create({ key: 'demoMode', value: true }); console.log('Demo mode seeded: ON'); }
-        app.listen(PORT, () => { console.log(`AfroLink API running on port ${PORT}`); });
+        app.listen(PORT, () => { 
+            console.log(`AfroLink API running on port ${PORT}`);
+            console.log(`Webhook URL: ${BASE_URL}/api/webhook/megapay`);
+        });
     } catch (e) { console.error('Startup error:', e); process.exit(1); }
 }
 start();
