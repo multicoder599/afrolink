@@ -78,6 +78,8 @@
         .btn--outline:hover { border-color:var(--rose-primary); background:var(--rose-soft); color:var(--rose-light); }
         .btn--gold { background:linear-gradient(135deg,var(--gold-warm),#f59e0b); color:#0a0a0f; font-weight:800; }
         .btn--gold:hover { transform:translateY(-2px); box-shadow:0 8px 24px var(--gold-glow); }
+        .btn--telegram { background:linear-gradient(135deg,#0088cc,#00aaff); color:#fff; box-shadow:0 4px 16px rgba(0,136,204,.35); }
+        .btn--telegram:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,136,204,.5); }
         .btn-glow { animation:pulseGlow 2.5s infinite; }
         @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(225,29,72,.4)} 50%{box-shadow:0 0 0 14px rgba(225,29,72,0)} }
 
@@ -113,6 +115,25 @@
         .discover-hero { text-align:center; padding:48px 16px 32px; position:relative; }
         .discover-hero h1 { font-family:var(--font-body); font-size:clamp(2.8rem,8vw,4.5rem); font-weight:800; letter-spacing:-2px; margin-bottom:12px; line-height:1.1; }
         .discover-hero > p { color:var(--text-secondary); font-size:15px; max-width:480px; margin:0 auto 32px; line-height:1.7; }
+
+        /* TELEGRAM CTA */
+        .telegram-cta { background:linear-gradient(135deg, rgba(0,136,204,0.12), rgba(0,136,204,0.04)); border:1.5px solid rgba(0,136,204,0.25); border-radius:var(--radius-xl); padding:28px 20px; margin:0 auto 32px; max-width:480px; text-align:center; position:relative; overflow:hidden; }
+        .telegram-cta::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#0088cc,#00aaff); }
+        .telegram-pulse { width:64px; height:64px; background:linear-gradient(135deg,#0088cc,#00aaff); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px; color:#fff; animation:telegramPulse 2.2s infinite; box-shadow:0 0 24px rgba(0,136,204,0.45); position:relative; z-index:1; }
+        @keyframes telegramPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+        .telegram-cta h3 { font-size:18px; font-weight:800; margin-bottom:6px; color:var(--text-primary); }
+        .telegram-cta p { font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height:1.6; }
+        .arrow-anim { display:inline-block; animation:arrowBounce 1.2s infinite; margin-left:6px; font-size:18px; }
+        @keyframes arrowBounce { 0%,100%{transform:translateX(0)} 50%{transform:translateX(8px)} }
+
+        /* FLOATING TELEGRAM BUTTON */
+        .floating-telegram { position:fixed; bottom:90px; right:16px; width:60px; height:60px; background:linear-gradient(135deg,#0088cc,#00aaff); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:30px; z-index:999; box-shadow:0 4px 24px rgba(0,136,204,0.45); text-decoration:none; animation:floatPulse 2.5s infinite; transition:transform .3s; }
+        .floating-telegram:hover { transform:scale(1.1); }
+        .floating-telegram i { position:relative; z-index:2; }
+        .float-arrow { position:absolute; top:-18px; right:-4px; font-size:22px; animation:pointDown 1.4s infinite; z-index:3; filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+        @keyframes floatPulse { 0%,100%{box-shadow:0 4px 24px rgba(0,136,204,0.45)} 50%{box-shadow:0 6px 36px rgba(0,136,204,0.7)} }
+        @keyframes pointDown { 0%,100%{transform:translateY(0)} 50%{transform:translateY(10px)} }
+
         .discover-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:32px; max-width:600px; margin-inline:auto; }
         .discover-stat { text-align:center; padding:18px 8px; background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); transition:all .3s; position:relative; overflow:hidden; }
         .discover-stat::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--rose-soft),transparent); opacity:0; transition:opacity .3s; }
@@ -161,7 +182,8 @@
         .profile-card .card-name i { font-size:13px; color:var(--rose-light); }
         .profile-card .card-loc { font-size:12px; color:rgba(255,255,255,.8); display:flex; align-items:center; gap:4px; margin-top:4px; text-shadow:0 1px 3px rgba(0,0,0,.8); }
         .profile-card .card-bottom { display:flex; align-items:center; gap:6px; margin-top:10px; }
-        .profile-card .card-phone { font-size:11px; color:rgba(255,255,255,.6); display:flex; align-items:center; gap:4px; flex:1; }
+        .profile-card .card-phone { font-size:12px; color:#4ADE80; display:flex; align-items:center; gap:4px; flex:1; font-weight:600; text-shadow:0 1px 3px rgba(0,0,0,.8); }
+        .profile-card .card-phone i { font-size:10px; }
         .profile-card .card-lock { width:28px; height:28px; background:rgba(255,255,255,.12); backdrop-filter:blur(8px); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#FFF; font-size:12px; }
         .profile-card .hot-badge { background:linear-gradient(135deg,var(--rose-primary),var(--pink-accent)); color:#FFF; font-size:10px; font-weight:800; padding:5px 12px; border-radius:20px; text-transform:uppercase; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(225,29,72,.3); }
         .profile-card .online-badge { background:rgba(0,0,0,.5); backdrop-filter:blur(8px); padding:5px 12px; border-radius:20px; font-size:10px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:5px; }
@@ -203,14 +225,6 @@
         .plan-features { list-style:none; margin-bottom:28px; text-align:left; padding:0; }
         .plan-features li { margin-bottom:10px; font-size:14px; color:var(--text-secondary); display:flex; align-items:center; gap:10px; }
         .plan-features li i { color:#4ADE80; font-size:13px; }
-
-        .video-grid { display:grid; grid-template-columns:1fr; gap:16px; padding:0 4px; margin-top:12px; max-width:500px; margin-inline:auto; }
-        @media(min-width:768px){ .video-grid { grid-template-columns:repeat(2,1fr); max-width:800px; gap:20px; } }
-        .video-card { position:relative; border-radius:var(--radius-lg); overflow:hidden; aspect-ratio:9/16; background:#000; box-shadow:var(--shadow-md); border:1px solid var(--border-subtle); }
-        .blurred-video { width:100%; height:100%; object-fit:cover; filter:blur(20px) brightness(.5); transform:scale(1.1); pointer-events:none; }
-        .video-overlay { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:30px; text-align:center; background:rgba(0,0,0,.3); }
-        .video-overlay i { font-size:48px; color:rgba(255,255,255,.85); margin-bottom:20px; animation:floatLock 3s ease-in-out infinite; }
-        @keyframes floatLock { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
         .listing-container { max-width:600px; margin:0 auto; width:100%; padding:0 12px; }
         .form-card { background:var(--bg-card); border-radius:var(--radius-xl); padding:32px 24px; box-shadow:var(--shadow-md); border:1px solid var(--border-subtle); position:relative; overflow:hidden; }
@@ -288,7 +302,7 @@
         .footer-logo { display:flex; align-items:center; justify-content:center; gap:10px; font-size:18px; font-weight:800; margin-bottom:12px; letter-spacing:-0.3px; }
         .legal-text { font-size:10px; color:#4a5568; max-width:700px; margin:16px auto 0; line-height:1.7; }
 
-        /* EXCLUSIVE SECTION - HOOKUP THEME */
+        /* EXCLUSIVE SECTION */
         .exclusive-hero { text-align:center; padding:32px 16px 24px; }
         .exclusive-hero .crown-wrap { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--rose-soft),var(--pink-soft)); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; border:1px solid var(--border-subtle); box-shadow:0 0 20px var(--rose-glow); }
         .exclusive-hero .crown-wrap i { font-size:28px; color:var(--rose-primary); }
@@ -308,19 +322,26 @@
         .category-card .cat-arrow { align-self:center; color:var(--rose-primary); font-size:14px; transition:transform .3s; }
         .category-card:hover .cat-arrow { transform:translateX(4px); }
 
-        .live-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:0 4px; }
-        @media(min-width:640px){ .live-grid { grid-template-columns:repeat(3,1fr); gap:12px; } }
-        @media(min-width:1024px){ .live-grid { grid-template-columns:repeat(4,1fr); gap:14px; } }
-        .live-card { position:relative; border-radius:var(--radius-lg); overflow:hidden; aspect-ratio:3/4; cursor:pointer; transition:all .3s; box-shadow:var(--shadow-sm); border:1px solid var(--border-subtle); background:var(--bg-card); }
-        .live-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md), var(--shadow-rose); border-color:var(--border-hover); }
-        .live-card img, .live-card .live-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(12px) brightness(.4); transform:scale(1.1); }
-        .live-card .live-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.4) 50%, transparent 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:14px; z-index:2; }
-        .live-card .live-badge { position:absolute; top:12px; left:12px; background:#e11d48; color:#fff; font-size:9px; font-weight:800; padding:4px 10px; border-radius:6px; text-transform:uppercase; display:flex; align-items:center; gap:4px; z-index:3; box-shadow:0 2px 8px rgba(225,29,72,.4); }
-        .live-card .live-badge.video { background:linear-gradient(135deg,#8b5cf6,#06b6d4); }
-        .live-card .live-badge::before { content:''; width:6px; height:6px; background:#fff; border-radius:50%; animation:pulseOnline 2s infinite; }
-        .live-card .live-name { font-size:15px; font-weight:700; color:#fff; margin-bottom:2px; text-shadow:0 1px 4px rgba(0,0,0,.8); }
-        .live-card .live-meta { font-size:11px; color:rgba(255,255,255,.7); text-shadow:0 1px 3px rgba(0,0,0,.8); }
-        .live-card .live-action { position:absolute; bottom:0; left:0; right:0; padding:12px 14px; z-index:4; background:linear-gradient(to top, rgba(10,10,15,0.9), transparent); }
+        /* EXCLUSIVE VIDEOS */
+        .video-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:0 4px; }
+        @media(min-width:640px){ .video-grid { grid-template-columns:repeat(3,1fr); gap:12px; } }
+        @media(min-width:1024px){ .video-grid { grid-template-columns:repeat(4,1fr); gap:14px; } }
+        .video-card { position:relative; border-radius:var(--radius-lg); overflow:hidden; aspect-ratio:9/16; background:#000; box-shadow:var(--shadow-md); border:1px solid var(--border-subtle); cursor:pointer; }
+        .video-card video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+        .video-card.locked video { filter:blur(18px) brightness(0.35); transform:scale(1.1); pointer-events:none; }
+        .video-card.unlocked video { filter:none; transform:none; pointer-events:auto; }
+        .video-overlay { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:24px; text-align:center; background:rgba(0,0,0,.25); z-index:2; }
+        .video-overlay i { font-size:44px; color:rgba(255,255,255,.9); margin-bottom:16px; animation:floatLock 3s ease-in-out infinite; }
+        @keyframes floatLock { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .video-overlay p { font-size:14px; font-weight:700; color:#fff; margin-bottom:12px; text-shadow:0 2px 8px rgba(0,0,0,.8); }
+        .video-info { position:absolute; bottom:0; left:0; right:0; padding:12px 14px; background:linear-gradient(to top, rgba(10,10,15,0.95), transparent); z-index:3; }
+        .video-info .video-name { font-size:14px; font-weight:700; color:#fff; margin-bottom:2px; text-shadow:0 1px 4px rgba(0,0,0,.8); }
+        .video-info .video-meta { font-size:11px; color:rgba(255,255,255,.7); text-shadow:0 1px 3px rgba(0,0,0,.8); }
+
+        .telegram-more-banner { display:none; margin:24px 4px 0; background:linear-gradient(135deg, rgba(0,136,204,0.12), rgba(0,136,204,0.04)); border:1.5px solid rgba(0,136,204,0.25); border-radius:var(--radius-xl); padding:24px; text-align:center; }
+        .telegram-more-banner.show { display:block; animation:slideFadeUp .5s ease; }
+        .telegram-more-banner h3 { font-size:18px; margin-bottom:8px; font-weight:800; }
+        .telegram-more-banner p { font-size:13px; color:var(--text-secondary); margin-bottom:16px; }
 
         @media(min-width:768px){
             .desktop-header { display:flex!important; }
@@ -328,6 +349,7 @@
             .bottom-nav-wrapper { display:none!important; }
             #app-container { padding-bottom:40px!important; padding-top:80px!important; }
             .footer { padding-bottom:40px!important; }
+            .floating-telegram { bottom:32px; right:32px; }
         }
         @media(max-width:767px){
             .desktop-header { display:none!important; }
@@ -344,6 +366,11 @@
 
 <<canvas id="particleCanvas"></canvas>
 <div class="toast-container" id="toastContainer"></div>
+
+<a href="https://t.me/+fGpCbPYPH69iYmVk" target="_blank" class="floating-telegram" id="floatingTelegram" aria-label="Join Telegram">
+    <div class="float-arrow">👇</div>
+    <i class="fab fa-telegram"></i>
+</a>
 
 <<header class="desktop-header">
     <a class="logo nav-trigger" data-page="discover">
@@ -376,6 +403,17 @@
     <div class="discover-hero">
         <h1 class="gradient-text">AfroLink</h1>
         <p>Real connections, zero games. Browse verified profiles around you, unlock their WhatsApp, and make tonight unforgettable.</p>
+
+        <div class="telegram-cta reveal">
+            <div class="telegram-pulse"><i class="fab fa-telegram"></i></div>
+            <h3>More Videos on Telegram</h3>
+            <p>Exclusive content not shown here. Join our private channel for the full collection.</p>
+            <a href="https://t.me/+fGpCbPYPH69iYmVk" target="_blank" class="btn btn--telegram" style="width:auto;padding:12px 24px;">
+                <i class="fab fa-telegram"></i> Join Telegram Channel
+                <span class="arrow-anim">👉</span>
+            </a>
+        </div>
+
         <div class="discover-stats">
             <div class="discover-stat"><div class="discover-stat-number" data-count="2430">0</div><div class="discover-stat-label">Profiles</div></div>
             <div class="discover-stat"><div class="discover-stat-number" data-count="156">0</div><div class="discover-stat-label">Online</div></div>
@@ -447,7 +485,7 @@
     <div class="exclusive-hero">
         <div class="crown-wrap"><i class="fas fa-crown"></i></div>
         <h2 class="gradient-text">Premium Content</h2>
-        <p>Subscribe via M-Pesa and get instant access to exclusive channels.</p>
+        <p>Subscribe via M-Pesa and get instant access to exclusive videos.</p>
     </div>
 
     <div class="section-header-row">
@@ -456,10 +494,20 @@
     <div class="category-grid" id="category-grid"></div>
 
     <div class="section-header-row" style="margin-top:24px;">
-        <h3 class="gradient-text"><i class="fas fa-video"></i> Live Previews</h3>
-        <span style="font-size:12px;color:var(--text-muted);font-weight:600;">CHAT</span>
+        <h3 class="gradient-text"><i class="fas fa-video"></i> Exclusive Videos</h3>
+        <span style="font-size:12px;color:var(--text-muted);font-weight:600;">VIP</span>
     </div>
-    <div class="live-grid" id="live-grid"></div>
+    <div class="video-grid" id="exclusive-video-grid"></div>
+
+    <div class="telegram-more-banner" id="telegram-more-videos">
+        <div class="telegram-pulse" style="width:48px;height:48px;font-size:24px;margin-bottom:12px;"><i class="fab fa-telegram"></i></div>
+        <h3 class="gradient-text-pink">Want More?</h3>
+        <p>Hundreds of uncut videos available only on our Telegram channel.</p>
+        <a href="https://t.me/+fGpCbPYPH69iYmVk" target="_blank" class="btn btn--telegram" style="width:auto;padding:12px 28px;margin-inline:auto;">
+            <i class="fab fa-telegram"></i> Get All Videos on Telegram
+            <span class="arrow-anim">👉</span>
+        </a>
+    </div>
 </section>
 
 <section id="view-plans" class="spa-view">

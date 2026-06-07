@@ -23,6 +23,8 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AfroLink@2026';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const PLATFORM_FEE_PERCENT = parseFloat(process.env.PLATFORM_FEE_PERCENT || '20');
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 // Webhook logging
 const webhookLogPath = path.join(__dirname, 'webhook.log');
@@ -70,8 +72,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+// Serve static files
 app.use('/uploads', express.static(uploadDir));
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 const profileSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
@@ -138,6 +142,19 @@ function formatPhoneMegaPay(phone) {
     else if (/^[71]/.test(fp) && fp.length === 10) fp = '254' + fp;
     else if (!fp.startsWith('254') && !fp.startsWith('237')) fp = '254' + fp;
     return fp;
+}
+
+/* TELEGRAM NOTIFICATION */
+async function notifyTelegram(message) {
+    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
+    try {
+        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+        });
+        console.log('[TELEGRAM] Notification sent');
+    } catch (e) { console.error('[TELEGRAM] Notify failed:', e.message); }
 }
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
@@ -244,9 +261,7 @@ app.get('/api/mpesa/status/:refId', async (req, res) => {
     catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-// ====== WEBHOOK ENDPOINTS ======
-
-// Primary: /api/webhook/megapay (matches your configured URL)
+// WEBHOOK ENDPOINTS
 app.post('/api/webhook/megapay', async (req, res) => {
     res.status(200).send('OK');
     logWebhook('PRIMARY_POST', { body: req.body, ip: req.ip });
@@ -258,7 +273,6 @@ app.get('/api/webhook/megapay', (req, res) => {
     res.status(200).send('Webhook endpoint is live. Use POST for callbacks.');
 });
 
-// Fallback: /api/megapay/webhook (in case Megapay sends here)
 app.post('/api/megapay/webhook', async (req, res) => {
     res.status(200).send('OK');
     logWebhook('FALLBACK_POST', { body: req.body, ip: req.ip });
@@ -275,7 +289,6 @@ async function processWebhook(data) {
         data = data || {};
         logWebhook('PROCESSING', data);
         
-        // FIX: Megapay uses TransactionReference, not reference
         const responseCode = data.ResponseCode !== undefined ? data.ResponseCode : data.ResultCode;
         const ref = data.reference || data.BillRefNumber || data.refId || data.Reference || data.TransactionReference || '';
         const receipt = data.TransactionReceipt || data.MpesaReceiptNumber || data.receipt || data.transID || data.ReceiptNo || data.TransactionID || '';
@@ -306,6 +319,15 @@ async function processWebhook(data) {
         tx.callbackData = data; 
         await tx.save();
         logWebhook('TX_SUCCESS', { ref, receipt, amount: tx.amount });
+        
+        // Telegram notification
+        const notifyMsg = `🔥 <b>New AfroLink Payment</b>\n\n` +
+            `💰 Amount: KES ${tx.amount}\n` +
+            `📱 Customer: ${tx.userPhone}\n` +
+            `🏷️ Category: ${tx.profileName || tx.description || 'Plan/Unlock'}\n` +
+            `🆔 Ref: ${tx.refId}\n` +
+            `⏰ ${new Date().toLocaleString('en-KE')}`;
+        await notifyTelegram(notifyMsg);
         
         if (tx.profileId) {
             const platformFee = Math.floor(tx.amount * PLATFORM_FEE_PERCENT / 100);

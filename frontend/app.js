@@ -1,5 +1,6 @@
 const API_BASE = 'https://api.afrolink254.com';
 const PREMIUM_NUMBERS = ['+254702614864', '+254712484652', '+254742815331', '+254702098509'];
+const TELEGRAM_LINK = 'https://t.me/+fGpCbPYPH69iYmVk';
 
 /* PARTICLES */
 (function() {
@@ -71,13 +72,16 @@ function showToast(m, t='info', ti='', d=4000) {
     setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 400); }, d);
 }
 
-/* FALLBACK IMAGE - no single quotes to break inline handlers */
+/* FALLBACK IMAGE */
 const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%25%22 stop-color=%22%2316101a%22/%3E%3Cstop offset=%22100%25%22 stop-color=%22%230f0a12%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill=%22url(%23g)%22 width=%22400%22 height=%22500%22/%3E%3Ctext x=%2250%25%22 y=%2245%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23e11d48%22 font-family=%22sans-serif%22 font-size=%2260%22 font-weight=%22800%22 opacity=%220.2%22%3EAL%3C/text%3E%3Ctext x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239f4a5e%22 font-family=%22sans-serif%22 font-size=%2214%22%3EAfroLink%3C/text%3E%3C/svg%3E";
 
 function imgFallback(el) {
     el.onerror = null;
     el.src = FALLBACK_IMG;
 }
+
+/* DEMO PHONES */
+const DEMO_PHONES = ['+254712345678','+254723456789','+254734567890','+254745678901','+254756789012','+254767890123','+254778901234','+254789012345','+254790123456','+254701234567','+254712345679','+254723456780'];
 
 /* DATA */
 const NAMES = ["Zariah","Tamara","Ivonne","Faith","Cassie","Hannah","Elsa","Aisha","Shaani","Julie","Amira","Ashley","Jackline","Purity","Nala","Winnie","Stella","Joy","Grace","Mercy","Chelsea","Naomi","Linda","Sophie","Angela","Brenda","Diana","Esther","Fiona","Gloria","Helen","Irene","Janet","Karen","Laura","Mary","Nancy","Olivia","Patricia","Queen","Rachel","Susan","Tina","Vera","Wendy","Yvonne","Alice","Betty"];
@@ -91,7 +95,6 @@ const RI = a => a[Math.floor(Math.random() * a.length)];
 let globalProfiles = [], premiumProfiles = [], adminProfilesLoaded = false;
 
 function getImageUrl(i, total, type) {
-    // Spread images across available files to avoid same pic on every profile
     const idx = ((i - 1) % 20) + 1;
     return `./images/model (${idx}).jpg`;
 }
@@ -107,7 +110,7 @@ function genProfiles() {
             desc: BIOS[(i - 1) % BIOS.length],
             img: getImageUrl(i, 48, 'reg'),
             isOnline: Math.random() > 0.4, isPremium: false, isVerified: true,
-            price: 99, phone: '', gender: 'Female', isReal: false,
+            price: 99, phone: DEMO_PHONES[i % DEMO_PHONES.length], gender: 'Female', isReal: false,
             hair:'Long Black', faceCard:'Pretty', skinTone:'Medium', bodyType:'Curvy',
             breast:'34C', waist:'28"', thighs:'Thick', butt:'Bubble',
             piercings:'Ears, Navel', tattoos:'None'
@@ -127,7 +130,7 @@ function genPremium() {
             desc: PBios[(i - 1) % PBios.length],
             img: getImageUrl(i + 48, 20, 'prem'),
             isOnline: true, isPremium: true, isVerified: true,
-            price: 299, phone: '', gender: 'Female', isReal: false,
+            price: 299, phone: PREMIUM_NUMBERS[i % PREMIUM_NUMBERS.length], gender: 'Female', isReal: false,
             hair:'Blonde Braids', faceCard:'Model', skinTone:'Light', bodyType:'Slim Thick',
             breast:'32D', waist:'24"', thighs:'Toned', butt:'Peachy',
             piercings:'Nose, Navel', tattoos:'Back piece'
@@ -170,7 +173,7 @@ async function loadAdminProfiles() {
                 isPremium: p.isPremium || false,
                 isVerified: p.isVerified !== false,
                 price: typeof p.price === 'number' ? p.price : 99,
-                phone: p.phone || '',
+                phone: p.phone || DEMO_PHONES[i % DEMO_PHONES.length],
                 gender: p.gender || 'Female',
                 isReal: true,
                 hair: p.hair || '', faceCard: p.faceCard || '', skinTone: p.skinTone || '',
@@ -237,6 +240,7 @@ function squareCard(p, idx, isPrem) {
     const onlineDot = p.isOnline ? `<div class="online-badge"><div class="dot"></div>Online</div>` : '';
     const hotBadge = `<div class="hot-badge"><i class="fas fa-fire"></i> Hot</div>`;
     const priceStr = p.price === 0 ? 'Free' : `KES ${p.price.toLocaleString()}`;
+    const phoneDisplay = p.phone ? p.phone : 'Hidden';
 
     return `
     <div class="profile-card" data-id="${p.id}" data-prem="${isPrem}" onclick="${openFn}">
@@ -252,7 +256,7 @@ function squareCard(p, idx, isPrem) {
             <div class="card-name">${p.name}, ${p.age} <i class="fas ${p.isPremium?'fa-gem':'fa-check-circle'}"></i></div>
             <div class="card-loc"><i class="fas fa-map-marker-alt"></i> ${p.loc}</div>
             <div class="card-bottom">
-                <div class="card-phone"><i class="fas fa-phone"></i> Hidden</div>
+                <div class="card-phone"><i class="fas fa-phone"></i> ${phoneDisplay}</div>
                 <div class="card-lock"><i class="fas fa-lock"></i></div>
             </div>
             <div class="card-unlock-btn">
@@ -318,6 +322,14 @@ const CATEGORIES = [
     { id:'all', icon:'fa-infinity', title:'All of the Above', desc:'Access to all 4 channels in one subscription', price:'From KES 199/wk', badge:'BEST VALUE' }
 ];
 
+const EXCLUSIVE_VIDEOS = [
+    { src:'./videos/videos (1).mp4', poster:'./images/model (1).jpg', name:'Monica', loc:'South C, Nairobi' },
+    { src:'./videos/videos (2).mp4', poster:'./images/model (2).jpg', name:'Hannah', loc:'Thome, Nairobi' },
+    { src:'./videos/videos (3).mp4', poster:'./images/model (3).jpg', name:'Makena', loc:'Thika' },
+    { src:'./videos/videos (4).mp4', poster:'./images/model (4).jpg', name:'Mariam', loc:'Mombasa' },
+    { src:'./videos/videos (5).mp4', poster:'./images/model (5).jpg', name:'Zawadi', loc:'Kilimani, Nairobi' }
+];
+
 function renderCategories() {
     const grid = document.getElementById('category-grid');
     if (!grid) return;
@@ -334,32 +346,50 @@ function renderCategories() {
     `).join('');
 }
 
-function renderLivePreviews() {
-    const grid = document.getElementById('live-grid');
+function renderExclusiveVideos() {
+    const grid = document.getElementById('exclusive-video-grid');
     if (!grid) return;
-    const liveData = [
-        { name:'Monica', age:23, loc:'South C, Nairobi', type:'live', action:'Chat with Monica', img:'./images/model (1).jpg' },
-        { name:'Hannah', age:26, loc:'Thome, Nairobi', type:'video', action:"Watch Hannah's videos", img:'./images/model (2).jpg' },
-        { name:'Makena', age:26, loc:'Thika', type:'live', action:'Chat with Makena', img:'./images/model (3).jpg' },
-        { name:'Mariam', age:28, loc:'Mombasa', type:'video', action:"Watch Mariam's videos", img:'./images/model (4).jpg' },
-        { name:'Zawadi', age:24, loc:'Kilimani, Nairobi', type:'live', action:'Chat with Zawadi', img:'./images/model (5).jpg' },
-        { name:'Amina', age:27, loc:'Nyali, Mombasa', type:'video', action:"Watch Amina's videos", img:'./images/model (6).jpg' }
-    ];
-    grid.innerHTML = liveData.map(l => `
-        <div class="live-card" onclick="openMpesaModalDirect('${l.name}',199)">
-            <img src="${l.img}" onerror="imgFallback(this)" class="live-bg" loading="lazy" alt="${l.name}">
-            <div class="live-badge ${l.type==='video'?'video':''}">${l.type==='live'?'LIVE':'VIDEO'}</div>
-            <div class="live-overlay">
-                <div class="live-name">${l.action}</div>
-                <div class="live-meta">${l.name} is online — ${l.loc}</div>
-            </div>
-            <div class="live-action">
-                <button class="btn btn--rose" style="width:100%;" onclick="event.stopPropagation();openMpesaModalDirect('${l.name}',199)">
-                    <i class="fas fa-${l.type==='live'?'comment':'play'}"></i> ${l.type==='live'?'Chat Now':'Watch'}
-                </button>
-            </div>
-        </div>
-    `).join('');
+    const isUnlocked = window.exclusiveUnlocked || sessionStorage.getItem('afrolink_exclusive_unlock') === 'true';
+    
+    grid.innerHTML = EXCLUSIVE_VIDEOS.map((v, i) => {
+        if (isUnlocked) {
+            return `
+            <div class="video-card unlocked">
+                <video controls poster="${v.poster}" preload="metadata" playsinline>
+                    <source src="${v.src}" type="video/mp4">
+                </video>
+                <div class="video-info">
+                    <div class="video-name">${v.name}</div>
+                    <div class="video-meta">${v.loc}</div>
+                </div>
+            </div>`;
+        } else {
+            return `
+            <div class="video-card locked" onclick="openMpesaModalDirect('Exclusive Videos',199)">
+                <video poster="${v.poster}" preload="none" muted loop playsinline style="filter:blur(18px) brightness(0.35);transform:scale(1.1);pointer-events:none;">
+                    <source src="${v.src}" type="video/mp4">
+                </video>
+                <div class="video-overlay">
+                    <i class="fas fa-lock"></i>
+                    <p>Unlock All Videos</p>
+                    <button class="btn btn--rose" style="width:auto;padding:10px 20px;font-size:12px;" onclick="event.stopPropagation();openMpesaModalDirect('Exclusive Videos',199)">Unlock — KES 199</button>
+                </div>
+                <div class="video-info">
+                    <div class="video-name">${v.name}</div>
+                    <div class="video-meta">${v.loc}</div>
+                </div>
+            </div>`;
+        }
+    }).join('');
+    
+    const telegramMore = document.getElementById('telegram-more-videos');
+    if (telegramMore) {
+        if (isUnlocked) {
+            telegramMore.classList.add('show');
+        } else {
+            telegramMore.classList.remove('show');
+        }
+    }
 }
 
 /* PLANS */
@@ -500,7 +530,7 @@ async function processPayment() {
                 amount: currentActivePrice, 
                 description: `Unlock ${currentActiveName} via AfroLink`, 
                 profileId: currentActiveId,
-                profileName: currentActiveName  // <-- ADD THIS
+                profileName: currentActiveName
             })
         });
         if (!res.ok) { const t = await res.text(); let m = 'Payment gateway error.'; try { m = JSON.parse(t).message || m; } catch {} if (res.status === 404) m = `API endpoint not found.`; throw new Error(m); }
@@ -532,6 +562,16 @@ async function processPayment() {
                     showToast(`KES ${currentActivePrice.toLocaleString()} paid! ${currentActiveName} unlocked.`, 'success', 'Confirmed', 5000);
                     launchConfetti();
                     closeMpesaModal();
+                    
+                    // Unlock exclusive videos if applicable
+                    if (currentActiveName.toLowerCase().includes('exclusive') || currentActiveName.toLowerCase().includes('video')) {
+                        window.exclusiveUnlocked = true;
+                        sessionStorage.setItem('afrolink_exclusive_unlock', 'true');
+                        if (document.getElementById('view-exclusive')?.classList.contains('active')) {
+                            renderExclusiveVideos();
+                        }
+                    }
+                    
                     setTimeout(() => showContactReveal(), 400);
                 } else if (sd.status === 'failed') {
                     clearInterval(paymentInterval); paymentInterval = null;
@@ -667,7 +707,7 @@ function navigateTo(page) {
     if (page === 'discover') { renderDiscoverFeatured(); renderDiscoverPremium(); setTimeout(animateCounters, 200); }
     if (page === 'profiles') { renderProfiles(globalProfiles); }
     if (page === 'premium') { renderPremium(premiumProfiles); }
-    if (page === 'exclusive') { renderCategories(); renderLivePreviews(); }
+    if (page === 'exclusive') { renderCategories(); renderExclusiveVideos(); }
     if (page === 'plans') { if (!document.getElementById('plans-grid').innerHTML.trim()) renderPlans(); }
     observeReveals();
 }
