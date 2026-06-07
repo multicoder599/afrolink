@@ -110,7 +110,7 @@ function genProfiles() {
             desc: BIOS[(i - 1) % BIOS.length],
             img: getImageUrl(i, 48, 'reg'),
             isOnline: Math.random() > 0.4, isPremium: false, isVerified: true,
-            price: 99, phone: DEMO_PHONES[i % DEMO_PHONES.length], gender: 'Female', isReal: false,
+            price: 199, phone: DEMO_PHONES[i % DEMO_PHONES.length], gender: 'Female', isReal: false,
             hair:'Long Black', faceCard:'Pretty', skinTone:'Medium', bodyType:'Curvy',
             breast:'34C', waist:'28"', thighs:'Thick', butt:'Bubble',
             piercings:'Ears, Navel', tattoos:'None'
@@ -172,7 +172,7 @@ async function loadAdminProfiles() {
                 isOnline: p.isOnline || false,
                 isPremium: p.isPremium || false,
                 isVerified: p.isVerified !== false,
-                price: typeof p.price === 'number' ? p.price : 99,
+                price: typeof p.price === 'number' ? p.price : 199,
                 phone: p.phone || DEMO_PHONES[i % DEMO_PHONES.length],
                 gender: p.gender || 'Female',
                 isReal: true,
@@ -315,11 +315,11 @@ function filterByLocation(val) {
 
 /* EXCLUSIVE SECTION */
 const CATEGORIES = [
-    { id:'kenyan', icon:'fa-exclamation-triangle', title:'Kenyan Porn', desc:'Premium Kenyan adult content', price:'From KES 99/wk' },
-    { id:'trending', icon:'fa-fire', title:'Trending Leaks', desc:'Latest viral & trending leaked content', price:'From KES 99/wk' },
-    { id:'somali', icon:'fa-heart', title:'Somali Porn', desc:'Exclusive Somali adult content', price:'From KES 99/wk' },
-    { id:'celebrity', icon:'fa-gem', title:'Celebrity Leaks', desc:'Exclusive celebrity & influencer content', price:'From KES 99/wk' },
-    { id:'all', icon:'fa-infinity', title:'All of the Above', desc:'Access to all 4 channels in one subscription', price:'From KES 199/wk', badge:'BEST VALUE' }
+    { id:'kenyan', icon:'fa-exclamation-triangle', title:'Kenyan Porn', desc:'Premium Kenyan adult content', price:'From KES 199/wk' },
+    { id:'trending', icon:'fa-fire', title:'Trending Leaks', desc:'Latest viral & trending leaked content', price:'From KES 199/wk' },
+    { id:'somali', icon:'fa-heart', title:'Somali Porn', desc:'Exclusive Somali adult content', price:'From KES 199/wk' },
+    { id:'celebrity', icon:'fa-gem', title:'Celebrity Leaks', desc:'Exclusive celebrity & influencer content', price:'From KES 199/wk' },
+    { id:'all', icon:'fa-infinity', title:'All of the Above', desc:'Access to all 4 channels in one subscription', price:'From KES 299/wk', badge:'BEST VALUE' }
 ];
 
 const EXCLUSIVE_VIDEOS = [
@@ -334,7 +334,7 @@ function renderCategories() {
     const grid = document.getElementById('category-grid');
     if (!grid) return;
     grid.innerHTML = CATEGORIES.map(cat => `
-        <div class="category-card" onclick="openMpesaModalDirect('${cat.title}',99)">
+        <div class="category-card" onclick="openMpesaModalDirect('${cat.title}',199)">
             <div class="cat-icon"><i class="fas ${cat.icon}"></i></div>
             <div class="cat-body">
                 <div class="cat-title">${cat.title}</div>
@@ -394,8 +394,8 @@ function renderExclusiveVideos() {
 
 /* PLANS */
 const PLANS = [
-    { title: "Basic Unlock", price: 299, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Basic" },
-    { title: "Starter Pack", price: 399, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Start Pack" },
+    { title: "Basic Unlock", price: 199, icon: "fa-unlock", desc: "Unlock 3 contacts", features: ["Unlock 3 WhatsApp contacts","View full bios & descriptions","Access to exclusive photos","24h validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Basic" },
+    { title: "Starter Pack", price: 299, icon: "fa-rocket", desc: "Unlock 10 contacts", features: ["Unlock 10 WhatsApp contacts","Priority profile visibility","See who viewed your profile","3-day validity"], badge: null, popular: false, btn: "btn--rose", btnText: "Start Pack" },
     { title: "Live Chat", price: 299, icon: "fa-comments", desc: "Unlimited messaging", features: ["Unlimited in-app messaging","Send photos & voice notes","Real-time chat with any profile","Priority support"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Chat" },
     { title: "Weekend Special", price: 499, icon: "fa-moon", desc: "Full weekend access", features: ["All features for 48 hours","Unlimited unlocks","Access to all exclusive content","Weekend-only pricing"], badge: "Hot", popular: false, btn: "btn--rose", btnText: "Get Weekend" },
     { title: "Video Chat", price: 399, icon: "fa-video", desc: "1-on-1 video calls", features: ["Private 1-on-1 video calls","HD streaming quality","Encrypted & secure","Schedule calls in advance"], badge: null, popular: false, btn: "btn--rose", btnText: "Get Video" },
@@ -444,7 +444,7 @@ function showDetailModal(p) {
     const descEl = document.getElementById('detail-desc');
     if (descEl) descEl.innerText = p.desc || 'No description available.';
     const priceEl = document.getElementById('detail-price');
-    if (priceEl) priceEl.innerText = (p.price || 99).toLocaleString();
+    if (priceEl) priceEl.innerText = (p.price || 199).toLocaleString();
 
     const attrsContainer = document.getElementById('detail-attrs-container');
     const attrsGrid = document.getElementById('detail-attrs');
@@ -483,7 +483,7 @@ function openMpesaFromDetail() {
 
 /* MPESA MODAL */
 const mpesaModal = document.getElementById('mpesaModal');
-let currentActiveName = '', currentActivePrice = 99, currentActiveId = '', currentActiveIsPremium = false, paymentInterval = null;
+let currentActiveName = '', currentActivePrice = 199, currentActiveId = '', currentActiveIsPremium = false, paymentInterval = null;
 
 function openMpesaModalDirect(name, price, id = '', isPremium = false) {
     currentActiveName = name; currentActivePrice = price; currentActiveId = id; currentActiveIsPremium = isPremium;

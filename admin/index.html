@@ -833,7 +833,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Age</label>
-                                <input type="number" id="pAge" required min="18" max="99" placeholder="18+" />
+                                <input type="number" id="pAge" required min="18" max="199" placeholder="18+" />
                             </div>
                         </div>
                         <div class="form-grid-2">
@@ -937,7 +937,7 @@
 
                         <div class="form-group">
                             <label>Unlock Price (KES)</label>
-                            <input type="number" id="pPrice" value="99" min="10" required />
+                            <input type="number" id="pPrice" value="199" min="10" required />
                         </div>
                         <div class="form-group">
                             <label>Profile Photo</label>
@@ -1127,7 +1127,7 @@
                     <td><strong style="color:var(--text);">${p.name}</strong><br><small style="color:var(--muted)">${p.gender}</small></td>
                     <td>${p.age}</td>
                     <td>${p.location}<br><small style="color:var(--muted)">${p.county}</small></td>
-                    <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">KES ${p.price || 99}</td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">KES ${p.price || 199}</td>
                     <td>
                         ${p.active !== false ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">Inactive</span>'}
                         ${p.isPremium ? '<span class="badge badge-gold">VIP</span>' : ''}
@@ -1268,7 +1268,7 @@
             document.getElementById('pLocation').value = p.location;
             document.getElementById('pPhone').value = p.phone;
             document.getElementById('pBio').value = p.bio;
-            document.getElementById('pPrice').value = p.price || 99;
+            document.getElementById('pPrice').value = p.price || 199;
 
             document.getElementById('pHair').value = p.hair || '';
             document.getElementById('pFaceCard').value = p.faceCard || '';
