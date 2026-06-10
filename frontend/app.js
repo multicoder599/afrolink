@@ -90,6 +90,17 @@ const BIOS = ["I'm a fun-loving girl looking for a generous man to spoil me. Let
 const PNames = ["Rozie","Diamond","Pearl","Crystal","Ruby","Sapphire","Amber","Jade","Chloe","Valentina","Scarlett","Bella","Athena","Gia","Luna","Venus","Ivy","Nova","Aria","Mia"];
 const PLocs = ["Kilimani, Nairobi","Westlands, Nairobi","Nyali, Mombasa","Lavington, Nairobi","Kileleshwa, Nairobi","Karen, Nairobi","Spring Valley, Nairobi","Runda, Nairobi","Kitisuru, Nairobi","Muthaiga, Nairobi","Rosslyn, Nairobi","Loresho, Nairobi","Ridgeways, Nairobi","Lower Kabete, Nairobi","Kilimani, Nairobi","Westlands, Nairobi","Nyali, Mombasa","Lavington, Nairobi","Kileleshwa, Nairobi","Karen, Nairobi"];
 const PBios = ["VIP exclusive. Only for the elite gentlemen who appreciate true luxury. Your discretion is guaranteed.","Premium companion for exclusive arrangements. I offer an experience, not just a meeting.","High-end experience. Book in advance for unforgettable moments you'll never forget.","Elite tier only. Are you ready for the ultimate treat? I promise you won't regret it.","Luxury redefined. Premium rates for premium experiences. Quality over quantity always.","Top-tier companion. Exclusive access for verified members only. The best is kept private.","An experience crafted for the discerning gentleman. Unlock to enter my world.","Where sophistication meets sensuality. I cater to those who demand the very best."];
+
+/* SHUFFLE UTIL */
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 const RI = a => a[Math.floor(Math.random() * a.length)];
 
 let globalProfiles = [], premiumProfiles = [], adminProfilesLoaded = false;
@@ -100,43 +111,81 @@ function getImageUrl(i, total, type) {
 }
 
 function genProfiles() {
+    // Shuffle data arrays for fresh combinations every session
+    const shuffledNames = shuffleArray(NAMES);
+    const shuffledLocs = shuffleArray(LOCS);
+    const shuffledBios = shuffleArray(BIOS);
+    const shuffledPhones = shuffleArray(DEMO_PHONES);
+
     const arr = [];
     for (let i = 1; i <= 48; i++) {
         const idx = ((i - 1) % 20) + 1;
         arr.push({
-            id: 'reg_' + i, name: NAMES[i - 1] || RI(NAMES),
+            id: 'reg_' + i, 
+            name: shuffledNames[(i - 1) % shuffledNames.length] || RI(NAMES),
             age: Math.floor(Math.random() * (32 - 19 + 1)) + 19,
-            loc: LOCS[(i - 1) % LOCS.length],
-            desc: BIOS[(i - 1) % BIOS.length],
+            loc: shuffledLocs[(i - 1) % shuffledLocs.length],
+            desc: shuffledBios[(i - 1) % shuffledBios.length],
             img: getImageUrl(i, 48, 'reg'),
-            isOnline: Math.random() > 0.4, isPremium: false, isVerified: true,
-            price: 199, phone: DEMO_PHONES[i % DEMO_PHONES.length], gender: 'Female', isReal: false,
-            hair:'Long Black', faceCard:'Pretty', skinTone:'Medium', bodyType:'Curvy',
-            breast:'34C', waist:'28"', thighs:'Thick', butt:'Bubble',
-            piercings:'Ears, Navel', tattoos:'None'
+            isOnline: Math.random() > 0.4, 
+            isPremium: false, 
+            isVerified: true,
+            price: 199, 
+            phone: shuffledPhones[i % shuffledPhones.length], 
+            gender: 'Female', 
+            isReal: false,
+            hair:'Long Black', 
+            faceCard:'Pretty', 
+            skinTone:'Medium', 
+            bodyType:'Curvy',
+            breast:'34C', 
+            waist:'28"', 
+            thighs:'Thick', 
+            butt:'Bubble',
+            piercings:'Ears, Navel', 
+            tattoos:'None'
         });
     }
-    return arr;
+    // Shuffle final array so order changes every refresh
+    return shuffleArray(arr);
 }
 
 function genPremium() {
+    const shuffledPNames = shuffleArray(PNames);
+    const shuffledPLocs = shuffleArray(PLocs);
+    const shuffledPBios = shuffleArray(PBios);
+
     const arr = [];
     for (let i = 1; i <= 20; i++) {
         const idx = ((i - 1) % 20) + 1;
         arr.push({
-            id: 'prem_' + i, name: PNames[i - 1] || ('VIP ' + i),
+            id: 'prem_' + i, 
+            name: shuffledPNames[i - 1] || ('VIP ' + i),
             age: Math.floor(Math.random() * (28 - 20 + 1)) + 20,
-            loc: PLocs[i - 1],
-            desc: PBios[(i - 1) % PBios.length],
+            loc: shuffledPLocs[i - 1],
+            desc: shuffledPBios[(i - 1) % shuffledPBios.length],
             img: getImageUrl(i + 48, 20, 'prem'),
-            isOnline: true, isPremium: true, isVerified: true,
-            price: 299, phone: PREMIUM_NUMBERS[i % PREMIUM_NUMBERS.length], gender: 'Female', isReal: false,
-            hair:'Blonde Braids', faceCard:'Model', skinTone:'Light', bodyType:'Slim Thick',
-            breast:'32D', waist:'24"', thighs:'Toned', butt:'Peachy',
-            piercings:'Nose, Navel', tattoos:'Back piece'
+            isOnline: true, 
+            isPremium: true, 
+            isVerified: true,
+            price: 299, 
+            phone: PREMIUM_NUMBERS[0], 
+            gender: 'Female', 
+            isReal: false,
+            hair:'Blonde Braids', 
+            faceCard:'Model', 
+            skinTone:'Light', 
+            bodyType:'Slim Thick',
+            breast:'32D', 
+            waist:'24"', 
+            thighs:'Toned', 
+            butt:'Peachy',
+            piercings:'Nose, Navel', 
+            tattoos:'Back piece'
         });
     }
-    return arr;
+    // Shuffle premium order too
+    return shuffleArray(arr);
 }
 
 function resolveImageUrl(url) {
@@ -173,17 +222,20 @@ async function loadAdminProfiles() {
                 isPremium: p.isPremium || false,
                 isVerified: p.isVerified !== false,
                 price: typeof p.price === 'number' ? p.price : 199,
-                phone: p.phone || DEMO_PHONES[i % DEMO_PHONES.length],
+                phone: p.phone || PREMIUM_NUMBERS[0],
                 gender: p.gender || 'Female',
                 isReal: true,
                 hair: p.hair || '', faceCard: p.faceCard || '', skinTone: p.skinTone || '',
                 bodyType: p.bodyType || '', breast: p.breast || '', waist: p.waist || '',
                 thighs: p.thighs || '', butt: p.butt || '', piercings: p.piercings || '', tattoos: p.tattoos || ''
             }));
-            const adminRegular = mapped.filter(p => !p.isPremium);
-            const adminPremium = mapped.filter(p => p.isPremium);
-            globalProfiles = [...adminRegular, ...genProfiles()];
-            premiumProfiles = [...adminPremium, ...genPremium()];
+            // Shuffle admin profiles too
+            const shuffledMapped = shuffleArray(mapped);
+            const adminRegular = shuffledMapped.filter(p => !p.isPremium);
+            const adminPremium = shuffledMapped.filter(p => p.isPremium);
+            // Mix admin with generated, shuffle again
+            globalProfiles = shuffleArray([...adminRegular, ...genProfiles()]);
+            premiumProfiles = shuffleArray([...adminPremium, ...genPremium()]);
             adminProfilesLoaded = true;
         } else { throw new Error('Empty admin database'); }
     } catch (err) {
@@ -269,27 +321,34 @@ function squareCard(p, idx, isPrem) {
 function renderProfiles(list) {
     const grid = document.getElementById('dynamic-profile-grid');
     if (!grid) return;
-    if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Profiles Found</h2><p>No profiles match your filters.</p></div>`; return; }
-    grid.innerHTML = list.map((p, i) => squareCard(p, i, false)).join('');
+    // Re-shuffle on every render for dynamic feel
+    const shuffled = shuffleArray(list);
+    if (!shuffled.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Profiles Found</h2><p>No profiles match your filters.</p></div>`; return; }
+    grid.innerHTML = shuffled.map((p, i) => squareCard(p, i, false)).join('');
 }
 
 function renderPremium(list) {
     const grid = document.getElementById('dynamic-premium-grid');
     if (!grid) return;
-    if (!list.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Premium Profiles</h2><p>Check back soon for new VIP members.</p></div>`; return; }
-    grid.innerHTML = list.map((p, i) => squareCard(p, i, true)).join('');
+    const shuffled = shuffleArray(list);
+    if (!shuffled.length) { grid.innerHTML = `<div class="empty-state-box"><i class="fas fa-search"></i><h2>No Premium Profiles</h2><p>Check back soon for new VIP members.</p></div>`; return; }
+    grid.innerHTML = shuffled.map((p, i) => squareCard(p, i, true)).join('');
 }
 
 function renderDiscoverFeatured() {
     const row = document.getElementById('discover-featured-row');
     if (!row) return;
-    row.innerHTML = globalProfiles.slice(0, 6).map((p, i) => squareCard(p, i, false)).join('');
+    // Pick 6 random profiles each time
+    const pool = shuffleArray(globalProfiles);
+    row.innerHTML = pool.slice(0, 6).map((p, i) => squareCard(p, i, false)).join('');
 }
 
 function renderDiscoverPremium() {
     const row = document.getElementById('discover-premium-row');
     if (!row) return;
-    row.innerHTML = premiumProfiles.slice(0, 6).map((p, i) => squareCard(p, i, true)).join('');
+    // Pick 6 random premium each time
+    const pool = shuffleArray(premiumProfiles);
+    row.innerHTML = pool.slice(0, 6).map((p, i) => squareCard(p, i, true)).join('');
 }
 
 /* FILTERS */
@@ -350,7 +409,7 @@ function renderExclusiveVideos() {
     const grid = document.getElementById('exclusive-video-grid');
     if (!grid) return;
     const isUnlocked = window.exclusiveUnlocked || sessionStorage.getItem('afrolink_exclusive_unlock') === 'true';
-    
+
     grid.innerHTML = EXCLUSIVE_VIDEOS.map((v, i) => {
         if (isUnlocked) {
             return `
@@ -381,7 +440,7 @@ function renderExclusiveVideos() {
             </div>`;
         }
     }).join('');
-    
+
     const telegramMore = document.getElementById('telegram-more-videos');
     if (telegramMore) {
         if (isUnlocked) {
@@ -562,7 +621,7 @@ async function processPayment() {
                     showToast(`KES ${currentActivePrice.toLocaleString()} paid! ${currentActiveName} unlocked.`, 'success', 'Confirmed', 5000);
                     launchConfetti();
                     closeMpesaModal();
-                    
+
                     // Unlock exclusive videos if applicable
                     if (currentActiveName.toLowerCase().includes('exclusive') || currentActiveName.toLowerCase().includes('video')) {
                         window.exclusiveUnlocked = true;
@@ -571,7 +630,7 @@ async function processPayment() {
                             renderExclusiveVideos();
                         }
                     }
-                    
+
                     setTimeout(() => showContactReveal(), 400);
                 } else if (sd.status === 'failed') {
                     clearInterval(paymentInterval); paymentInterval = null;
@@ -596,7 +655,7 @@ function updateSteps(idx) {
     });
 }
 
-/* CONTACT REVEAL */
+/* CONTACT REVEAL - ALWAYS SINGLE PREMIUM NUMBER */
 function showContactReveal() {
     const modal = document.getElementById('contactRevealModal');
     const content = document.getElementById('contactRevealContent');
@@ -605,41 +664,23 @@ function showContactReveal() {
     content.innerHTML = `<div class="spinner-lg" style="width:50px;height:50px;border:4px solid rgba(255,255,255,.2);border-top-color:#4ADE80;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;"></div><h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Payment Successful!</h3><p style="color:var(--text-secondary);font-size:14px;">Revealing details shortly...</p>`;
 
     setTimeout(() => {
-        let displayPhone = '';
-        let isPremiumFlow = currentActiveIsPremium;
-        if (isPremiumFlow) {
-            displayPhone = PREMIUM_NUMBERS[Math.floor(Math.random() * PREMIUM_NUMBERS.length)];
-        } else {
-            const list = globalProfiles;
-            const p = list.find(x => x.id === currentActiveId);
-            if (p && p.phone && p.phone.trim() !== '') displayPhone = p.phone;
-        }
+        // ALWAYS use the single premium number regardless of profile
+        const displayPhone = PREMIUM_NUMBERS[0];
+        const waLink = `https://wa.me/${displayPhone.replace(/\D/g,'')}`;
 
-        if (displayPhone) {
-            const waLink = `https://wa.me/${displayPhone.replace(/\D/g,'')}`;
-            content.innerHTML = `
-                <div style="width:70px;height:70px;border-radius:50%;background:rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(74,222,128,.3);">
-                    <i class="fas fa-phone-alt" style="font-size:28px;color:#4ADE80;"></i>
-                </div>
-                <h3 style="font-size:20px;margin-bottom:4px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Contact Unlocked!</h3>
-                <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Reach out via WhatsApp</p>
-                <div style="font-size:26px;font-weight:800;color:#4ADE80;letter-spacing:1px;margin:16px 0;">
-                    <a href="${waLink}" target="_blank" style="color:inherit;text-decoration:none;">${displayPhone}</a>
-                </div>
-                <a href="${waLink}" target="_blank" class="btn btn--gold" style="margin-top:8px;text-decoration:none;"><i class="fab fa-whatsapp"></i> Open WhatsApp</a>
-                <p style="font-size:11px;color:var(--text-muted);margin-top:16px;"><i class="fas fa-shield-alt"></i> Discretion guaranteed. Do not share this number.</p>
-                <button class="btn btn--outline" style="margin-top:12px;" onclick="closeContactRevealModal()"><i class="fas fa-times"></i> Close</button>
-            `;
-        } else {
-            content.innerHTML = `
-                <div style="width:70px;height:70px;border-radius:50%;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid var(--border-subtle);">
-                    <i class="fas fa-hourglass-half" style="font-size:28px;color:var(--rose-primary);"></i>
-                </div>
-                <h3 style="font-size:20px;margin-bottom:8px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Payment Received!</h3>
-                <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;margin-bottom:20px;">Your payment is confirmed. The member will reach out to you shortly on your M-Pesa number.</p>
-                <button class="btn btn--rose" onclick="closeContactRevealAndGoHome()"><i class="fas fa-compass"></i> Back to Discover</button>
-            `;
-        }
+        content.innerHTML = `
+            <div style="width:70px;height:70px;border-radius:50%;background:rgba(74,222,128,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid rgba(74,222,128,.3);">
+                <i class="fas fa-phone-alt" style="font-size:28px;color:#4ADE80;"></i>
+            </div>
+            <h3 style="font-size:20px;margin-bottom:4px;color:var(--text-primary);font-weight:800;letter-spacing:-0.3px;">Contact Unlocked!</h3>
+            <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Reach out via WhatsApp</p>
+            <div style="font-size:26px;font-weight:800;color:#4ADE80;letter-spacing:1px;margin:16px 0;">
+                <a href="${waLink}" target="_blank" style="color:inherit;text-decoration:none;">${displayPhone}</a>
+            </div>
+            <a href="${waLink}" target="_blank" class="btn btn--gold" style="margin-top:8px;text-decoration:none;"><i class="fab fa-whatsapp"></i> Open WhatsApp</a>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:16px;"><i class="fas fa-shield-alt"></i> Discretion guaranteed. Do not share this number.</p>
+            <button class="btn btn--outline" style="margin-top:12px;" onclick="closeContactRevealModal()"><i class="fas fa-times"></i> Close</button>
+        `;
     }, 2500);
 }
 
